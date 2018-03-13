@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "./node_modules/grunt-cli/bin/grunt",
+    "watch": "./node_modules/grunt-cli/bin/grunt watch",
     "test": "./node_modules/grunt-cli/bin/grunt mochaTest"
   },
   "repository": {
@@ -16,9 +17,6 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/grafana/simple-json-datasource/issues"
-  },
-  "engines": {
-    "node": "6.10.0"
   },
   "engineStrict": true,
   "devDependencies": {
