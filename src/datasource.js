@@ -18,39 +18,22 @@ export class GenericDatasource {
   }
 
   query(options) {
-
-    console.log(options);
-    // var query = this.buildQueryParameters(options);
-    // query.targets = query.targets.filter(t => !t.hide);
-    //
-    // if (query.targets.length <= 0) {
-    //   return this.q.when({data: []});
-    // }
-    //
+    
     let allPromises = [];
     let allTargetResults = {data:[]};
     let self = this;
-    let results = [1,2,3];
-
 
     _.forEach(options.targets,function(target){
-      let targetid = target.target;
       allPromises.push(this.doRequest({
-        url: this.url + '/Datastreams('+targetid.toString()+')/Observations',
+        url: this.url + '/Datastreams('+target.target.toString()+')/Observations',
         // data: query,
         method: 'GET'
       }).then(function(response){
-        // console.log(response.data.value);
-        // let values = response.data.value;
         let filtered = _.map(response.data.value,function(value,index){
           return [value.result,moment(new Date(value.resultTime)).format('x')];
         });
-        // response.data = {
-        //   'target' : 18,
-        //   'datapoints' : filtered
-        // };
         return {
-          'target' : 18,
+          'target' : target.target.toString(),
           'datapoints' : filtered
         };
       }));
@@ -58,21 +41,11 @@ export class GenericDatasource {
     }.bind(this));
 
     return Promise.all(allPromises).then(function(values) {
-      // console.log(allTargetResults);
       _.forEach(values,function(value){
-        // console.log(self.allTargetResults);
         allTargetResults.data.push(value);
       });
-      console.log(allTargetResults);
       return allTargetResults;
-      // console.log("resolved all promises");
-      // console.log(allTargetResults);
-    // return allTargetResults;
     });
-    // console.log(randdsf);
-    // console.log(allTargetResults);
-    // console.log(allPromises);
-    // return result;
   }
 
   testDatasource() {
