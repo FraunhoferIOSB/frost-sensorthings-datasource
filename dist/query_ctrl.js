@@ -74,8 +74,12 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
 
         _createClass(GenericDatasourceQueryCtrl, [{
           key: 'getOptions',
-          value: function getOptions(query) {
-            return this.datasource.metricFindQuery(query || '');
+          value: function getOptions(query, key) {
+            var metricTypes = {
+              'sensors': "/Sensors",
+              'datastreams': "/Datastreams"
+            };
+            return this.datasource.metricFindQuery(query || '', metricTypes[key]);
           }
         }, {
           key: 'toggleEditorMode',

@@ -6,8 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "./node_modules/grunt-cli/bin/grunt",
-    "watch": "./node_modules/grunt-cli/bin/grunt watch",
-    "test": "./node_modules/grunt-cli/bin/grunt mochaTest"
+    "watch": "./node_modules/grunt-cli/bin/grunt && ./node_modules/grunt-cli/bin/grunt watch"
   },
   "repository": {
     "type": "git",

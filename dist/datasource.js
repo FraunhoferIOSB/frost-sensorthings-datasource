@@ -54,26 +54,30 @@ System.register(['lodash'], function (_export, _context) {
         _createClass(GenericDatasource, [{
           key: 'query',
           value: function query(options) {
+
+            console.log(options);
+            console.log("options");
             var query = this.buildQueryParameters(options);
-            query.targets = query.targets.filter(function (t) {
-              return !t.hide;
-            });
-
-            if (query.targets.length <= 0) {
-              return this.q.when({ data: [] });
-            }
-
-            return this.doRequest({
-              url: this.url + '/query',
-              data: query,
-              method: 'POST'
-            });
+            // query.targets = query.targets.filter(t => !t.hide);
+            //
+            // if (query.targets.length <= 0) {
+            //   return this.q.when({data: []});
+            // }
+            //
+            // let result = this.doRequest({
+            //   url: this.url + '/query',
+            //   data: query,
+            //   method: 'POST'
+            // });
+            //
+            // // console.log(result);
+            // return result;
           }
         }, {
           key: 'testDatasource',
           value: function testDatasource() {
             return this.doRequest({
-              url: this.url + '/',
+              url: this.url,
               method: 'GET'
             }).then(function (response) {
               if (response.status === 200) {
@@ -102,33 +106,40 @@ System.register(['lodash'], function (_export, _context) {
               method: 'POST',
               data: annotationQuery
             }).then(function (result) {
+              // console.log(result.data);
               return result.data;
             });
           }
         }, {
           key: 'metricFindQuery',
-          value: function metricFindQuery(query) {
+          value: function metricFindQuery(query, suburl) {
             var interpolated = {
               target: this.templateSrv.replace(query, null, 'regex')
             };
 
             return this.doRequest({
-              url: this.url + '/search',
+              url: this.url + suburl,
               data: interpolated,
-              method: 'POST'
+              method: 'GET'
             }).then(this.mapToTextValue);
           }
         }, {
           key: 'mapToTextValue',
           value: function mapToTextValue(result) {
-            return _.map(result.data, function (d, i) {
-              if (d && d.text && d.value) {
-                return { text: d.text, value: d.value };
-              } else if (_.isObject(d)) {
-                return { text: d, value: i };
-              }
-              return { text: d, value: d };
+            return _.map(result.data.value, function (data, index) {
+              return {
+                text: data.name,
+                value: data['@iot.id']
+              };
             });
+            // return _.map(result.data, (d, i) => {
+            //   if (d && d.text && d.value) {
+            //     return { text: d.text, value: d.value };
+            //   } else if (_.isObject(d)) {
+            //     return { text: d, value: i};
+            //   }
+            //   return { text: d, value: d };
+            // });
           }
         }, {
           key: 'doRequest',
@@ -158,7 +169,6 @@ System.register(['lodash'], function (_export, _context) {
             });
 
             options.targets = targets;
-
             return options;
           }
         }]);

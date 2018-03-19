@@ -17,23 +17,29 @@ export class GenericDatasource {
   }
 
   query(options) {
+
+    console.log(options);
+    console.log("options");
     var query = this.buildQueryParameters(options);
-    query.targets = query.targets.filter(t => !t.hide);
-
-    if (query.targets.length <= 0) {
-      return this.q.when({data: []});
-    }
-
-    return this.doRequest({
-      url: this.url + '/query',
-      data: query,
-      method: 'POST'
-    });
+    // query.targets = query.targets.filter(t => !t.hide);
+    //
+    // if (query.targets.length <= 0) {
+    //   return this.q.when({data: []});
+    // }
+    //
+    // let result = this.doRequest({
+    //   url: this.url + '/query',
+    //   data: query,
+    //   method: 'POST'
+    // });
+    //
+    // // console.log(result);
+    // return result;
   }
 
   testDatasource() {
     return this.doRequest({
-      url: this.url + '/',
+      url: this.url,
       method: 'GET',
     }).then(response => {
       if (response.status === 200) {
@@ -61,31 +67,39 @@ export class GenericDatasource {
       method: 'POST',
       data: annotationQuery
     }).then(result => {
+      // console.log(result.data);
       return result.data;
     });
   }
 
-  metricFindQuery(query) {
+  metricFindQuery(query,suburl) {
     var interpolated = {
         target: this.templateSrv.replace(query, null, 'regex')
     };
 
     return this.doRequest({
-      url: this.url + '/search',
+      url: this.url + suburl,
       data: interpolated,
-      method: 'POST',
+      method: 'GET',
     }).then(this.mapToTextValue);
   }
 
   mapToTextValue(result) {
-    return _.map(result.data, (d, i) => {
-      if (d && d.text && d.value) {
-        return { text: d.text, value: d.value };
-      } else if (_.isObject(d)) {
-        return { text: d, value: i};
-      }
-      return { text: d, value: d };
+    return _.map(result.data.value, (data,index) => {
+      return {
+        text: data.name,
+        value: data['@iot.id'],
+        // type: data['@iot.selfLink'],
+      };
     });
+    // return _.map(result.data, (d, i) => {
+    //   if (d && d.text && d.value) {
+    //     return { text: d.text, value: d.value };
+    //   } else if (_.isObject(d)) {
+    //     return { text: d, value: i};
+    //   }
+    //   return { text: d, value: d };
+    // });
   }
 
   doRequest(options) {
@@ -111,7 +125,6 @@ export class GenericDatasource {
     });
 
     options.targets = targets;
-
     return options;
   }
 }

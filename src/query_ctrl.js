@@ -11,8 +11,12 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.target.type = this.target.type || 'timeserie';
   }
 
-  getOptions(query) {
-    return this.datasource.metricFindQuery(query || '');
+  getOptions(query,key) {
+    let metricTypes = {
+      'sensors' : "/Sensors",
+      'datastreams' : "/Datastreams",
+    };
+    return this.datasource.metricFindQuery((query || ''),metricTypes[key]);
   }
 
   toggleEditorMode() {
@@ -25,4 +29,3 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 }
 
 GenericDatasourceQueryCtrl.templateUrl = 'partials/query.editor.html';
-
