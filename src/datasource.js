@@ -1,4 +1,5 @@
 import _ from "lodash";
+import moment from "moment";
 
 export class GenericDatasource {
 
@@ -19,21 +20,58 @@ export class GenericDatasource {
   query(options) {
 
     console.log(options);
-    console.log("options");
-    var query = this.buildQueryParameters(options);
+    // var query = this.buildQueryParameters(options);
     // query.targets = query.targets.filter(t => !t.hide);
     //
     // if (query.targets.length <= 0) {
     //   return this.q.when({data: []});
     // }
     //
-    // let result = this.doRequest({
-    //   url: this.url + '/query',
-    //   data: query,
-    //   method: 'POST'
-    // });
-    //
-    // // console.log(result);
+    let allPromises = [];
+    let allTargetResults = {data:[]};
+    let self = this;
+    let results = [1,2,3];
+
+
+    _.forEach(options.targets,function(target){
+      let targetid = target.target;
+      allPromises.push(this.doRequest({
+        url: this.url + '/Datastreams('+targetid.toString()+')/Observations',
+        // data: query,
+        method: 'GET'
+      }).then(function(response){
+        // console.log(response.data.value);
+        // let values = response.data.value;
+        let filtered = _.map(response.data.value,function(value,index){
+          return [value.result,moment(new Date(value.resultTime)).format('x')];
+        });
+        // response.data = {
+        //   'target' : 18,
+        //   'datapoints' : filtered
+        // };
+        return {
+          'target' : 18,
+          'datapoints' : filtered
+        };
+      }));
+
+    }.bind(this));
+
+    return Promise.all(allPromises).then(function(values) {
+      // console.log(allTargetResults);
+      _.forEach(values,function(value){
+        // console.log(self.allTargetResults);
+        allTargetResults.data.push(value);
+      });
+      console.log(allTargetResults);
+      return allTargetResults;
+      // console.log("resolved all promises");
+      // console.log(allTargetResults);
+    // return allTargetResults;
+    });
+    // console.log(randdsf);
+    // console.log(allTargetResults);
+    // console.log(allPromises);
     // return result;
   }
 
@@ -67,7 +105,6 @@ export class GenericDatasource {
       method: 'POST',
       data: annotationQuery
     }).then(result => {
-      // console.log(result.data);
       return result.data;
     });
   }
@@ -88,8 +125,7 @@ export class GenericDatasource {
     return _.map(result.data.value, (data,index) => {
       return {
         text: data.name,
-        value: data['@iot.id'],
-        // type: data['@iot.selfLink'],
+        value: data['@iot.id']
       };
     });
     // return _.map(result.data, (d, i) => {
@@ -107,6 +143,7 @@ export class GenericDatasource {
     options.headers = this.headers;
 
     return this.backendSrv.datasourceRequest(options);
+
   }
 
   buildQueryParameters(options) {

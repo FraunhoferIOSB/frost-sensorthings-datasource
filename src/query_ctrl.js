@@ -9,14 +9,18 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.scope = $scope;
     this.target.target = this.target.target || 'select metric';
     this.target.type = this.target.type || 'timeserie';
+    this.target.ogcType = this.target.ogcType || "";
+    this.target.ogcUrl = this.target.ogcUrl || "";
   }
 
-  getOptions(query,key) {
+  getOptions(query,ogcType) {
     let metricTypes = {
       'sensors' : "/Sensors",
       'datastreams' : "/Datastreams",
     };
-    return this.datasource.metricFindQuery((query || ''),metricTypes[key]);
+    this.target.ogcType = ogcType;
+    this.target.ogcUrl = metricTypes[ogcType];
+    return this.datasource.metricFindQuery((query || ''),metricTypes[ogcType]);
   }
 
   toggleEditorMode() {

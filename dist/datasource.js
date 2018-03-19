@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-System.register(['lodash'], function (_export, _context) {
+System.register(["lodash", "moment"], function (_export, _context) {
   "use strict";
 
-  var _, _createClass, GenericDatasource;
+  var _, moment, _createClass, GenericDatasource;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -14,6 +14,8 @@ System.register(['lodash'], function (_export, _context) {
   return {
     setters: [function (_lodash) {
       _ = _lodash.default;
+    }, function (_moment) {
+      moment = _moment.default;
     }],
     execute: function () {
       _createClass = function () {
@@ -34,7 +36,7 @@ System.register(['lodash'], function (_export, _context) {
         };
       }();
 
-      _export('GenericDatasource', GenericDatasource = function () {
+      _export("GenericDatasource", GenericDatasource = function () {
         function GenericDatasource(instanceSettings, $q, backendSrv, templateSrv) {
           _classCallCheck(this, GenericDatasource);
 
@@ -52,29 +54,64 @@ System.register(['lodash'], function (_export, _context) {
         }
 
         _createClass(GenericDatasource, [{
-          key: 'query',
+          key: "query",
           value: function query(options) {
 
             console.log(options);
-            console.log("options");
-            var query = this.buildQueryParameters(options);
+            // var query = this.buildQueryParameters(options);
             // query.targets = query.targets.filter(t => !t.hide);
             //
             // if (query.targets.length <= 0) {
             //   return this.q.when({data: []});
             // }
             //
-            // let result = this.doRequest({
-            //   url: this.url + '/query',
-            //   data: query,
-            //   method: 'POST'
-            // });
-            //
-            // // console.log(result);
+            var allPromises = [];
+            var allTargetResults = { data: [] };
+            var self = this;
+            var results = [1, 2, 3];
+
+            _.forEach(options.targets, function (target) {
+              var targetid = target.target;
+              allPromises.push(this.doRequest({
+                url: this.url + '/Datastreams(' + targetid.toString() + ')/Observations',
+                // data: query,
+                method: 'GET'
+              }).then(function (response) {
+                // console.log(response.data.value);
+                // let values = response.data.value;
+                var filtered = _.map(response.data.value, function (value, index) {
+                  return [value.result, moment(new Date(value.resultTime)).format('x')];
+                });
+                // response.data = {
+                //   'target' : 18,
+                //   'datapoints' : filtered
+                // };
+                return {
+                  'target': 18,
+                  'datapoints': filtered
+                };
+              }));
+            }.bind(this));
+
+            return Promise.all(allPromises).then(function (values) {
+              // console.log(allTargetResults);
+              _.forEach(values, function (value) {
+                // console.log(self.allTargetResults);
+                allTargetResults.data.push(value);
+              });
+              console.log(allTargetResults);
+              return allTargetResults;
+              // console.log("resolved all promises");
+              // console.log(allTargetResults);
+              // return allTargetResults;
+            });
+            // console.log(randdsf);
+            // console.log(allTargetResults);
+            // console.log(allPromises);
             // return result;
           }
         }, {
-          key: 'testDatasource',
+          key: "testDatasource",
           value: function testDatasource() {
             return this.doRequest({
               url: this.url,
@@ -86,7 +123,7 @@ System.register(['lodash'], function (_export, _context) {
             });
           }
         }, {
-          key: 'annotationQuery',
+          key: "annotationQuery",
           value: function annotationQuery(options) {
             var query = this.templateSrv.replace(options.annotation.query, {}, 'glob');
             var annotationQuery = {
@@ -106,12 +143,11 @@ System.register(['lodash'], function (_export, _context) {
               method: 'POST',
               data: annotationQuery
             }).then(function (result) {
-              // console.log(result.data);
               return result.data;
             });
           }
         }, {
-          key: 'metricFindQuery',
+          key: "metricFindQuery",
           value: function metricFindQuery(query, suburl) {
             var interpolated = {
               target: this.templateSrv.replace(query, null, 'regex')
@@ -124,7 +160,7 @@ System.register(['lodash'], function (_export, _context) {
             }).then(this.mapToTextValue);
           }
         }, {
-          key: 'mapToTextValue',
+          key: "mapToTextValue",
           value: function mapToTextValue(result) {
             return _.map(result.data.value, function (data, index) {
               return {
@@ -142,7 +178,7 @@ System.register(['lodash'], function (_export, _context) {
             // });
           }
         }, {
-          key: 'doRequest',
+          key: "doRequest",
           value: function doRequest(options) {
             options.withCredentials = this.withCredentials;
             options.headers = this.headers;
@@ -150,7 +186,7 @@ System.register(['lodash'], function (_export, _context) {
             return this.backendSrv.datasourceRequest(options);
           }
         }, {
-          key: 'buildQueryParameters',
+          key: "buildQueryParameters",
           value: function buildQueryParameters(options) {
             var _this = this;
 
@@ -176,7 +212,7 @@ System.register(['lodash'], function (_export, _context) {
         return GenericDatasource;
       }());
 
-      _export('GenericDatasource', GenericDatasource);
+      _export("GenericDatasource", GenericDatasource);
     }
   };
 });

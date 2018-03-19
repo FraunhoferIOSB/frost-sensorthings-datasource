@@ -69,17 +69,21 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           _this.scope = $scope;
           _this.target.target = _this.target.target || 'select metric';
           _this.target.type = _this.target.type || 'timeserie';
+          _this.target.ogcType = _this.target.ogcType || "";
+          _this.target.ogcUrl = _this.target.ogcUrl || "";
           return _this;
         }
 
         _createClass(GenericDatasourceQueryCtrl, [{
           key: 'getOptions',
-          value: function getOptions(query, key) {
+          value: function getOptions(query, ogcType) {
             var metricTypes = {
               'sensors': "/Sensors",
               'datastreams': "/Datastreams"
             };
-            return this.datasource.metricFindQuery(query || '', metricTypes[key]);
+            this.target.ogcType = ogcType;
+            this.target.ogcUrl = metricTypes[ogcType];
+            return this.datasource.metricFindQuery(query || '', metricTypes[ogcType]);
           }
         }, {
           key: 'toggleEditorMode',
