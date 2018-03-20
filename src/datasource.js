@@ -18,8 +18,6 @@ export class GenericDatasource {
   }
 
   query(options) {
-    console.log(options);
-
     let allPromises = [];
     let allTargetResults = {data:[]};
 

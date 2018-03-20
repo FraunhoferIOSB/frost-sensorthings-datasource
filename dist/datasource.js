@@ -56,8 +56,6 @@ System.register(["lodash", "moment"], function (_export, _context) {
         _createClass(GenericDatasource, [{
           key: "query",
           value: function query(options) {
-            console.log(options);
-
             var allPromises = [];
             var allTargetResults = { data: [] };
 

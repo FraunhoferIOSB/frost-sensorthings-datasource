@@ -66,8 +66,17 @@ module.exports = function(grunt) {
           ext:'.js'
         }]
       }
+    },
+
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['dist/test/spec/test-main.js', 'dist/test/spec/*_spec.js']
+      }
     }
   });
 
-  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:pluginDef', 'babel']);
+  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:pluginDef', 'babel', 'mochaTest']);
 };
