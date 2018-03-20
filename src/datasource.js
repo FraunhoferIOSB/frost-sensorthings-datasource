@@ -18,10 +18,10 @@ export class GenericDatasource {
   }
 
   query(options) {
-    
+    console.log(options);
+
     let allPromises = [];
     let allTargetResults = {data:[]};
-    let self = this;
 
     _.forEach(options.targets,function(target){
       allPromises.push(this.doRequest({
@@ -30,7 +30,7 @@ export class GenericDatasource {
         method: 'GET'
       }).then(function(response){
         let filtered = _.map(response.data.value,function(value,index){
-          return [value.result,moment(new Date(value.resultTime)).format('x')];
+          return [value.result,moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x')];
         });
         return {
           'target' : target.target.toString(),

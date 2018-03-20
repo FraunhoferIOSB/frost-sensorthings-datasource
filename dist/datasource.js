@@ -56,10 +56,10 @@ System.register(["lodash", "moment"], function (_export, _context) {
         _createClass(GenericDatasource, [{
           key: "query",
           value: function query(options) {
+            console.log(options);
 
             var allPromises = [];
             var allTargetResults = { data: [] };
-            var self = this;
 
             _.forEach(options.targets, function (target) {
               allPromises.push(this.doRequest({
@@ -68,7 +68,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                 method: 'GET'
               }).then(function (response) {
                 var filtered = _.map(response.data.value, function (value, index) {
-                  return [value.result, moment(new Date(value.resultTime)).format('x')];
+                  return [value.result, moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x')];
                 });
                 return {
                   'target': target.target.toString(),
@@ -81,7 +81,6 @@ System.register(["lodash", "moment"], function (_export, _context) {
               _.forEach(values, function (value) {
                 allTargetResults.data.push(value);
               });
-              console.log(allTargetResults);
               return allTargetResults;
             });
           }
