@@ -17,16 +17,39 @@ export class GenericDatasource {
     }
   }
 
+  getTimeFilter(options){
+    let from = options.range.from.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
+    let to = options.range.to.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
+    return "phenomenonTime gt " + from + " and phenomenonTime lt " + to;
+  }
+  sleep(delay) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay){
+
+    };
+  }
   query(options) {
+    this.sleep(2000);
+    console.log("slept for 2 seconds");
+    // console.log(options);
     let allPromises = [];
     let allTargetResults = {data:[]};
+    let self = this;
+    let timeFilter = this.getTimeFilter(options);
+
+
+    // var sample = this.buildQueryParameters(options);
+    console.log("query triggerd");
+
+    // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
     _.forEach(options.targets,function(target){
       allPromises.push(this.doRequest({
-        url: this.url + '/Datastreams('+target.target.toString()+')/Observations',
+        url: this.url + '/Datastreams('+18+')/Observations?'+'$filter='+timeFilter,
         // data: query,
         method: 'GET'
       }).then(function(response){
+        // console.log(response);
         let filtered = _.map(response.data.value,function(value,index){
           return [value.result,moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x')];
         });
@@ -81,13 +104,13 @@ export class GenericDatasource {
   }
 
   metricFindQuery(query,suburl) {
-    var interpolated = {
-        target: this.templateSrv.replace(query, null, 'regex')
-    };
+    // var interpolated = {
+    //     target: this.templateSrv.replace(query, null, 'regex')
+    // };
 
     return this.doRequest({
       url: this.url + suburl,
-      data: interpolated,
+      // data: interpolated,
       method: 'GET',
     }).then(this.mapToTextValue);
   }
@@ -95,8 +118,9 @@ export class GenericDatasource {
   mapToTextValue(result) {
     return _.map(result.data.value, (data,index) => {
       return {
-        text: data.name,
-        value: data['@iot.id']
+        text: data.name + " ( " + data['@iot.id'] + ")",
+        value: data['@iot.id'],
+        id: data['@iot.id']
       };
     });
     // return _.map(result.data, (d, i) => {
@@ -125,7 +149,7 @@ export class GenericDatasource {
 
     var targets = _.map(options.targets, target => {
       return {
-        target: this.templateSrv.replace(target.target, options.scopedVars, 'regex'),
+        target: this.templateSrv.replace(target.target.toString(), options.scopedVars, 'regex') ,
         refId: target.refId,
         hide: target.hide,
         type: target.type || 'timeserie'
@@ -133,6 +157,7 @@ export class GenericDatasource {
     });
 
     options.targets = targets;
+    console.log(options);
     return options;
   }
 }

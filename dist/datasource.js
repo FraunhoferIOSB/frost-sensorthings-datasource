@@ -54,17 +54,41 @@ System.register(["lodash", "moment"], function (_export, _context) {
         }
 
         _createClass(GenericDatasource, [{
+          key: "getTimeFilter",
+          value: function getTimeFilter(options) {
+            var from = options.range.from.format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
+            var to = options.range.to.format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
+            return "phenomenonTime gt " + from + " and phenomenonTime lt " + to;
+          }
+        }, {
+          key: "sleep",
+          value: function sleep(delay) {
+            var start = new Date().getTime();
+            while (new Date().getTime() < start + delay) {};
+          }
+        }, {
           key: "query",
           value: function query(options) {
+            this.sleep(2000);
+            console.log("slept for 2 seconds");
+            // console.log(options);
             var allPromises = [];
             var allTargetResults = { data: [] };
+            var self = this;
+            var timeFilter = this.getTimeFilter(options);
+
+            // var sample = this.buildQueryParameters(options);
+            console.log("query triggerd");
+
+            // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
             _.forEach(options.targets, function (target) {
               allPromises.push(this.doRequest({
-                url: this.url + '/Datastreams(' + target.target.toString() + ')/Observations',
+                url: this.url + '/Datastreams(' + 18 + ')/Observations?' + '$filter=' + timeFilter,
                 // data: query,
                 method: 'GET'
               }).then(function (response) {
+                // console.log(response);
                 var filtered = _.map(response.data.value, function (value, index) {
                   return [value.result, moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x')];
                 });
@@ -121,13 +145,13 @@ System.register(["lodash", "moment"], function (_export, _context) {
         }, {
           key: "metricFindQuery",
           value: function metricFindQuery(query, suburl) {
-            var interpolated = {
-              target: this.templateSrv.replace(query, null, 'regex')
-            };
+            // var interpolated = {
+            //     target: this.templateSrv.replace(query, null, 'regex')
+            // };
 
             return this.doRequest({
               url: this.url + suburl,
-              data: interpolated,
+              // data: interpolated,
               method: 'GET'
             }).then(this.mapToTextValue);
           }
@@ -136,8 +160,9 @@ System.register(["lodash", "moment"], function (_export, _context) {
           value: function mapToTextValue(result) {
             return _.map(result.data.value, function (data, index) {
               return {
-                text: data.name,
-                value: data['@iot.id']
+                text: data.name + " ( " + data['@iot.id'] + ")",
+                value: data['@iot.id'],
+                id: data['@iot.id']
               };
             });
             // return _.map(result.data, (d, i) => {
@@ -169,7 +194,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
 
             var targets = _.map(options.targets, function (target) {
               return {
-                target: _this.templateSrv.replace(target.target, options.scopedVars, 'regex'),
+                target: _this.templateSrv.replace(target.target.toString(), options.scopedVars, 'regex'),
                 refId: target.refId,
                 hide: target.hide,
                 type: target.type || 'timeserie'
@@ -177,6 +202,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
             });
 
             options.targets = targets;
+            console.log(options);
             return options;
           }
         }]);

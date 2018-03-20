@@ -71,19 +71,35 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           _this.target.type = _this.target.type || 'timeserie';
           _this.target.ogcType = _this.target.ogcType || "";
           _this.target.ogcUrl = _this.target.ogcUrl || "";
+          _this.allDataSources = {};
           return _this;
         }
 
         _createClass(GenericDatasourceQueryCtrl, [{
+          key: 'sleep',
+          value: function sleep(delay) {
+            var start = new Date().getTime();
+            while (new Date().getTime() < start + delay) {};
+          }
+        }, {
           key: 'getOptions',
           value: function getOptions(query, ogcType) {
+            console.log("getOptions");
+            // this.sleep(2000);
+            // console.log("slept for 2 seconds");
             var metricTypes = {
               'sensors': "/Sensors",
               'datastreams': "/Datastreams"
             };
+            var self = this;
             this.target.ogcType = ogcType;
             this.target.ogcUrl = metricTypes[ogcType];
-            return this.datasource.metricFindQuery(query || '', metricTypes[ogcType]);
+            return this.datasource.metricFindQuery(query || '', metricTypes[ogcType]).then(function (result) {
+              // console.log(this.target.target);
+              self.allDataSources = result;
+              // console.log(result);
+              return result;
+            });
           }
         }, {
           key: 'toggleEditorMode',
@@ -92,7 +108,11 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           }
         }, {
           key: 'onChangeInternal',
-          value: function onChangeInternal() {
+          value: function onChangeInternal(query) {
+            // console.log(query);
+            console.log("internal changed");
+            console.log(this.allDataSources);
+            // this.target.target = "changed" ;
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
           }
         }]);
