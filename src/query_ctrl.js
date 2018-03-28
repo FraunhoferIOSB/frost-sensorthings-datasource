@@ -11,6 +11,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.target.type = this.target.type || 'timeserie';
     this.target.ogcType = this.target.ogcType || "";
     this.target.ogcUrl = this.target.ogcUrl || "";
+    this.target.datastreamID = 0;
     this.allDataSources  = {};
   }
 
@@ -22,9 +23,6 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   }
 
   getOptions(query,ogcType) {
-    console.log("getOptions");
-    // this.sleep(2000);
-    // console.log("slept for 2 seconds");
     let metricTypes = {
       'sensors' : "/Sensors",
       'datastreams' : "/Datastreams",
@@ -33,9 +31,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.target.ogcType = ogcType;
     this.target.ogcUrl = metricTypes[ogcType];
     return this.datasource.metricFindQuery((query || ''),metricTypes[ogcType]).then((result)=>{
-      // console.log(this.target.target);
       self.allDataSources = result;
-      // console.log(result);
       return result;
     });
   }
@@ -45,10 +41,9 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   }
 
   onChangeInternal(query) {
-    // console.log(query);
-    console.log("internal changed");
-    console.log(this.allDataSources);
-    // this.target.target = "changed" ;
+    let selectedDataSource =_.find(this.allDataSources, { 'id' : this.target.target });
+    this.target.target = selectedDataSource.text ;
+    this.target.datastreamID = selectedDataSource.id ;
     this.panelCtrl.refresh(); // Asks the panel to refresh data.
   }
 }

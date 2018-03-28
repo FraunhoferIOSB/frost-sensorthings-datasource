@@ -29,27 +29,24 @@ export class GenericDatasource {
     };
   }
   query(options) {
-    this.sleep(2000);
-    console.log("slept for 2 seconds");
+    // this.sleep(2000);
+    // console.log("slept for 2 seconds");
     // console.log(options);
     let allPromises = [];
     let allTargetResults = {data:[]};
     let self = this;
     let timeFilter = this.getTimeFilter(options);
 
-
     // var sample = this.buildQueryParameters(options);
-    console.log("query triggerd");
 
     // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
     _.forEach(options.targets,function(target){
       allPromises.push(this.doRequest({
-        url: this.url + '/Datastreams('+18+')/Observations?'+'$filter='+timeFilter,
+        url: this.url + '/Datastreams('+target.datastreamID+')/Observations?'+'$filter='+timeFilter,
         // data: query,
         method: 'GET'
       }).then(function(response){
-        // console.log(response);
         let filtered = _.map(response.data.value,function(value,index){
           return [value.result,moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x')];
         });
@@ -118,7 +115,7 @@ export class GenericDatasource {
   mapToTextValue(result) {
     return _.map(result.data.value, (data,index) => {
       return {
-        text: data.name + " ( " + data['@iot.id'] + ")",
+        text: data.name + " ( " + data['@iot.id'] + " )",
         value: data['@iot.id'],
         id: data['@iot.id']
       };
