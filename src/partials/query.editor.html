@@ -10,12 +10,18 @@
 
     <div ng-if="!ctrl.target.rawQuery">
       <div class="gf-form">
-        <gf-form-dropdown model="ctrl.target.dsTarget"
+        <gf-form-dropdown model="ctrl.target.senTarget"
           allow-custom="true"
           lookup-text="true"
-          get-options="ctrl.getOptions($query,'datastreams')"
-          on-change="ctrl.onChangeInternal(ctrl.target.dsTarget)">
+          get-options="ctrl.getSensors($query)"
+          on-change="ctrl.onSensorChange(ctrl.target.senTarget)">
       </gf-form-dropdown>
+      <gf-form-dropdown ng-if="ctrl.target.selectedSensorId!=0" model="ctrl.target.dsTarget"
+        allow-custom="true"
+        lookup-text="true"
+        get-options="ctrl.getOptions($query)"
+        on-change="ctrl.onChangeInternal(ctrl.target.dsTarget)">
+    </gf-form-dropdown>
       </div>
     </div>
     <div class="gf-form gf-form--grow">
