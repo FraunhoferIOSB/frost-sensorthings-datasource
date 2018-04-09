@@ -4,24 +4,28 @@
       <select class="gf-form-input" ng-model="ctrl.target.type" ng-options="f as f for f in ['table', 'timeserie']"></select>
     </div>
 
-    <!-- <div class="gf-form" ng-if="ctrl.target.rawQuery">
+    <div class="gf-form" ng-if="ctrl.target.rawQuery">
       <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.onChangeInternal()" />
-    </div> -->
+    </div>
 
     <div ng-if="!ctrl.target.rawQuery">
       <div class="gf-form">
-        <gf-form-dropdown model="ctrl.target.senTarget"
-          allow-custom="true"
-          lookup-text="true"
-          get-options="ctrl.getSensors($query)"
-          on-change="ctrl.onSensorChange(ctrl.target.senTarget)">
-      </gf-form-dropdown>
-      <gf-form-dropdown ng-if="ctrl.target.selectedSensorId!=0" model="ctrl.target.dsTarget"
-        allow-custom="true"
-        lookup-text="true"
-        get-options="ctrl.getOptions($query)"
-        on-change="ctrl.onChangeInternal(ctrl.target.dsTarget)">
-    </gf-form-dropdown>
+          <div class="gf-form">
+              <gf-form-dropdown model="ctrl.target.senTarget"
+              allow-custom="true"
+              lookup-text="true"
+              get-options="ctrl.getSensors($query)"
+              on-change="ctrl.onSensorChange(ctrl.target.senTarget)">
+          </gf-form-dropdown>
+          </div>
+          <div class="gf-form">
+              <gf-form-dropdown ng-if="ctrl.target.selectedSensorId!=0" model="ctrl.target.dsTarget"
+              allow-custom="true"
+              lookup-text="true"
+              get-options="ctrl.getOptions($query)"
+              on-change="ctrl.onChangeInternal(ctrl.target.dsTarget)">
+          </gf-form-dropdown>
+          </div>
       </div>
     </div>
     <div class="gf-form gf-form--grow">
