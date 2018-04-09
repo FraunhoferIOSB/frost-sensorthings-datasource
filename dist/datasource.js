@@ -86,7 +86,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                   return [value.result, moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x')];
                 });
                 return {
-                  'target': target.target.toString(),
+                  'target': target.dsTarget.toString(),
                   'datapoints': filtered
                 };
               }));
@@ -174,12 +174,12 @@ System.register(["lodash", "moment"], function (_export, _context) {
 
             //remove placeholder targets
             options.targets = _.filter(options.targets, function (target) {
-              return target.target !== 'select metric';
+              return target.dsTarget !== 'select metric';
             });
 
             var targets = _.map(options.targets, function (target) {
               return {
-                target: _this.templateSrv.replace(target.target.toString(), options.scopedVars, 'regex'),
+                target: _this.templateSrv.replace(target.dsTarget.toString(), options.scopedVars, 'regex'),
                 refId: target.refId,
                 hide: target.hide,
                 type: target.type || 'timeserie'
@@ -187,6 +187,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
             });
 
             options.targets = targets;
+            console.log(options);
             return options;
           }
         }]);

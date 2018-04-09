@@ -67,12 +67,11 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           var _this = _possibleConstructorReturn(this, (GenericDatasourceQueryCtrl.__proto__ || Object.getPrototypeOf(GenericDatasourceQueryCtrl)).call(this, $scope, $injector));
 
           _this.scope = $scope;
-          _this.target.target = _this.target.target || 'select metric';
+          _this.target.dsTarget = _this.target.dsTarget || 'select metric';
           _this.target.type = _this.target.type || 'timeserie';
           _this.target.ogcType = _this.target.ogcType || "";
           _this.target.ogcUrl = _this.target.ogcUrl || "";
-          console.log(_this.target);
-          _this.target.datastreamID = 0;
+          _this.target.datastreamID = _this.target.datastreamID || 0;
           _this.allDataSources = {};
           return _this;
         }
@@ -86,7 +85,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'getOptions',
           value: function getOptions(query, ogcType) {
-            // console.log(query);
+
             var metricTypes = {
               'sensors': "/Sensors",
               'datastreams': "/Datastreams"
@@ -107,8 +106,12 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'onChangeInternal',
           value: function onChangeInternal(query) {
-            var selectedDataSource = _.find(this.allDataSources, { 'value': this.target.target });
-            this.target.datastreamID = selectedDataSource.id;
+            var selectedDataSource = _.find(this.allDataSources, { 'value': this.target.dsTarget });
+            if (selectedDataSource) {
+              this.target.datastreamID = selectedDataSource.id;
+            } else {
+              this.target.datastreamID = 0;
+            }
             this.panelCtrl.refresh();
           }
         }]);

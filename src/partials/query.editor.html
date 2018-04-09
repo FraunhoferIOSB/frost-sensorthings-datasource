@@ -1,7 +1,7 @@
 <query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
   <div class="gf-form-inline">
     <div class="gf-form max-width-8">
-      <select class="gf-form-input" ng-model="ctrl.target.type" ng-options="f as f for f in ['table', 'timeserie','watchedd']"></select>
+      <select class="gf-form-input" ng-model="ctrl.target.type" ng-options="f as f for f in ['table', 'timeserie']"></select>
     </div>
 
     <!-- <div class="gf-form" ng-if="ctrl.target.rawQuery">
@@ -10,17 +10,13 @@
 
     <div ng-if="!ctrl.target.rawQuery">
       <div class="gf-form">
-        <gf-form-dropdown model="ctrl.target.target"
+        <gf-form-dropdown model="ctrl.target.dsTarget"
           allow-custom="true"
           lookup-text="true"
           get-options="ctrl.getOptions($query,'datastreams')"
-          on-change="ctrl.onChangeInternal(ctrl.target.target)">
+          on-change="ctrl.onChangeInternal(ctrl.target.dsTarget)">
       </gf-form-dropdown>
       </div>
-    </div>
-    <div>
-        <input  class="gf-input" type="text" name="" value="" ng-model="name">
-        <p>{{name}}</p>
     </div>
     <div class="gf-form gf-form--grow">
       <div class="gf-form-label gf-form-label--grow"></div>

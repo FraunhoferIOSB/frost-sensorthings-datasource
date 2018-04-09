@@ -1,18 +1,16 @@
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query-editor.css!'
-
 export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
   constructor($scope, $injector)  {
     super($scope, $injector);
 
     this.scope = $scope;
-    this.target.target = this.target.target || 'select metric';
+    this.target.dsTarget = this.target.dsTarget || 'select metric';
     this.target.type = this.target.type || 'timeserie';
     this.target.ogcType = this.target.ogcType || "";
     this.target.ogcUrl = this.target.ogcUrl || "";
-    console.log(this.target);
-    this.target.datastreamID = 0;
+    this.target.datastreamID = this.target.datastreamID || 0;
     this.allDataSources  = {};
   }
 
@@ -23,8 +21,9 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     };
   }
 
+
   getOptions(query,ogcType) {
-      // console.log(query);
+
     let metricTypes = {
       'sensors' : "/Sensors",
       'datastreams' : "/Datastreams",
@@ -44,8 +43,12 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   }
 
   onChangeInternal(query) {
-    let selectedDataSource =_.find(this.allDataSources, { 'value' : this.target.target });
-    this.target.datastreamID = selectedDataSource.id ;
+    let selectedDataSource =_.find(this.allDataSources, { 'value' : this.target.dsTarget });
+    if (selectedDataSource) {
+        this.target.datastreamID = selectedDataSource.id ;
+    } else {
+        this.target.datastreamID = 0 ;
+    }
     this.panelCtrl.refresh();
   }
 }
