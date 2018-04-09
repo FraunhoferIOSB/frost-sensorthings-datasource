@@ -29,15 +29,10 @@ export class GenericDatasource {
     };
   }
   query(options) {
-    // this.sleep(2000);
-    // console.log("slept for 2 seconds");
-    // console.log(options);
     let allPromises = [];
     let allTargetResults = {data:[]};
     let self = this;
     let timeFilter = this.getTimeFilter(options);
-
-    // var sample = this.buildQueryParameters(options);
 
     // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
@@ -116,18 +111,10 @@ export class GenericDatasource {
     return _.map(result.data.value, (data,index) => {
       return {
         text: data.name + " ( " + data['@iot.id'] + " )",
-        value: data['@iot.id'],
+        value: data.name + " ( " + data['@iot.id'] + " )",
         id: data['@iot.id']
       };
     });
-    // return _.map(result.data, (d, i) => {
-    //   if (d && d.text && d.value) {
-    //     return { text: d.text, value: d.value };
-    //   } else if (_.isObject(d)) {
-    //     return { text: d, value: i};
-    //   }
-    //   return { text: d, value: d };
-    // });
   }
 
   doRequest(options) {
@@ -154,7 +141,6 @@ export class GenericDatasource {
     });
 
     options.targets = targets;
-    console.log(options);
     return options;
   }
 }

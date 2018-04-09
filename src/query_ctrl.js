@@ -11,6 +11,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.target.type = this.target.type || 'timeserie';
     this.target.ogcType = this.target.ogcType || "";
     this.target.ogcUrl = this.target.ogcUrl || "";
+    console.log(this.target);
     this.target.datastreamID = 0;
     this.allDataSources  = {};
   }
@@ -23,6 +24,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   }
 
   getOptions(query,ogcType) {
+      // console.log(query);
     let metricTypes = {
       'sensors' : "/Sensors",
       'datastreams' : "/Datastreams",
@@ -34,6 +36,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
       self.allDataSources = result;
       return result;
     });
+
   }
 
   toggleEditorMode() {
@@ -41,10 +44,9 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   }
 
   onChangeInternal(query) {
-    let selectedDataSource =_.find(this.allDataSources, { 'id' : this.target.target });
-    this.target.target = selectedDataSource.text ;
+    let selectedDataSource =_.find(this.allDataSources, { 'value' : this.target.target });
     this.target.datastreamID = selectedDataSource.id ;
-    this.panelCtrl.refresh(); // Asks the panel to refresh data.
+    this.panelCtrl.refresh();
   }
 }
 

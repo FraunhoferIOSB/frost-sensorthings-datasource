@@ -71,6 +71,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           _this.target.type = _this.target.type || 'timeserie';
           _this.target.ogcType = _this.target.ogcType || "";
           _this.target.ogcUrl = _this.target.ogcUrl || "";
+          console.log(_this.target);
           _this.target.datastreamID = 0;
           _this.allDataSources = {};
           return _this;
@@ -85,6 +86,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'getOptions',
           value: function getOptions(query, ogcType) {
+            // console.log(query);
             var metricTypes = {
               'sensors': "/Sensors",
               'datastreams': "/Datastreams"
@@ -105,10 +107,9 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'onChangeInternal',
           value: function onChangeInternal(query) {
-            var selectedDataSource = _.find(this.allDataSources, { 'id': this.target.target });
-            this.target.target = selectedDataSource.text;
+            var selectedDataSource = _.find(this.allDataSources, { 'value': this.target.target });
             this.target.datastreamID = selectedDataSource.id;
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }]);
 
