@@ -1,7 +1,10 @@
 <query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
   <div class="gf-form-inline">
     <div class="gf-form max-width-8">
-      <select class="gf-form-input" ng-model="ctrl.target.type" ng-options="f as f for f in ['table', 'timeserie']"></select>
+      <select class="gf-form-input"
+              ng-model="ctrl.target.type"
+              ng-options="f as f for f in ['Sensor', 'Thing']"
+              ng-change="ctrl.typeChanged(ctrl.target.type)"></select>
     </div>
 
     <div class="gf-form" ng-if="ctrl.target.rawQuery">
@@ -11,15 +14,29 @@
     <div ng-if="!ctrl.target.rawQuery">
       <div class="gf-form">
           <div class="gf-form">
-              <gf-form-dropdown model="ctrl.target.senTarget"
+              <gf-form-dropdown
+              ng-if="ctrl.showSensors()"
+              model="ctrl.target.senTarget"
               allow-custom="true"
               lookup-text="true"
               get-options="ctrl.getSensors($query)"
               on-change="ctrl.onSensorChange(ctrl.target.senTarget)">
-          </gf-form-dropdown>
+            </gf-form-dropdown>
           </div>
           <div class="gf-form">
-              <gf-form-dropdown ng-if="ctrl.target.selectedSensorId!=0" model="ctrl.target.dsTarget"
+              <gf-form-dropdown
+              model="ctrl.target.thingTarget"
+              ng-if="ctrl.showThings()"
+              allow-custom="true"
+              lookup-text="true"
+              get-options="ctrl.getThings($query)"
+              on-change="ctrl.onThingChange(ctrl.target.senTarget)">
+            </gf-form-dropdown>
+          </div>
+          <div class="gf-form">
+              <gf-form-dropdown
+              ng-if="ctrl.target.selectedSensorId!=0 || ctrl.target.selectedThingId!=0"
+              model="ctrl.target.dsTarget"
               allow-custom="true"
               lookup-text="true"
               get-options="ctrl.getOptions($query)"

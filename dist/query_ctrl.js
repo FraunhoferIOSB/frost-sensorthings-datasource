@@ -68,15 +68,25 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
 
                     _this.scope = $scope;
 
-                    _this.target.type = _this.target.type || 'timeserie';
+                    _this.target.type = _this.target.type || 'Sensor';
 
-                    _this.target.senTarget = _this.target.senTarget || 'select sensor';
+                    // sensor init start
+                    _this.target.senTarget = _this.target.senTarget || 'select a sensor';
                     _this.allSensors = {};
                     _this.target.selectedSensorId = _this.target.selectedSensorId || 0;
+                    // sensor init end
 
+                    // thing init start
+                    _this.target.thingTarget = _this.target.thingTarget || 'select a thing';
+                    _this.allThings = {};
+                    _this.target.selectedThingId = _this.target.selectedThingId || 0;
+                    // thing init end
+
+                    // datasource init start
                     _this.target.dsTarget = _this.target.dsTarget || 'select metric';
-                    _this.target.datastreamID = _this.target.datastreamID || 0;
                     _this.allDataSources = {};
+                    _this.target.datastreamID = _this.target.datastreamID || 0;
+                    // datasource init end
                     return _this;
                 }
 
@@ -90,10 +100,26 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                     key: 'getOptions',
                     value: function getOptions(query) {
                         var self = this;
-                        return this.datasource.metricFindQuery(query || '', "/Sensors(" + this.target.selectedSensorId + ")/Datastreams").then(function (result) {
+                        var targetUrl = "";
+                        if (this.target.type == 'Sensor') {
+                            targetUrl = "/Sensors(" + this.target.selectedSensorId + ")/Datastreams";
+                        } else {
+                            targetUrl = "/Things(" + this.target.selectedThingId + ")/Datastreams";
+                        }
+                        return this.datasource.metricFindQuery(query || '', targetUrl).then(function (result) {
                             self.allDataSources = result;
                             return result;
                         });
+                    }
+                }, {
+                    key: 'showSensors',
+                    value: function showSensors() {
+                        return this.target.type == 'Sensor';
+                    }
+                }, {
+                    key: 'showThings',
+                    value: function showThings() {
+                        return this.target.type == 'Thing';
                     }
                 }, {
                     key: 'getSensors',
@@ -129,6 +155,38 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                             this.target.selectedSensorId = selectedSensor.id;
                         } else {
                             this.target.selectedSensorId = 0;
+                        }
+                        this.onChangeInternal();
+                    }
+                }, {
+                    key: 'typeChanged',
+                    value: function typeChanged(type) {
+                        // resetting and refreshing panel if type(sensor or thing) changed
+                        this.target.dsTarget = "select metric";
+                        this.target.senTarget = "select a sensor";
+                        this.target.thingTarget = "select a thing";
+                        this.target.selectedSensorId = 0;
+                        this.target.selectedThingId = 0;
+                        this.onChangeInternal();
+                    }
+                }, {
+                    key: 'getThings',
+                    value: function getThings(query) {
+                        var self = this;
+                        return this.datasource.metricFindQuery(query || '', "/Things").then(function (result) {
+                            self.allThings = result;
+                            return result;
+                        });
+                    }
+                }, {
+                    key: 'onThingChange',
+                    value: function onThingChange(query) {
+                        this.target.dsTarget = "select metric";
+                        var selectedThing = _.find(this.allThings, { 'value': this.target.thingTarget });
+                        if (selectedThing) {
+                            this.target.selectedThingId = selectedThing.id;
+                        } else {
+                            this.target.selectedThingId = 0;
                         }
                         this.onChangeInternal();
                     }
