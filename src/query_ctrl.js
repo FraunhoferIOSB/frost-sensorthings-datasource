@@ -57,6 +57,14 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         });
     }
 
+    getTargetTypes() {
+        let targetTypes = ['Sensor', 'Thing'];
+        if (this.target.panelType == 'table') {
+            targetTypes.push('Location');
+        }
+        return targetTypes;
+    }
+
     showSensors(){
         return this.target.type == 'Sensor';
     }
@@ -66,7 +74,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
 
     showLocations(){
-        return this.target.type == 'Location' && this.target.panelType == 'table';
+        return this.target.type == 'Location';
     }
 
     getSensors(query) {

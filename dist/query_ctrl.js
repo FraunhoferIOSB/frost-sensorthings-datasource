@@ -119,6 +119,15 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                         });
                     }
                 }, {
+                    key: 'getTargetTypes',
+                    value: function getTargetTypes() {
+                        var targetTypes = ['Sensor', 'Thing'];
+                        if (this.target.panelType == 'table') {
+                            targetTypes.push('Location');
+                        }
+                        return targetTypes;
+                    }
+                }, {
                     key: 'showSensors',
                     value: function showSensors() {
                         return this.target.type == 'Sensor';
@@ -131,7 +140,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showLocations',
                     value: function showLocations() {
-                        return this.target.type == 'Location' && this.target.panelType == 'table';
+                        return this.target.type == 'Location';
                     }
                 }, {
                     key: 'getSensors',

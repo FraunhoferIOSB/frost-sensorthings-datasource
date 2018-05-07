@@ -4,7 +4,7 @@
     <div class="gf-form max-width-8">
       <select  class="gf-form-input"
               ng-model="ctrl.target.type"
-              ng-options="f as f for f in ['Sensor', 'Thing', 'Location']"
+              ng-options="f as f for f in ctrl.getTargetTypes()"
               ng-change="ctrl.typeChanged(ctrl.target.type)"></select>
     </div>
 
