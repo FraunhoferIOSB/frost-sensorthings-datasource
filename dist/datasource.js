@@ -123,7 +123,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                     value: function transformDataSource(target, values) {
                         return {
                             'target': target.dsTarget.toString(),
-                            'datapoints': values.length == 0 ? [] : _.map(values, function (value, index) {
+                            'datapoints': _.map(values, function (value, index) {
                                 return [value.result, parseInt(moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                             })
                         };
@@ -133,7 +133,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                     value: function transformThings(target, values) {
                         return {
                             'target': target.selectedLocation.toString(),
-                            'datapoints': values.length == 0 ? [] : _.map(values, function (value, index) {
+                            'datapoints': _.map(values, function (value, index) {
                                 return [value.Thing.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                             })
                         };

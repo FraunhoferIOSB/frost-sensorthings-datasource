@@ -132,14 +132,14 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
 
     getLocations(query) {
-        let self = this;
-        return this.datasource.LocationFindQuery((query || ''),"/Locations").then((result)=>{
-            self.allLocations = result;
+        return this.datasource.LocationFindQuery((query || ''),"/Locations").then(((result)=>{
+            this.allLocations = result;
             return result;
-        });
+        }).bind(this));
     }
 
     onLocationChange(locationTarget) {
+        // find and store the selected location name to use it as column name (refer datasource.js->transformThings())
         this.target.selectedLocation =_.find(this.allLocations, { 'value' : locationTarget }).text;
         this.panelCtrl.refresh();
     }

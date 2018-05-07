@@ -205,15 +205,17 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'getLocations',
                     value: function getLocations(query) {
-                        var self = this;
+                        var _this2 = this;
+
                         return this.datasource.LocationFindQuery(query || '', "/Locations").then(function (result) {
-                            self.allLocations = result;
+                            _this2.allLocations = result;
                             return result;
-                        });
+                        }.bind(this));
                     }
                 }, {
                     key: 'onLocationChange',
                     value: function onLocationChange(locationTarget) {
+                        // find and store the selected location name to use it as column name (refer datasource.js->transformThings())
                         this.target.selectedLocation = _.find(this.allLocations, { 'value': locationTarget }).text;
                         this.panelCtrl.refresh();
                     }
