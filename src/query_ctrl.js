@@ -6,6 +6,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         super($scope, $injector);
 
         this.scope = $scope;
+        this.target.panelType = this.scope.ctrl.panel.type;
 
         this.target.type = this.target.type || 'Sensor';
 
@@ -26,6 +27,12 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         this.allDataSources  = {};
         this.target.datastreamID = this.target.datastreamID || 0;
         // datasource init end
+
+        // Location init start
+        this.target.locationTarget = this.target.locationTarget || 0;
+        this.target.selectedLocation = this.target.selectedLocation || 'select a location';
+        this.allLocations = {};
+        // Location init end
     }
 
     sleep(delay) {
@@ -56,6 +63,10 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     showThings(){
         return this.target.type == 'Thing';
+    }
+
+    showLocations(){
+        return this.target.type == 'Location' && this.target.panelType == 'table';
     }
 
     getSensors(query) {
@@ -118,6 +129,19 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
             this.target.selectedThingId = 0 ;
         }
         this.onChangeInternal();
+    }
+
+    getLocations(query) {
+        let self = this;
+        return this.datasource.LocationFindQuery((query || ''),"/Locations").then((result)=>{
+            self.allLocations = result;
+            return result;
+        });
+    }
+
+    onLocationChange(locationTarget) {
+        this.target.selectedLocation =_.find(this.allLocations, { 'value' : locationTarget }).text;
+        this.panelCtrl.refresh();
     }
 
 }

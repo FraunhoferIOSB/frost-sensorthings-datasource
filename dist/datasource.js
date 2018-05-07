@@ -69,6 +69,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                 }, {
                     key: "query",
                     value: function query(options) {
+                        // console.log(options);
 
                         // Filter targets that are set to hidden
                         options.targets = _.filter(options.targets, function (target) {
@@ -83,18 +84,30 @@ System.register(["lodash", "moment"], function (_export, _context) {
                         // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
                         _.forEach(options.targets, function (target) {
+
+                            var self = this;
+
+                            var suburl = '';
+
+                            if (_.isEqual(target.type, "Location")) {
+                                if (target.locationTarget == 0) return;
+                                suburl = '/Locations(' + target.locationTarget + ')/HistoricalLocations?$expand=Things';
+                            } else {
+                                if (target.datastreamID == 0) return;
+                                suburl = '/Datastreams(' + target.datastreamID + ')/Observations?' + '$filter=' + timeFilter;
+                            }
+
                             allPromises.push(this.doRequest({
-                                url: this.url + '/Datastreams(' + target.datastreamID + ')/Observations?' + '$filter=' + timeFilter,
-                                // data: query,
+                                url: this.url + suburl,
                                 method: 'GET'
                             }).then(function (response) {
-                                var filtered = _.map(response.data.value, function (value, index) {
-                                    return [value.result, parseInt(moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-                                });
-                                return {
-                                    'target': target.dsTarget.toString(),
-                                    'datapoints': filtered
-                                };
+                                var transformedResults = [];
+                                if (_.isEqual(target.type, "Location")) {
+                                    transformedResults = self.transformThings(target, response.data.value);
+                                } else {
+                                    transformedResults = self.transformDataSource(target, response.data.value);
+                                }
+                                return transformedResults;
                             }));
                         }.bind(this));
 
@@ -104,6 +117,26 @@ System.register(["lodash", "moment"], function (_export, _context) {
                             });
                             return allTargetResults;
                         });
+                    }
+                }, {
+                    key: "transformDataSource",
+                    value: function transformDataSource(target, values) {
+                        return {
+                            'target': target.dsTarget.toString(),
+                            'datapoints': values.length == 0 ? [] : _.map(values, function (value, index) {
+                                return [value.result, parseInt(moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                            })
+                        };
+                    }
+                }, {
+                    key: "transformThings",
+                    value: function transformThings(target, values) {
+                        return {
+                            'target': target.selectedLocation.toString(),
+                            'datapoints': values.length == 0 ? [] : _.map(values, function (value, index) {
+                                return [value.Thing.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                            })
+                        };
                     }
                 }, {
                     key: "testDatasource",
@@ -153,6 +186,27 @@ System.register(["lodash", "moment"], function (_export, _context) {
                             // data: interpolated,
                             method: 'GET'
                         }).then(this.mapToTextValue);
+                    }
+                }, {
+                    key: "LocationFindQuery",
+                    value: function LocationFindQuery(query, suburl) {
+                        return this.doRequest({
+                            url: this.url + suburl,
+                            // data: interpolated,
+                            method: 'GET'
+                        }).then(function (result) {
+                            var allLocations = [{
+                                text: "select a location",
+                                value: 0
+                            }];
+                            _.forEach(result.data.value, function (data, index) {
+                                allLocations.push({
+                                    text: data.name + " ( " + data.description + " )",
+                                    value: data['@iot.id']
+                                });
+                            });
+                            return allLocations;
+                        });
                     }
                 }, {
                     key: "mapToTextValue",

@@ -1,15 +1,13 @@
 <query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
   <div class="gf-form-inline">
+
     <div class="gf-form max-width-8">
-      <select class="gf-form-input"
+      <select  class="gf-form-input"
               ng-model="ctrl.target.type"
-              ng-options="f as f for f in ['Sensor', 'Thing']"
+              ng-options="f as f for f in ['Sensor', 'Thing', 'Location']"
               ng-change="ctrl.typeChanged(ctrl.target.type)"></select>
     </div>
 
-    <div class="gf-form" ng-if="ctrl.target.rawQuery">
-      <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.onChangeInternal()" />
-    </div>
 
     <div ng-if="!ctrl.target.rawQuery">
       <div class="gf-form">
@@ -30,7 +28,7 @@
               allow-custom="true"
               lookup-text="true"
               get-options="ctrl.getThings($query)"
-              on-change="ctrl.onThingChange(ctrl.target.senTarget)">
+              on-change="ctrl.onThingChange(ctrl.target.thingTarget)">
             </gf-form-dropdown>
           </div>
           <div class="gf-form">
@@ -43,8 +41,23 @@
               on-change="ctrl.onChangeInternal(ctrl.target.dsTarget)">
           </gf-form-dropdown>
           </div>
+          <div class="gf-form">
+              <gf-form-dropdown
+              ng-if="ctrl.showLocations()"
+              model="ctrl.target.locationTarget"
+              allow-custom="true"
+              lookup-text="true"
+              get-options="ctrl.getLocations($query)"
+              on-change="ctrl.onLocationChange(ctrl.target.locationTarget)">
+            </gf-form-dropdown>
+          </div>
       </div>
     </div>
+
+    <div >
+
+    </div>
+
     <div class="gf-form gf-form--grow">
       <div class="gf-form-label gf-form-label--grow"></div>
     </div>

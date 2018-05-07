@@ -67,6 +67,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                     var _this = _possibleConstructorReturn(this, (GenericDatasourceQueryCtrl.__proto__ || Object.getPrototypeOf(GenericDatasourceQueryCtrl)).call(this, $scope, $injector));
 
                     _this.scope = $scope;
+                    _this.target.panelType = _this.scope.ctrl.panel.type;
 
                     _this.target.type = _this.target.type || 'Sensor';
 
@@ -87,6 +88,12 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                     _this.allDataSources = {};
                     _this.target.datastreamID = _this.target.datastreamID || 0;
                     // datasource init end
+
+                    // Location init start
+                    _this.target.locationTarget = _this.target.locationTarget || 0;
+                    _this.target.selectedLocation = _this.target.selectedLocation || 'select a location';
+                    _this.allLocations = {};
+                    // Location init end
                     return _this;
                 }
 
@@ -120,6 +127,11 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                     key: 'showThings',
                     value: function showThings() {
                         return this.target.type == 'Thing';
+                    }
+                }, {
+                    key: 'showLocations',
+                    value: function showLocations() {
+                        return this.target.type == 'Location' && this.target.panelType == 'table';
                     }
                 }, {
                     key: 'getSensors',
@@ -189,6 +201,21 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                             this.target.selectedThingId = 0;
                         }
                         this.onChangeInternal();
+                    }
+                }, {
+                    key: 'getLocations',
+                    value: function getLocations(query) {
+                        var self = this;
+                        return this.datasource.LocationFindQuery(query || '', "/Locations").then(function (result) {
+                            self.allLocations = result;
+                            return result;
+                        });
+                    }
+                }, {
+                    key: 'onLocationChange',
+                    value: function onLocationChange(locationTarget) {
+                        this.target.selectedLocation = _.find(this.allLocations, { 'value': locationTarget }).text;
+                        this.panelCtrl.refresh();
                     }
                 }]);
 
