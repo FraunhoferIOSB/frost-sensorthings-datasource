@@ -51,12 +51,12 @@ export class GenericDatasource {
 
             let suburl = '';
 
-            if (_.isEqual(target.type,"Location")) {
-                if (target.locationTarget == 0) return;
-                suburl = '/Locations(' + target.locationTarget + ')/HistoricalLocations?$expand=Things';
+            if (_.isEqual(target.type,"Location(HL)")) {
+                if (target.selectedLocationId == 0) return;
+                suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?$expand=Things';
             } else {
-                if (target.datastreamID == 0) return;
-                suburl = '/Datastreams('+target.datastreamID+')/Observations?'+'$filter='+timeFilter;
+                if (target.selectedDatastreamId == 0) return;
+                suburl = '/Datastreams('+target.selectedDatastreamId+')/Observations?'+'$filter='+timeFilter;
             }
 
             allPromises.push(this.doRequest({
@@ -64,7 +64,7 @@ export class GenericDatasource {
                 method: 'GET'
             }).then(function(response){
                 let transformedResults = [];
-                if (_.isEqual(target.type,"Location")) {
+                if (_.isEqual(target.type,"Location(HL)")) {
                     transformedResults = self.transformThings(target,response.data.value);
                 } else {
                     transformedResults = self.transformDataSource(target,response.data.value);
@@ -84,7 +84,7 @@ export class GenericDatasource {
 
     transformDataSource(target,values){
         return {
-            'target' : target.dsTarget.toString(),
+            'target' : target.selectedDatastreamName.toString(),
             'datapoints' : _.map(values,function(value,index){
                 return [value.result,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
             })
@@ -134,46 +134,35 @@ export class GenericDatasource {
         });
     }
 
-    metricFindQuery(query,suburl) {
-        // var interpolated = {
-        //     target: this.templateSrv.replace(query, null, 'regex')
-        // };
-
+    metricFindQuery(query,suburl,type) {
         return this.doRequest({
             url: this.url + suburl,
-            // data: interpolated,
-            method: 'GET',
-        }).then(this.mapToTextValue);
-    }
-
-    LocationFindQuery(query,suburl) {
-        return this.doRequest({
-            url: this.url + suburl,
-            // data: interpolated,
             method: 'GET',
         }).then((result) => {
-            let allLocations = [{
-                text: "select a location",
-                value: 0
-            }];
-            _.forEach(result.data.value, (data,index) => {
-                allLocations.push({
-                    text: data.name + " ( " + data.description + " )",
-                    value : data['@iot.id'],
-                });
-            });
-            return allLocations;
+            return this.transformMetrics(result.data.value,type);
         });
     }
 
-    mapToTextValue(result) {
-        return _.map(result.data.value, (data,index) => {
-            return {
-                text: data.name + " ( " + data['@iot.id'] + " )",
-                value: data.name + " ( " + data['@iot.id'] + " )",
-                id: data['@iot.id']
-            };
+    transformMetrics(metrics,type) {
+        let placeholder = "select a sensor";
+        if (type == "thing") {
+            placeholder = "select a thing";
+        } else if (type == "datastream") {
+            placeholder = "select a datastream";
+        } else if (type == "location") {
+            placeholder = "select a location";
+        }
+        let transformedMetrics = [{
+            text: placeholder,
+            value: 0
+        }];
+        _.forEach(metrics, (metric,index) => {
+            transformedMetrics.push({
+                text: metric.name + " ( " + metric['@iot.id'] + " )",
+                value: metric['@iot.id']
+            });
         });
+        return transformedMetrics;
     }
 
     doRequest(options) {

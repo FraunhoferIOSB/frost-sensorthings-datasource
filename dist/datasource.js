@@ -89,12 +89,12 @@ System.register(["lodash", "moment"], function (_export, _context) {
 
                             var suburl = '';
 
-                            if (_.isEqual(target.type, "Location")) {
-                                if (target.locationTarget == 0) return;
-                                suburl = '/Locations(' + target.locationTarget + ')/HistoricalLocations?$expand=Things';
+                            if (_.isEqual(target.type, "Location(HL)")) {
+                                if (target.selectedLocationId == 0) return;
+                                suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?$expand=Things';
                             } else {
-                                if (target.datastreamID == 0) return;
-                                suburl = '/Datastreams(' + target.datastreamID + ')/Observations?' + '$filter=' + timeFilter;
+                                if (target.selectedDatastreamId == 0) return;
+                                suburl = '/Datastreams(' + target.selectedDatastreamId + ')/Observations?' + '$filter=' + timeFilter;
                             }
 
                             allPromises.push(this.doRequest({
@@ -102,7 +102,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                                 method: 'GET'
                             }).then(function (response) {
                                 var transformedResults = [];
-                                if (_.isEqual(target.type, "Location")) {
+                                if (_.isEqual(target.type, "Location(HL)")) {
                                     transformedResults = self.transformThings(target, response.data.value);
                                 } else {
                                     transformedResults = self.transformDataSource(target, response.data.value);
@@ -122,7 +122,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                     key: "transformDataSource",
                     value: function transformDataSource(target, values) {
                         return {
-                            'target': target.dsTarget.toString(),
+                            'target': target.selectedDatastreamName.toString(),
                             'datapoints': _.map(values, function (value, index) {
                                 return [value.result, parseInt(moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                             })
@@ -176,48 +176,38 @@ System.register(["lodash", "moment"], function (_export, _context) {
                     }
                 }, {
                     key: "metricFindQuery",
-                    value: function metricFindQuery(query, suburl) {
-                        // var interpolated = {
-                        //     target: this.templateSrv.replace(query, null, 'regex')
-                        // };
+                    value: function metricFindQuery(query, suburl, type) {
+                        var _this = this;
 
                         return this.doRequest({
                             url: this.url + suburl,
-                            // data: interpolated,
-                            method: 'GET'
-                        }).then(this.mapToTextValue);
-                    }
-                }, {
-                    key: "LocationFindQuery",
-                    value: function LocationFindQuery(query, suburl) {
-                        return this.doRequest({
-                            url: this.url + suburl,
-                            // data: interpolated,
                             method: 'GET'
                         }).then(function (result) {
-                            var allLocations = [{
-                                text: "select a location",
-                                value: 0
-                            }];
-                            _.forEach(result.data.value, function (data, index) {
-                                allLocations.push({
-                                    text: data.name + " ( " + data.description + " )",
-                                    value: data['@iot.id']
-                                });
-                            });
-                            return allLocations;
+                            return _this.transformMetrics(result.data.value, type);
                         });
                     }
                 }, {
-                    key: "mapToTextValue",
-                    value: function mapToTextValue(result) {
-                        return _.map(result.data.value, function (data, index) {
-                            return {
-                                text: data.name + " ( " + data['@iot.id'] + " )",
-                                value: data.name + " ( " + data['@iot.id'] + " )",
-                                id: data['@iot.id']
-                            };
+                    key: "transformMetrics",
+                    value: function transformMetrics(metrics, type) {
+                        var placeholder = "select a sensor";
+                        if (type == "thing") {
+                            placeholder = "select a thing";
+                        } else if (type == "datastream") {
+                            placeholder = "select a datastream";
+                        } else if (type == "location") {
+                            placeholder = "select a location";
+                        }
+                        var transformedMetrics = [{
+                            text: placeholder,
+                            value: 0
+                        }];
+                        _.forEach(metrics, function (metric, index) {
+                            transformedMetrics.push({
+                                text: metric.name + " ( " + metric['@iot.id'] + " )",
+                                value: metric['@iot.id']
+                            });
                         });
+                        return transformedMetrics;
                     }
                 }, {
                     key: "doRequest",
@@ -230,7 +220,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                 }, {
                     key: "buildQueryParameters",
                     value: function buildQueryParameters(options) {
-                        var _this = this;
+                        var _this2 = this;
 
                         //remove placeholder targets
                         options.targets = _.filter(options.targets, function (target) {
@@ -239,7 +229,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
 
                         var targets = _.map(options.targets, function (target) {
                             return {
-                                target: _this.templateSrv.replace(target.dsTarget.toString(), options.scopedVars, 'regex'),
+                                target: _this2.templateSrv.replace(target.dsTarget.toString(), options.scopedVars, 'regex'),
                                 refId: target.refId,
                                 hide: target.hide,
                                 type: target.type || 'timeserie'

@@ -14,41 +14,43 @@
           <div class="gf-form">
               <gf-form-dropdown
               ng-if="ctrl.showSensors()"
-              model="ctrl.target.senTarget"
+              model="ctrl.target.selectedSensorId"
               allow-custom="true"
               lookup-text="true"
               get-options="ctrl.getSensors($query)"
-              on-change="ctrl.onSensorChange(ctrl.target.senTarget)">
+              on-change="ctrl.onSensorChange($query)">
             </gf-form-dropdown>
           </div>
+
           <div class="gf-form">
               <gf-form-dropdown
-              model="ctrl.target.thingTarget"
+              model="ctrl.target.selectedThingId"
               ng-if="ctrl.showThings()"
               allow-custom="true"
               lookup-text="true"
               get-options="ctrl.getThings($query)"
-              on-change="ctrl.onThingChange(ctrl.target.thingTarget)">
+              on-change="ctrl.onThingChange($query)">
             </gf-form-dropdown>
           </div>
+
           <div class="gf-form">
               <gf-form-dropdown
-              ng-if="ctrl.target.selectedSensorId!=0 || ctrl.target.selectedThingId!=0"
-              model="ctrl.target.dsTarget"
+              ng-if="ctrl.showDatastreams()"
+              model="ctrl.target.selectedDatastreamId"
               allow-custom="true"
               lookup-text="true"
-              get-options="ctrl.getOptions($query)"
-              on-change="ctrl.onChangeInternal(ctrl.target.dsTarget)">
+              get-options="ctrl.getDataSources($query)"
+              on-change="ctrl.onDataSourceChange($query)">
           </gf-form-dropdown>
           </div>
           <div class="gf-form">
               <gf-form-dropdown
               ng-if="ctrl.showLocations()"
-              model="ctrl.target.locationTarget"
+              model="ctrl.target.selectedLocationId"
               allow-custom="true"
               lookup-text="true"
               get-options="ctrl.getLocations($query)"
-              on-change="ctrl.onLocationChange(ctrl.target.locationTarget)">
+              on-change="ctrl.onLocationChange($query)">
             </gf-form-dropdown>
           </div>
       </div>
