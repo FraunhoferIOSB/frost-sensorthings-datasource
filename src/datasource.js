@@ -54,6 +54,9 @@ export class GenericDatasource {
             if (_.isEqual(target.type,"Location(HL)")) {
                 if (target.selectedLocationId == 0) return;
                 suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?$expand=Things';
+            } else if(_.isEqual(target.type,"Thing(HL)")){
+                if (target.selectedThingId == 0) return;
+                suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?$expand=Locations';
             } else {
                 if (target.selectedDatastreamId == 0) return;
                 suburl = '/Datastreams('+target.selectedDatastreamId+')/Observations?'+'$filter='+timeFilter;
@@ -66,6 +69,8 @@ export class GenericDatasource {
                 let transformedResults = [];
                 if (_.isEqual(target.type,"Location(HL)")) {
                     transformedResults = self.transformThings(target,response.data.value);
+                } else if(_.isEqual(target.type,"Thing(HL)")){
+                    transformedResults = self.transformLocations(target,response.data.value);
                 } else {
                     transformedResults = self.transformDataSource(target,response.data.value);
                 }
@@ -93,10 +98,23 @@ export class GenericDatasource {
 
     transformThings(target,values){
         return {
-            'target' : target.selectedLocation.toString(),
+            'target' : target.selectedLocationName.toString(),
             'datapoints' : _.map(values,function(value,index){
                 return [value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
             })
+        };
+    }
+
+    transformLocations(target,values) {
+        let result = [];
+        _.forEach(values,function(value) {
+            _.forEach(value.Locations,function(location) {
+                result.push([location.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
+            });
+        });
+        return {
+            'target' : target.selectedThingName.toString(),
+            'datapoints' : result
         };
     }
 

@@ -141,7 +141,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showDatastreams',
                     value: function showDatastreams() {
-                        return this.target.selectedSensorId != 0 || this.target.selectedThingId != 0;
+                        return (this.target.selectedSensorId != 0 || this.target.selectedThingId != 0) && (this.target.type == "Sensor" || this.target.type == "Thing");
                     }
                 }, {
                     key: 'getDataSources',

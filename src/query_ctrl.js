@@ -77,7 +77,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //datastream starts
     showDatastreams(){
-        return this.target.selectedSensorId!=0 || this.target.selectedThingId!=0;
+        return (this.target.selectedSensorId!=0 || this.target.selectedThingId!=0) && (this.target.type == "Sensor" || this.target.type == "Thing");
     }
 
     getDataSources(query) {
