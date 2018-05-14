@@ -17,10 +17,10 @@ export class GenericDatasource {
         }
     }
 
-    getTimeFilter(options){
+    getTimeFilter(options,key){
         let from = options.range.from.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
         let to = options.range.to.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
-        return "phenomenonTime gt " + from + " and phenomenonTime lt " + to;
+        return key + " gt " + from + " and "+ key + " lt " + to;
     }
 
     sleep(delay) {
@@ -41,24 +41,24 @@ export class GenericDatasource {
         let allPromises = [];
         let allTargetResults = {data:[]};
         let self = this;
-        let timeFilter = this.getTimeFilter(options);
 
         // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
         _.forEach(options.targets,function(target){
-
             let self = this;
-
             let suburl = '';
 
             if (_.isEqual(target.type,"Location(HL)")) {
                 if (target.selectedLocationId == 0) return;
-                suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?$expand=Things';
+                let timeFilter = this.getTimeFilter(options,"time");
+                suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things';
             } else if(_.isEqual(target.type,"Thing(HL)")){
                 if (target.selectedThingId == 0) return;
-                suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?$expand=Locations';
+                let timeFilter = this.getTimeFilter(options,"time");
+                suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
             } else {
                 if (target.selectedDatastreamId == 0) return;
+                let timeFilter = this.getTimeFilter(options,"phenomenonTime");
                 suburl = '/Datastreams('+target.selectedDatastreamId+')/Observations?'+'$filter='+timeFilter;
             }
 
@@ -91,6 +91,10 @@ export class GenericDatasource {
         return {
             'target' : target.selectedDatastreamName.toString(),
             'datapoints' : _.map(values,function(value,index){
+                if (target.panelType == "table") {
+                    return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                }
+                // graph panel type expects the value in float/double/int and not as strings
                 return [value.result,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
             })
         };
@@ -100,7 +104,7 @@ export class GenericDatasource {
         return {
             'target' : target.selectedLocationName.toString(),
             'datapoints' : _.map(values,function(value,index){
-                return [value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
             })
         };
     }
@@ -109,7 +113,7 @@ export class GenericDatasource {
         let result = [];
         _.forEach(values,function(value) {
             _.forEach(value.Locations,function(location) {
-                result.push([location.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
+                result.push([_.isEmpty(location.name) ? '-' : location.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
             });
         });
         return {
