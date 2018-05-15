@@ -69,6 +69,11 @@ System.register(["lodash", "moment"], function (_export, _context) {
                 }, {
                     key: "query",
                     value: function query(options) {
+                        console.log(options);
+
+                        var demo = [{ "key": "fraunhofer cafeteria", "latitude": 50.7495107, "longitude": 7.1948428, "name": "fraunhofer cafeteria" }, { "key": "charleroi", "latitude": 50.4108, "longitude": 4.4446, "name": "Charleroi" }, { "key": "frankfurt", "latitude": 50.110924, "longitude": 8.682127, "name": "Frankfurt" }, { "key": "london", "latitude": 51.503399, "longitude": -0.119519, "name": "London" }, { "key": "paris", "latitude": 48.864716, "longitude": 2.349014, "name": "Paris" }];
+
+                        console.log(demo);
                         // console.log(options);
 
                         // Filter targets that are set to hidden
@@ -77,7 +82,9 @@ System.register(["lodash", "moment"], function (_export, _context) {
                         });
 
                         var allPromises = [];
-                        var allTargetResults = { data: [] };
+                        var allTargetResults = { data: demo };
+                        // allTargetResults.data =
+                        return allTargetResults;
                         var self = this;
 
                         // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
