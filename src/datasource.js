@@ -31,12 +31,8 @@ export class GenericDatasource {
     }
 
     query(options) {
-        console.log(options);
 
-        let demo = [ { "key": "fraunhofer cafeteria", "latitude": 50.7495107, "longitude": 7.1948428, "name": "fraunhofer cafeteria" }, { "key": "charleroi", "latitude": 50.4108, "longitude": 4.4446, "name": "Charleroi"}, { "key": "frankfurt", "latitude": 50.110924, "longitude": 8.682127, "name": "Frankfurt", }, { "key": "london", "latitude": 51.503399, "longitude": -0.119519, "name": "London", }, { "key": "paris", "latitude": 48.864716, "longitude": 2.349014, "name": "Paris" } ];
-
-        console.log(demo);
-        // console.log(options);
+        // let allCoordinates = [ { "key": "fraunhofer cafeteria", "latitude": 50.7495107, "longitude": 7.1948428, "name": "fraunhofer cafeteria" }, { "key": "charleroi", "latitude": 50.4108, "longitude": 4.4446, "name": "Charleroi"}, { "key": "frankfurt", "latitude": 50.110924, "longitude": 8.682127, "name": "Frankfurt", }, { "key": "london", "latitude": 51.503399, "longitude": -0.119519, "name": "London", }, { "key": "paris", "latitude": 48.864716, "longitude": 2.349014, "name": "Paris" } ];
 
         // Filter targets that are set to hidden
         options.targets = _.filter(options.targets, target => {
@@ -44,10 +40,37 @@ export class GenericDatasource {
         });
 
         let allPromises = [];
-        let allTargetResults = {data:demo};
-        // allTargetResults.data =
-        return allTargetResults;
+        
+        if (_.find(options.targets, {"panelType" : 'grafana-worldmap-panel'})) {
+            _.forEach(options.targets,function(target){
+                let self = this;
+                let suburl = '';
+
+                if (target.selectedThingId == 0) return;
+                let timeFilter = this.getTimeFilter(options,"time");
+                suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+
+                allPromises.push(this.doRequest({
+                    url: this.url + suburl,
+                    method: 'GET'
+                }).then(function(response){
+                    return self.transformLocationsCoordinates(target,response.data.value);
+                }));
+
+            }.bind(this));
+
+            return Promise.all(allPromises).then(function(values) {
+                let allCoordinates = [];
+                _.forEach(values,function(value){
+                    allCoordinates = allCoordinates.concat(value);
+                });
+                return {data: allCoordinates};
+            });
+        }
+
         let self = this;
+        let allTargetResults = {data:[]};
+
 
         // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
@@ -92,6 +115,29 @@ export class GenericDatasource {
             });
             return allTargetResults;
         });
+    }
+
+    transformLocationsCoordinates(target,values){
+        let result = [];
+        let timestamp = "";
+        let lastLocation = false;
+        let lastLocationValue = "";
+        _.forEach(values,function(value,index) {
+            _.forEach(value.Locations,function(location,locationIndex) {
+                timestamp = moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS');
+                lastLocationValue = (!lastLocation) ? ("(Last seen)") : "";
+                result.push({
+                            "key": location.name,
+                            "latitude": location.location.coordinates[0],
+                            "longitude": location.location.coordinates[1],
+                            "name": location.name + " | " +target.selectedThingName + " | " + timestamp + lastLocationValue
+                        });
+                if (index == 0 && locationIndex == 0 ) {
+                    lastLocation = true;
+                }
+            });
+        });
+        return result;
     }
 
     transformDataSource(target,values){

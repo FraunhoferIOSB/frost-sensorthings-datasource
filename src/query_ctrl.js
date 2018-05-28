@@ -51,6 +51,10 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         return targetTypes;
     }
 
+    showControlTypes(){
+        return (this.target.panelType != 'grafana-worldmap-panel');
+    }
+
     toggleEditorMode() {
         this.target.rawQuery = !this.target.rawQuery;
     }
@@ -58,7 +62,8 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //sensor starts
     showSensors(){
-        return this.target.type == 'Sensor';
+        return this.target.type == 'Sensor' &&
+                (this.target.panelType != 'grafana-worldmap-panel');
     }
 
     getSensors(query) {
@@ -77,7 +82,9 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //datastream starts
     showDatastreams(){
-        return (this.target.selectedSensorId!=0 || this.target.selectedThingId!=0) && (this.target.type == "Sensor" || this.target.type == "Thing");
+        return (this.target.selectedSensorId!=0 || this.target.selectedThingId!=0) &&
+                (this.target.type == "Sensor" || this.target.type == "Thing") &&
+                (this.target.panelType != 'grafana-worldmap-panel');
     }
 
     getDataSources(query) {
@@ -114,7 +121,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //thing starts
     showThings(){
-        return this.target.type == 'Thing' || this.target.type == 'Thing(HL)';
+        return this.target.type == 'Thing' || this.target.type == 'Thing(HL)' || (this.target.panelType == 'grafana-worldmap-panel');
     }
 
     getThings(query) {
