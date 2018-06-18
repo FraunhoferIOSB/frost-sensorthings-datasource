@@ -6,26 +6,34 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         super($scope, $injector);
 
         this.scope = $scope;
+        this.target.panelType = this.scope.ctrl.panel.type;
 
         this.target.type = this.target.type || 'Sensor';
 
+        // datasource init start
+        this.target.selectedDatastreamId = this.target.selectedDatastreamId || 0;
+        this.target.selectedDatastreamName = this.target.selectedDatastreamName || 'select a datastream';
+        this.allDataSources  = {};
+        // datasource init end
+
         // sensor init start
-        this.target.senTarget = this.target.senTarget || 'select a sensor';
-        this.allSensors  = {};
         this.target.selectedSensorId = this.target.selectedSensorId || 0;
+        this.target.selectedSensorName = this.target.selectedSensorName || 'select a sensor';
+        this.allSensors  = {};
         // sensor init end
 
         // thing init start
-        this.target.thingTarget = this.target.thingTarget || 'select a thing';
-        this.allThings  = {};
         this.target.selectedThingId = this.target.selectedThingId || 0;
+        this.target.selectedThingName = this.target.selectedThingName || 'select a thing';
+        this.allThings  = {};
         // thing init end
 
-        // datasource init start
-        this.target.dsTarget = this.target.dsTarget || 'select metric';
-        this.allDataSources  = {};
-        this.target.datastreamID = this.target.datastreamID || 0;
-        // datasource init end
+
+        // Location init start
+        this.target.selectedLocationId = this.target.selectedLocationId || 0;
+        this.target.selectedLocationName = this.target.selectedLocationName || 'select a location';
+        this.allLocations = {};
+        // Location init end
     }
 
     sleep(delay) {
@@ -35,8 +43,51 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         };
     }
 
+    getTargetTypes() {
+        let targetTypes = ['Sensor', 'Thing'];
+        if (this.target.panelType == 'table') {
+            targetTypes.push('Location(HL)','Thing(HL)');
+        }
+        return targetTypes;
+    }
 
-    getOptions(query) {
+    showControlTypes(){
+        return (this.target.panelType != 'grafana-worldmap-panel');
+    }
+
+    toggleEditorMode() {
+        this.target.rawQuery = !this.target.rawQuery;
+    }
+
+
+    //sensor starts
+    showSensors(){
+        return this.target.type == 'Sensor' &&
+                (this.target.panelType != 'grafana-worldmap-panel');
+    }
+
+    getSensors(query) {
+        let self = this;
+        return this.datasource.metricFindQuery((query || ''),"/Sensors",'sensor').then((result)=>{
+            self.allSensors = result;
+            return result;
+        });
+    }
+
+    onSensorChange(query,selectedSensorId) {
+        this.target.selectedSensorName =_.find(this.allSensors, { 'value' : this.target.selectedSensorId }).text;
+        this.resetDataSource();
+    }
+    //sensor ends
+
+    //datastream starts
+    showDatastreams(){
+        return (this.target.selectedSensorId!=0 || this.target.selectedThingId!=0) &&
+                (this.target.type == "Sensor" || this.target.type == "Thing") &&
+                (this.target.panelType != 'grafana-worldmap-panel');
+    }
+
+    getDataSources(query) {
         let self = this;
         let targetUrl = "";
         if (this.target.type == 'Sensor') {
@@ -44,81 +95,67 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         } else {
             targetUrl = "/Things("+this.target.selectedThingId+")/Datastreams";
         }
-        return this.datasource.metricFindQuery((query || ''),targetUrl).then((result)=>{
+        return this.datasource.metricFindQuery((query || ''),targetUrl,'datastream').then((result)=>{
             self.allDataSources = result;
             return result;
         });
     }
 
-    showSensors(){
-        return this.target.type == 'Sensor';
-    }
-
-    showThings(){
-        return this.target.type == 'Thing';
-    }
-
-    getSensors(query) {
-        let self = this;
-        return this.datasource.metricFindQuery((query || ''),"/Sensors").then((result)=>{
-            self.allSensors = result;
-            return result;
-        });
-    }
-
-    toggleEditorMode() {
-        this.target.rawQuery = !this.target.rawQuery;
-    }
-
-    onChangeInternal(query) {
-        let selectedDataSource =_.find(this.allDataSources, { 'value' : this.target.dsTarget });
-        if (selectedDataSource) {
-            this.target.datastreamID = selectedDataSource.id ;
-        } else {
-            this.target.datastreamID = 0 ;
-        }
+    onDataSourceChange(query) {
+        this.target.selectedDatastreamName =_.find(this.allDataSources, { 'value' : this.target.selectedDatastreamId }).text;
         this.panelCtrl.refresh();
     }
 
-    onSensorChange(query) {
-        this.target.dsTarget = "select metric";
-        let selectedSensor =_.find(this.allSensors, { 'value' : this.target.senTarget });
-        if (selectedSensor) {
-            this.target.selectedSensorId = selectedSensor.id ;
-        } else {
-            this.target.selectedSensorId = 0 ;
-        }
-        this.onChangeInternal();
+    resetDataSource(){
+        this.target.selectedDatastreamId = 0;
+        this.target.selectedDatastreamName = "select a datastream";
+        this.panelCtrl.refresh();
     }
+    //datastream ends
 
     typeChanged(type) {
-        // resetting and refreshing panel if type(sensor or thing) changed
-        this.target.dsTarget = "select metric";
-        this.target.senTarget = "select a sensor";
-        this.target.thingTarget = "select a thing";
         this.target.selectedSensorId = 0;
         this.target.selectedThingId = 0;
-        this.onChangeInternal();
+        this.resetDataSource();
+    }
+
+    //thing starts
+    showThings(){
+        return this.target.type == 'Thing' || this.target.type == 'Thing(HL)' || (this.target.panelType == 'grafana-worldmap-panel');
     }
 
     getThings(query) {
         let self = this;
-        return this.datasource.metricFindQuery((query || ''),"/Things").then((result)=>{
+        return this.datasource.metricFindQuery((query || ''),"/Things",'thing').then((result)=>{
             self.allThings = result;
             return result;
         });
     }
 
     onThingChange(query) {
-        this.target.dsTarget = "select metric";
-        let selectedThing =_.find(this.allThings, { 'value' : this.target.thingTarget });
-        if (selectedThing) {
-            this.target.selectedThingId = selectedThing.id ;
-        } else {
-            this.target.selectedThingId = 0 ;
-        }
-        this.onChangeInternal();
+        this.target.selectedThingName =_.find(this.allThings, { 'value' : this.target.selectedThingId }).text;
+        this.resetDataSource();
     }
+    //thing ends
+
+    //location starts
+    showLocations(){
+        return this.target.type == 'Location(HL)';
+    }
+
+    getLocations(query) {
+        return this.datasource.metricFindQuery((query || ''),"/Locations",'location').then(((result)=>{
+            this.allLocations = result;
+            return result;
+        }).bind(this));
+    }
+
+    onLocationChange(query) {
+        // find and store the selected location name to use it as column name (refer datasource.js->transformThings())
+        this.target.selectedLocationName =_.find(this.allLocations, { 'value' : this.target.selectedLocationId }).text;
+        this.panelCtrl.refresh();
+    }
+    //location ends
 
 }
 

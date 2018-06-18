@@ -17,44 +17,94 @@ export class GenericDatasource {
         }
     }
 
-    getTimeFilter(options){
+    getTimeFilter(options,key){
         let from = options.range.from.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
         let to = options.range.to.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
-        return "phenomenonTime gt " + from + " and phenomenonTime lt " + to;
+        return key + " gt " + from + " and "+ key + " lt " + to;
     }
+
     sleep(delay) {
         var start = new Date().getTime();
         while (new Date().getTime() < start + delay){
 
         };
     }
+
     query(options) {
 
+//         let allCoordinates = [ { "key": "fraunhofer cafeteria", "latitude": 50.7495107, "longitude": 7.1948428, "name": "fraunhofer cafeteria",value:2 }, { "key": "charleroi", "latitude": 50.4108, "longitude": 4.4446, "name": "Charleroi",value:3}, { "key": "frankfurt", "latitude": 50.110924, "longitude": 8.682127, "name": "Frankfurt", }, { "key": "london", "latitude": 51.503399, "longitude": -0.119519, "name": "London", }, { "key": "paris", "latitude": 48.864716, "longitude": 2.349014, "name": "Paris" } ];
+// return {data: allCoordinates};
         // Filter targets that are set to hidden
         options.targets = _.filter(options.targets, target => {
             return target.hide != true;
         });
 
         let allPromises = [];
-        let allTargetResults = {data:[]};
+
+        if (_.find(options.targets, {"panelType" : 'grafana-worldmap-panel'})) {
+            _.forEach(options.targets,function(target,targetIndex){
+                let self = this;
+                let suburl = '';
+
+                if (target.selectedThingId == 0) return;
+                let timeFilter = this.getTimeFilter(options,"time");
+                suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+
+                allPromises.push(this.doRequest({
+                    url: this.url + suburl,
+                    method: 'GET'
+                }).then(function(response){
+                    return self.transformLocationsCoordinates(target,targetIndex,response.data.value);
+                }));
+
+            }.bind(this));
+
+            return Promise.all(allPromises).then(function(values) {
+                let allCoordinates = [];
+                _.forEach(values,function(value){
+                    allCoordinates = allCoordinates.concat(value);
+                });
+                return {data: allCoordinates};
+            });
+        }
+
         let self = this;
-        let timeFilter = this.getTimeFilter(options);
+        let allTargetResults = {data:[]};
+
 
         // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
         _.forEach(options.targets,function(target){
+            let self = this;
+            let suburl = '';
+
+            if (_.isEqual(target.type,"Location(HL)")) {
+                if (target.selectedLocationId == 0) return;
+                let timeFilter = this.getTimeFilter(options,"time");
+                suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things';
+            } else if(_.isEqual(target.type,"Thing(HL)")){
+                if (target.selectedThingId == 0) return;
+                let timeFilter = this.getTimeFilter(options,"time");
+                suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+            } else {
+                if (target.selectedDatastreamId == 0) return;
+                let timeFilter = this.getTimeFilter(options,"phenomenonTime");
+                suburl = '/Datastreams('+target.selectedDatastreamId+')/Observations?'+'$filter='+timeFilter;
+            }
+
             allPromises.push(this.doRequest({
-                url: this.url + '/Datastreams('+target.datastreamID+')/Observations?'+'$filter='+timeFilter,
-                // data: query,
+                url: this.url + suburl,
                 method: 'GET'
             }).then(function(response){
-                let filtered = _.map(response.data.value,function(value,index){
-                    return [value.result,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-                });
-                return {
-                    'target' : target.dsTarget.toString(),
-                    'datapoints' : filtered
-                };
+                let transformedResults = [];
+                if (_.isEqual(target.type,"Location(HL)")) {
+                    transformedResults = self.transformThings(target,response.data.value);
+                } else if(_.isEqual(target.type,"Thing(HL)")){
+                    transformedResults = self.transformLocations(target,response.data.value);
+                } else {
+                    transformedResults = self.transformDataSource(target,response.data.value);
+                }
+                return transformedResults;
             }));
 
         }.bind(this));
@@ -65,6 +115,65 @@ export class GenericDatasource {
             });
             return allTargetResults;
         });
+    }
+
+    transformLocationsCoordinates(target,targetIndex,values){
+        let result = [];
+        let timestamp = "";
+        let lastLocation = false;
+        let lastLocationValue = "";
+        _.forEach(values,function(value,index) {
+            _.forEach(value.Locations,function(location,locationIndex) {
+                timestamp = moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS');
+                lastLocationValue = (!lastLocation) ? ("(Last seen)") : "";
+                result.push({
+                            "key": location.name,
+                            "latitude": location.location.coordinates[0],
+                            "longitude": location.location.coordinates[1],
+                            "name": location.name + " | " +target.selectedThingName + " | " + timestamp + lastLocationValue,
+                            "value": targetIndex+1,
+                        });
+                if (index == 0 && locationIndex == 0 ) {
+                    lastLocation = true;
+                }
+            });
+        });
+        return result;
+    }
+
+    transformDataSource(target,values){
+        return {
+            'target' : target.selectedDatastreamName.toString(),
+            'datapoints' : _.map(values,function(value,index){
+                if (target.panelType == "table") {
+                    return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                }
+                // graph panel type expects the value in float/double/int and not as strings
+                return [value.result,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+            })
+        };
+    }
+
+    transformThings(target,values){
+        return {
+            'target' : target.selectedLocationName.toString(),
+            'datapoints' : _.map(values,function(value,index){
+                return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+            })
+        };
+    }
+
+    transformLocations(target,values) {
+        let result = [];
+        _.forEach(values,function(value) {
+            _.forEach(value.Locations,function(location) {
+                result.push([_.isEmpty(location.name) ? '-' : location.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
+            });
+        });
+        return {
+            'target' : target.selectedThingName.toString(),
+            'datapoints' : result
+        };
     }
 
     testDatasource() {
@@ -101,26 +210,35 @@ export class GenericDatasource {
         });
     }
 
-    metricFindQuery(query,suburl) {
-        // var interpolated = {
-        //     target: this.templateSrv.replace(query, null, 'regex')
-        // };
-
+    metricFindQuery(query,suburl,type) {
         return this.doRequest({
             url: this.url + suburl,
-            // data: interpolated,
             method: 'GET',
-        }).then(this.mapToTextValue);
+        }).then((result) => {
+            return this.transformMetrics(result.data.value,type);
+        });
     }
 
-    mapToTextValue(result) {
-        return _.map(result.data.value, (data,index) => {
-            return {
-                text: data.name + " ( " + data['@iot.id'] + " )",
-                value: data.name + " ( " + data['@iot.id'] + " )",
-                id: data['@iot.id']
-            };
+    transformMetrics(metrics,type) {
+        let placeholder = "select a sensor";
+        if (type == "thing") {
+            placeholder = "select a thing";
+        } else if (type == "datastream") {
+            placeholder = "select a datastream";
+        } else if (type == "location") {
+            placeholder = "select a location";
+        }
+        let transformedMetrics = [{
+            text: placeholder,
+            value: 0
+        }];
+        _.forEach(metrics, (metric,index) => {
+            transformedMetrics.push({
+                text: metric.name + " ( " + metric['@iot.id'] + " )",
+                value: metric['@iot.id']
+            });
         });
+        return transformedMetrics;
     }
 
     doRequest(options) {
@@ -147,7 +265,6 @@ export class GenericDatasource {
         });
 
         options.targets = targets;
-        console.log(options);
         return options;
     }
 }

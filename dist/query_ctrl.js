@@ -67,26 +67,34 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                     var _this = _possibleConstructorReturn(this, (GenericDatasourceQueryCtrl.__proto__ || Object.getPrototypeOf(GenericDatasourceQueryCtrl)).call(this, $scope, $injector));
 
                     _this.scope = $scope;
+                    _this.target.panelType = _this.scope.ctrl.panel.type;
 
                     _this.target.type = _this.target.type || 'Sensor';
 
+                    // datasource init start
+                    _this.target.selectedDatastreamId = _this.target.selectedDatastreamId || 0;
+                    _this.target.selectedDatastreamName = _this.target.selectedDatastreamName || 'select a datastream';
+                    _this.allDataSources = {};
+                    // datasource init end
+
                     // sensor init start
-                    _this.target.senTarget = _this.target.senTarget || 'select a sensor';
-                    _this.allSensors = {};
                     _this.target.selectedSensorId = _this.target.selectedSensorId || 0;
+                    _this.target.selectedSensorName = _this.target.selectedSensorName || 'select a sensor';
+                    _this.allSensors = {};
                     // sensor init end
 
                     // thing init start
-                    _this.target.thingTarget = _this.target.thingTarget || 'select a thing';
-                    _this.allThings = {};
                     _this.target.selectedThingId = _this.target.selectedThingId || 0;
+                    _this.target.selectedThingName = _this.target.selectedThingName || 'select a thing';
+                    _this.allThings = {};
                     // thing init end
 
-                    // datasource init start
-                    _this.target.dsTarget = _this.target.dsTarget || 'select metric';
-                    _this.allDataSources = {};
-                    _this.target.datastreamID = _this.target.datastreamID || 0;
-                    // datasource init end
+
+                    // Location init start
+                    _this.target.selectedLocationId = _this.target.selectedLocationId || 0;
+                    _this.target.selectedLocationName = _this.target.selectedLocationName || 'select a location';
+                    _this.allLocations = {};
+                    // Location init end
                     return _this;
                 }
 
@@ -97,38 +105,18 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                         while (new Date().getTime() < start + delay) {};
                     }
                 }, {
-                    key: 'getOptions',
-                    value: function getOptions(query) {
-                        var self = this;
-                        var targetUrl = "";
-                        if (this.target.type == 'Sensor') {
-                            targetUrl = "/Sensors(" + this.target.selectedSensorId + ")/Datastreams";
-                        } else {
-                            targetUrl = "/Things(" + this.target.selectedThingId + ")/Datastreams";
+                    key: 'getTargetTypes',
+                    value: function getTargetTypes() {
+                        var targetTypes = ['Sensor', 'Thing'];
+                        if (this.target.panelType == 'table') {
+                            targetTypes.push('Location(HL)', 'Thing(HL)');
                         }
-                        return this.datasource.metricFindQuery(query || '', targetUrl).then(function (result) {
-                            self.allDataSources = result;
-                            return result;
-                        });
+                        return targetTypes;
                     }
                 }, {
-                    key: 'showSensors',
-                    value: function showSensors() {
-                        return this.target.type == 'Sensor';
-                    }
-                }, {
-                    key: 'showThings',
-                    value: function showThings() {
-                        return this.target.type == 'Thing';
-                    }
-                }, {
-                    key: 'getSensors',
-                    value: function getSensors(query) {
-                        var self = this;
-                        return this.datasource.metricFindQuery(query || '', "/Sensors").then(function (result) {
-                            self.allSensors = result;
-                            return result;
-                        });
+                    key: 'showControlTypes',
+                    value: function showControlTypes() {
+                        return this.target.panelType != 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'toggleEditorMode',
@@ -136,44 +124,75 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                         this.target.rawQuery = !this.target.rawQuery;
                     }
                 }, {
-                    key: 'onChangeInternal',
-                    value: function onChangeInternal(query) {
-                        var selectedDataSource = _.find(this.allDataSources, { 'value': this.target.dsTarget });
-                        if (selectedDataSource) {
-                            this.target.datastreamID = selectedDataSource.id;
-                        } else {
-                            this.target.datastreamID = 0;
-                        }
-                        this.panelCtrl.refresh();
+                    key: 'showSensors',
+                    value: function showSensors() {
+                        return this.target.type == 'Sensor' && this.target.panelType != 'grafana-worldmap-panel';
+                    }
+                }, {
+                    key: 'getSensors',
+                    value: function getSensors(query) {
+                        var self = this;
+                        return this.datasource.metricFindQuery(query || '', "/Sensors", 'sensor').then(function (result) {
+                            self.allSensors = result;
+                            return result;
+                        });
                     }
                 }, {
                     key: 'onSensorChange',
-                    value: function onSensorChange(query) {
-                        this.target.dsTarget = "select metric";
-                        var selectedSensor = _.find(this.allSensors, { 'value': this.target.senTarget });
-                        if (selectedSensor) {
-                            this.target.selectedSensorId = selectedSensor.id;
+                    value: function onSensorChange(query, selectedSensorId) {
+                        this.target.selectedSensorName = _.find(this.allSensors, { 'value': this.target.selectedSensorId }).text;
+                        this.resetDataSource();
+                    }
+                }, {
+                    key: 'showDatastreams',
+                    value: function showDatastreams() {
+                        return (this.target.selectedSensorId != 0 || this.target.selectedThingId != 0) && (this.target.type == "Sensor" || this.target.type == "Thing") && this.target.panelType != 'grafana-worldmap-panel';
+                    }
+                }, {
+                    key: 'getDataSources',
+                    value: function getDataSources(query) {
+                        var self = this;
+                        var targetUrl = "";
+                        if (this.target.type == 'Sensor') {
+                            targetUrl = "/Sensors(" + this.target.selectedSensorId + ")/Datastreams";
                         } else {
-                            this.target.selectedSensorId = 0;
+                            targetUrl = "/Things(" + this.target.selectedThingId + ")/Datastreams";
                         }
-                        this.onChangeInternal();
+                        return this.datasource.metricFindQuery(query || '', targetUrl, 'datastream').then(function (result) {
+                            self.allDataSources = result;
+                            return result;
+                        });
+                    }
+                }, {
+                    key: 'onDataSourceChange',
+                    value: function onDataSourceChange(query) {
+                        this.target.selectedDatastreamName = _.find(this.allDataSources, { 'value': this.target.selectedDatastreamId }).text;
+                        this.panelCtrl.refresh();
+                    }
+                }, {
+                    key: 'resetDataSource',
+                    value: function resetDataSource() {
+                        this.target.selectedDatastreamId = 0;
+                        this.target.selectedDatastreamName = "select a datastream";
+                        this.panelCtrl.refresh();
                     }
                 }, {
                     key: 'typeChanged',
                     value: function typeChanged(type) {
-                        // resetting and refreshing panel if type(sensor or thing) changed
-                        this.target.dsTarget = "select metric";
-                        this.target.senTarget = "select a sensor";
-                        this.target.thingTarget = "select a thing";
                         this.target.selectedSensorId = 0;
                         this.target.selectedThingId = 0;
-                        this.onChangeInternal();
+                        this.resetDataSource();
+                    }
+                }, {
+                    key: 'showThings',
+                    value: function showThings() {
+                        return this.target.type == 'Thing' || this.target.type == 'Thing(HL)' || this.target.panelType == 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'getThings',
                     value: function getThings(query) {
                         var self = this;
-                        return this.datasource.metricFindQuery(query || '', "/Things").then(function (result) {
+                        return this.datasource.metricFindQuery(query || '', "/Things", 'thing').then(function (result) {
                             self.allThings = result;
                             return result;
                         });
@@ -181,14 +200,30 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'onThingChange',
                     value: function onThingChange(query) {
-                        this.target.dsTarget = "select metric";
-                        var selectedThing = _.find(this.allThings, { 'value': this.target.thingTarget });
-                        if (selectedThing) {
-                            this.target.selectedThingId = selectedThing.id;
-                        } else {
-                            this.target.selectedThingId = 0;
-                        }
-                        this.onChangeInternal();
+                        this.target.selectedThingName = _.find(this.allThings, { 'value': this.target.selectedThingId }).text;
+                        this.resetDataSource();
+                    }
+                }, {
+                    key: 'showLocations',
+                    value: function showLocations() {
+                        return this.target.type == 'Location(HL)';
+                    }
+                }, {
+                    key: 'getLocations',
+                    value: function getLocations(query) {
+                        var _this2 = this;
+
+                        return this.datasource.metricFindQuery(query || '', "/Locations", 'location').then(function (result) {
+                            _this2.allLocations = result;
+                            return result;
+                        }.bind(this));
+                    }
+                }, {
+                    key: 'onLocationChange',
+                    value: function onLocationChange(query) {
+                        // find and store the selected location name to use it as column name (refer datasource.js->transformThings())
+                        this.target.selectedLocationName = _.find(this.allLocations, { 'value': this.target.selectedLocationId }).text;
+                        this.panelCtrl.refresh();
                     }
                 }]);
 
