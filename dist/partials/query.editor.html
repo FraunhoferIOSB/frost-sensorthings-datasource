@@ -1,7 +1,7 @@
 <query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
   <div class="gf-form-inline">
 
-    <div class="gf-form max-width-8">
+    <div class="gf-form max-width-8" ng-if="ctrl.showControlTypes()">
       <select  class="gf-form-input"
               ng-model="ctrl.target.type"
               ng-options="f as f for f in ctrl.getTargetTypes()"

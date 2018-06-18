@@ -114,6 +114,11 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                         return targetTypes;
                     }
                 }, {
+                    key: 'showControlTypes',
+                    value: function showControlTypes() {
+                        return this.target.panelType != 'grafana-worldmap-panel';
+                    }
+                }, {
                     key: 'toggleEditorMode',
                     value: function toggleEditorMode() {
                         this.target.rawQuery = !this.target.rawQuery;
@@ -121,7 +126,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showSensors',
                     value: function showSensors() {
-                        return this.target.type == 'Sensor';
+                        return this.target.type == 'Sensor' && this.target.panelType != 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'getSensors',
@@ -141,7 +146,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showDatastreams',
                     value: function showDatastreams() {
-                        return (this.target.selectedSensorId != 0 || this.target.selectedThingId != 0) && (this.target.type == "Sensor" || this.target.type == "Thing");
+                        return (this.target.selectedSensorId != 0 || this.target.selectedThingId != 0) && (this.target.type == "Sensor" || this.target.type == "Thing") && this.target.panelType != 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'getDataSources',
@@ -181,7 +186,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showThings',
                     value: function showThings() {
-                        return this.target.type == 'Thing' || this.target.type == 'Thing(HL)';
+                        return this.target.type == 'Thing' || this.target.type == 'Thing(HL)' || this.target.panelType == 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'getThings',
