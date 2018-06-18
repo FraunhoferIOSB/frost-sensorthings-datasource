@@ -22,10 +22,6 @@ git clone https://code.linksmart.eu/scm/gst/grafana-sensorthings-datasource.git 
 2. Click "Add data source".
 3. Then, provide the necessary details to connect with OGC SensorThings server. Look at the image below for reference.
 
-<p align="center">
-  <img src="https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png">
-</p>
-
 ![](https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
 
 Name | Description
@@ -45,7 +41,7 @@ To visualize the observations from OGC SensorThings server,
 1. Add a graph panel.
 2. Select "OGC SensorThings Datasource" datasource.
 3. Select "Sensor" or "Things" to get the list of sensors or things which is already available in your sensorthings database.
-4. Then select a sensor or things from the list, to get the list of datastreams.
+4. Then select a specific sensor or thing from the list, to get the list of datastreams.
 5. Finally, select a datastream to visualize the observations in the graph.
 
 ![](https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/graph_demo.gif)
