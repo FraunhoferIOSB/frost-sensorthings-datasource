@@ -1,3 +1,13 @@
+# OCG SensorThings Datasource Plugin
+[Grafana](http://grafana.org/) datasource plugin for [OCG SensorThings Datasource](http://developers.sensorup.com/docs/).
+
+## Deployment
+
+### Install via grafana-cli
+```
+sudo grafana-cli plugins install linksmart-hds-datasource
+```
+
 ## Simple JSON Datasource - a generic backend datasource
 
 More documentation about datasource plugins can be found in the [Docs](https://github.com/grafana/grafana/blob/master/docs/sources/plugins/developing/datasources.md).

@@ -32,17 +32,17 @@ export class GenericDatasource {
 
     query(options) {
 
-        // let allCoordinates = [ { "key": "fraunhofer cafeteria", "latitude": 50.7495107, "longitude": 7.1948428, "name": "fraunhofer cafeteria" }, { "key": "charleroi", "latitude": 50.4108, "longitude": 4.4446, "name": "Charleroi"}, { "key": "frankfurt", "latitude": 50.110924, "longitude": 8.682127, "name": "Frankfurt", }, { "key": "london", "latitude": 51.503399, "longitude": -0.119519, "name": "London", }, { "key": "paris", "latitude": 48.864716, "longitude": 2.349014, "name": "Paris" } ];
-
+//         let allCoordinates = [ { "key": "fraunhofer cafeteria", "latitude": 50.7495107, "longitude": 7.1948428, "name": "fraunhofer cafeteria",value:2 }, { "key": "charleroi", "latitude": 50.4108, "longitude": 4.4446, "name": "Charleroi",value:3}, { "key": "frankfurt", "latitude": 50.110924, "longitude": 8.682127, "name": "Frankfurt", }, { "key": "london", "latitude": 51.503399, "longitude": -0.119519, "name": "London", }, { "key": "paris", "latitude": 48.864716, "longitude": 2.349014, "name": "Paris" } ];
+// return {data: allCoordinates};
         // Filter targets that are set to hidden
         options.targets = _.filter(options.targets, target => {
             return target.hide != true;
         });
 
         let allPromises = [];
-        
+
         if (_.find(options.targets, {"panelType" : 'grafana-worldmap-panel'})) {
-            _.forEach(options.targets,function(target){
+            _.forEach(options.targets,function(target,targetIndex){
                 let self = this;
                 let suburl = '';
 
@@ -54,7 +54,7 @@ export class GenericDatasource {
                     url: this.url + suburl,
                     method: 'GET'
                 }).then(function(response){
-                    return self.transformLocationsCoordinates(target,response.data.value);
+                    return self.transformLocationsCoordinates(target,targetIndex,response.data.value);
                 }));
 
             }.bind(this));
@@ -117,7 +117,7 @@ export class GenericDatasource {
         });
     }
 
-    transformLocationsCoordinates(target,values){
+    transformLocationsCoordinates(target,targetIndex,values){
         let result = [];
         let timestamp = "";
         let lastLocation = false;
@@ -130,7 +130,8 @@ export class GenericDatasource {
                             "key": location.name,
                             "latitude": location.location.coordinates[0],
                             "longitude": location.location.coordinates[1],
-                            "name": location.name + " | " +target.selectedThingName + " | " + timestamp + lastLocationValue
+                            "name": location.name + " | " +target.selectedThingName + " | " + timestamp + lastLocationValue,
+                            "value": targetIndex+1,
                         });
                 if (index == 0 && locationIndex == 0 ) {
                     lastLocation = true;
@@ -264,7 +265,6 @@ export class GenericDatasource {
         });
 
         options.targets = targets;
-        console.log(options);
         return options;
     }
 }
