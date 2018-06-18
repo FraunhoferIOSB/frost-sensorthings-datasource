@@ -23,7 +23,7 @@
     "links": [
         {"name": "SensorThings DataSource", "url": "http://developers.sensorup.com/docs/"},
         {"name": "Source Codes", "url": "https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/"},
-        {"name": "Apache License", "url": "https://code.linksmart.eu/projects/HDS/repos/grafana-hds-datasource/raw/LICENSE"}
+        {"name": "Apache License", "url": "https://code.linksmart.eu/projects/HDS/repos/grafana-hds-datasource/raw/LICENSE"},
         {"name": "MIT License", "url": "https://github.com/grafana/simple-json-datasource/blob/master/LICENSE"}
     ],
     "version": "0.1.0",
