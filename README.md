@@ -22,6 +22,10 @@ git clone https://code.linksmart.eu/scm/gst/grafana-sensorthings-datasource.git 
 2. Click "Add data source".
 3. Then, provide the necessary details to connect with OGC SensorThings server. Look at the image below for reference.
 
+<p align="center">
+  <img src="https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png">
+</p>
+
 ![](https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
 
 Name | Description
