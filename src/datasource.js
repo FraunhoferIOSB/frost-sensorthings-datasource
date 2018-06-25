@@ -18,15 +18,14 @@ export class GenericDatasource {
     }
 
     getTimeFilter(options,key){
-        let from = options.range.from.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
-        let to = options.range.to.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
+        let from = options.range.from.local().format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
+        let to = options.range.to.local().format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
         return key + " gt " + from + " and "+ key + " lt " + to;
     }
 
     sleep(delay) {
         var start = new Date().getTime();
         while (new Date().getTime() < start + delay){
-
         };
     }
 
@@ -146,10 +145,11 @@ export class GenericDatasource {
             'target' : target.selectedDatastreamName.toString(),
             'datapoints' : _.map(values,function(value,index){
                 if (target.panelType == "table") {
-                    return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                    return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").subtract(moment().utcOffset(),'minutes').format('x'))];
                 }
                 // graph panel type expects the value in float/double/int and not as strings
-                return [value.result,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                return [value.result,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").subtract(moment().utcOffset(),'minutes').format('x'))];
+                // return [value.result,parseInt(moment(value.resultTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
             })
         };
     }
@@ -158,7 +158,8 @@ export class GenericDatasource {
         return {
             'target' : target.selectedLocationName.toString(),
             'datapoints' : _.map(values,function(value,index){
-                return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").subtract(moment().utcOffset(),'minutes').format('x'))];
+                // return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
             })
         };
     }
@@ -167,7 +168,8 @@ export class GenericDatasource {
         let result = [];
         _.forEach(values,function(value) {
             _.forEach(value.Locations,function(location) {
-                result.push([_.isEmpty(location.name) ? '-' : location.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
+                result.push([_.isEmpty(location.name) ? '-' : location.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").subtract(moment().utcOffset(),'minutes').format('x'))]);
+                // result.push([_.isEmpty(location.name) ? '-' : location.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
             });
         });
         return {
