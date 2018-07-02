@@ -56,8 +56,8 @@ System.register(["lodash", "moment"], function (_export, _context) {
                 _createClass(GenericDatasource, [{
                     key: "getTimeFilter",
                     value: function getTimeFilter(options, key) {
-                        var from = options.range.from.format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
-                        var to = options.range.to.format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
+                        var from = options.range.from.utc().format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
+                        var to = options.range.to.utc().format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
                         return key + " gt " + from + " and " + key + " lt " + to;
                     }
                 }, {

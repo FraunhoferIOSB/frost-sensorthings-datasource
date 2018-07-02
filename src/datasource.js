@@ -18,8 +18,8 @@ export class GenericDatasource {
     }
 
     getTimeFilter(options,key){
-        let from = options.range.from.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
-        let to = options.range.to.format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
+        let from = options.range.from.utc().format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
+        let to = options.range.to.utc().format("YYYY-MM-DDTHH:mm:ss.SSS")+"Z";
         return key + " gt " + from + " and "+ key + " lt " + to;
     }
 
