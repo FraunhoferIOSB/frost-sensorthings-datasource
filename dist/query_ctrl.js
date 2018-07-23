@@ -69,7 +69,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                     _this.scope = $scope;
                     _this.target.panelType = _this.scope.ctrl.panel.type;
 
-                    _this.target.type = _this.target.type || 'Sensor';
+                    _this.target.type = _this.target.type || 'Sensors';
 
                     // datasource init start
                     _this.target.selectedDatastreamId = _this.target.selectedDatastreamId || 0;
@@ -107,9 +107,9 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'getTargetTypes',
                     value: function getTargetTypes() {
-                        var targetTypes = ['Sensor', 'Thing'];
+                        var targetTypes = ['Sensors', 'Things'];
                         if (this.target.panelType == 'table') {
-                            targetTypes.push('Location(HL)', 'Thing(HL)');
+                            targetTypes.push('Location', 'Historical Location');
                         }
                         return targetTypes;
                     }
@@ -126,7 +126,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showSensors',
                     value: function showSensors() {
-                        return this.target.type == 'Sensor' && this.target.panelType != 'grafana-worldmap-panel';
+                        return this.target.type == 'Sensors' && this.target.panelType != 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'getSensors',
@@ -146,14 +146,14 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showDatastreams',
                     value: function showDatastreams() {
-                        return (this.target.selectedSensorId != 0 || this.target.selectedThingId != 0) && (this.target.type == "Sensor" || this.target.type == "Thing") && this.target.panelType != 'grafana-worldmap-panel';
+                        return (this.target.selectedSensorId != 0 || this.target.selectedThingId != 0) && (this.target.type == "Sensors" || this.target.type == "Things") && this.target.panelType != 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'getDataSources',
                     value: function getDataSources(query) {
                         var self = this;
                         var targetUrl = "";
-                        if (this.target.type == 'Sensor') {
+                        if (this.target.type == 'Sensors') {
                             targetUrl = "/Sensors(" + this.target.selectedSensorId + ")/Datastreams";
                         } else {
                             targetUrl = "/Things(" + this.target.selectedThingId + ")/Datastreams";
@@ -186,7 +186,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showThings',
                     value: function showThings() {
-                        return this.target.type == 'Thing' || this.target.type == 'Thing(HL)' || this.target.panelType == 'grafana-worldmap-panel';
+                        return this.target.type == 'Things' || this.target.type == 'Historical Location' || this.target.panelType == 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'getThings',
@@ -206,7 +206,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showLocations',
                     value: function showLocations() {
-                        return this.target.type == 'Location(HL)';
+                        return this.target.type == 'Location';
                     }
                 }, {
                     key: 'getLocations',

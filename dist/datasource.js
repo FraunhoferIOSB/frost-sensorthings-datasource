@@ -114,11 +114,11 @@ System.register(["lodash", "moment"], function (_export, _context) {
                             var self = this;
                             var suburl = '';
 
-                            if (_.isEqual(target.type, "Location(HL)")) {
+                            if (_.isEqual(target.type, "Location")) {
                                 if (target.selectedLocationId == 0) return;
                                 var timeFilter = this.getTimeFilter(options, "time");
                                 suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things';
-                            } else if (_.isEqual(target.type, "Thing(HL)")) {
+                            } else if (_.isEqual(target.type, "Historical Location")) {
                                 if (target.selectedThingId == 0) return;
                                 var _timeFilter = this.getTimeFilter(options, "time");
                                 suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?' + '$filter=' + _timeFilter + '&$expand=Locations';
@@ -133,9 +133,9 @@ System.register(["lodash", "moment"], function (_export, _context) {
                                 method: 'GET'
                             }).then(function (response) {
                                 var transformedResults = [];
-                                if (_.isEqual(target.type, "Location(HL)")) {
+                                if (_.isEqual(target.type, "Location")) {
                                     transformedResults = self.transformThings(target, response.data.value);
-                                } else if (_.isEqual(target.type, "Thing(HL)")) {
+                                } else if (_.isEqual(target.type, "Historical Location")) {
                                     transformedResults = self.transformLocations(target, response.data.value);
                                 } else {
                                     transformedResults = self.transformDataSource(target, response.data.value);
@@ -177,10 +177,10 @@ System.register(["lodash", "moment"], function (_export, _context) {
                             'target': target.selectedDatastreamName.toString(),
                             'datapoints': _.map(values, function (value, index) {
                                 if (target.panelType == "table") {
-                                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                                 }
                                 // graph panel type expects the value in float/double/int and not as strings
-                                return [value.result, parseInt(moment(value.resultTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                return [value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                             })
                         };
                     }

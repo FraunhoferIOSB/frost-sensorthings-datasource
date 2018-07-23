@@ -8,7 +8,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         this.scope = $scope;
         this.target.panelType = this.scope.ctrl.panel.type;
 
-        this.target.type = this.target.type || 'Sensor';
+        this.target.type = this.target.type || 'Sensors';
 
         // datasource init start
         this.target.selectedDatastreamId = this.target.selectedDatastreamId || 0;
@@ -44,9 +44,9 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
 
     getTargetTypes() {
-        let targetTypes = ['Sensor', 'Thing'];
+        let targetTypes = ['Sensors', 'Things'];
         if (this.target.panelType == 'table') {
-            targetTypes.push('Location(HL)','Thing(HL)');
+            targetTypes.push('Location','Historical Location');
         }
         return targetTypes;
     }
@@ -62,7 +62,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //sensor starts
     showSensors(){
-        return this.target.type == 'Sensor' &&
+        return this.target.type == 'Sensors' &&
                 (this.target.panelType != 'grafana-worldmap-panel');
     }
 
@@ -83,14 +83,14 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     //datastream starts
     showDatastreams(){
         return (this.target.selectedSensorId!=0 || this.target.selectedThingId!=0) &&
-                (this.target.type == "Sensor" || this.target.type == "Thing") &&
+                (this.target.type == "Sensors" || this.target.type == "Things") &&
                 (this.target.panelType != 'grafana-worldmap-panel');
     }
 
     getDataSources(query) {
         let self = this;
         let targetUrl = "";
-        if (this.target.type == 'Sensor') {
+        if (this.target.type == 'Sensors') {
             targetUrl = "/Sensors("+this.target.selectedSensorId+")/Datastreams";
         } else {
             targetUrl = "/Things("+this.target.selectedThingId+")/Datastreams";
@@ -121,7 +121,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //thing starts
     showThings(){
-        return this.target.type == 'Thing' || this.target.type == 'Thing(HL)' || (this.target.panelType == 'grafana-worldmap-panel');
+        return this.target.type == 'Things' || this.target.type == 'Historical Location' || (this.target.panelType == 'grafana-worldmap-panel');
     }
 
     getThings(query) {
@@ -140,7 +140,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //location starts
     showLocations(){
-        return this.target.type == 'Location(HL)';
+        return this.target.type == 'Location';
     }
 
     getLocations(query) {

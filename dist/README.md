@@ -51,7 +51,7 @@ Using table view, one can see list of observation recorded based on Sensors/Thin
 
 1. Add a table panel.
 2. Select "OGC SensorThings Datasource" datasource.
-3. Select "Sensor" or "Things" or "Location(HL)" or "Thing(HL)" from the intial dropdown list. (Note: HL -> Historical Location)
+3. Select "Sensor" or "Things" or "Location" or "Thing(HL)" from the intial dropdown list. (Note: HL -> Historical Location)
 4. See the demo below for better understand.
 
 ![](https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/table_demo.gif)
@@ -60,7 +60,7 @@ Name | Description
 ------------ | -------------
 Sensor | A Sensor in SensorThings API is an instrument that observes a property or phenomenon with the goal of producing an estimate of the value of the property.
 Thing | A Thing is an object of the physical world (physical Things) or the information world (virtual Things) that is capable of being identified and integrated into communication networks [ITU-T Y.2060].
-Location (HL) | Returns list of historical things that has been attached/visited in the selected location. 
+Location (HL) | Returns list of historical things that has been attached/visited in the selected location.
 Thing (HL) | Returns list of historical locations that has been  attached/visited in the selected thing
 
 ### Dev setup
