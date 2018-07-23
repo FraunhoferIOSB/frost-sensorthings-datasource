@@ -1,0 +1,33 @@
+Grafana SensorThings Datasource
+Copyright 2018 Fraunhofer Institute for Applied Information Technology FIT
+
+This product includes software developed at
+Fraunhofer Institute for Applied Information Technology FIT (http://fit.fraunhofer.de/).
+
+This software is a fork of the simple-json-datasource (https://github.com/grafana/simple-json-datasource)
+developed by Grafana under MIT License.
+
+Grafana SensorThings Datasource includes the following dependencies 
+developed by the corresponding developers and organisations:
+
+* https://github.com/grafana/simple-json-datasource by Grafana (MIT License)
+* https://github.com/nodejs/node by Node.js contributors (MIT License)
+* https://github.com/babel/babel by Sebastian McKenzie (MIT License)
+* https://github.com/chaijs/chai by Jake Luer (MIT License)
+* https://github.com/gruntjs/grunt by "Cowboy" Ben Alman (MIT License)
+* https://github.com/babel/grunt-babel by Sindre Sorhus (MIT License)
+* https://github.com/gruntjs/grunt-cli by Tyler Kellen, contributors (MIT License)
+* https://github.com/gruntjs/grunt-contrib-clean by Tim Branyen (MIT License)
+* https://github.com/gruntjs/grunt-contrib-copy by Chris Talkington (MIT License)
+* https://github.com/gruntjs/grunt-contrib-uglify by "Cowboy" Ben Alman (MIT License)
+* https://github.com/gruntjs/grunt-contrib-watch by "Cowboy" Ben Alman (MIT License)
+* https://github.com/Bartvds/grunt-execute by Bart van der Schoor (MIT License)
+* https://github.com/pghalliday/grunt-mocha-test by Peter Halliday (MIT License)
+* https://github.com/yoavniran/grunt-systemjs-builder by contributors (no license)
+* https://github.com/tmpvar/jsdom by Elijah Insua (MIT License)
+* https://github.com/sindresorhus/load-grunt-tasks by Sindre Sorhus (MIT License)
+* https://dak0rn.github.io/prunk by Daniel Koch (Apache License)
+* https://github.com/kriskowal/q by Kristopher Michael Kowal (MIT License)
+* https://github.com/lodash/lodas by jQuery Foundation and other contributors (MIT License)
+* https://github.com/mochajs/mocha by TJ Holowaychuk (MIT License)
+* https://github.com/moment/moment by JS Foundation and other contributors (MIT License)

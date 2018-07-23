@@ -12,7 +12,7 @@ sudo grafana-cli plugins install grafana-sensorthings-datasource
 
 * Clone the repository into Grafana's [plugin directory](http://docs.grafana.org/plugins/installation/#grafana-plugin-directory):
 ```
-git clone https://code.linksmart.eu/scm/gst/grafana-sensorthings-datasource.git grafana-sensorthings-datasource
+git clone https://code.linksmart.eu/scm/ogc-st/grafana-sensorthings-datasource.git grafana-sensorthings-datasource
 ```
 * Restart Grafana server to see the newly added datasource.
 
