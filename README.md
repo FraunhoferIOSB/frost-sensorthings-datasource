@@ -1,28 +1,34 @@
-# OGC SensorThings Datasource Plugin
-[Grafana](http://grafana.org/) datasource plugin for [OGC SensorThings Datasource](http://developers.sensorup.com/docs/).
+# OGC SensorThings Data Source Plugin
+This plugin enables the visualization of sensor and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) on [Grafana](http://grafana.org/). 
 
-## How to install OGC SensorThings Datasource Plugin?
+It provides:
+* Time-series visualization on [Graph](https://grafana.com/plugins/graph)
+* Time-series and location history in [Table](https://grafana.com/plugins/table)
+* Sensor data in [Singlestat](https://grafana.com/plugins/singlestat)
+* Location of things on [Worldmap Panel](https://grafana.com/plugins/grafana-worldmap-panel)
+
+## Installation
 
 ### Install via grafana-cli
 ```
-sudo grafana-cli plugins install grafana-sensorthings-datasource
+sudo grafana-cli plugins install linksmart-sensorthings-datasource
 ```
 
 ### Install from source
 
 * Clone the repository into Grafana's [plugin directory](http://docs.grafana.org/plugins/installation/#grafana-plugin-directory):
 ```
-git clone https://code.linksmart.eu/scm/ogc-st/grafana-sensorthings-datasource.git grafana-sensorthings-datasource
+git clone https://code.linksmart.eu/scm/ogc-st/grafana-sensorthings-datasource.git linksmart-sensorthings-datasource
 ```
 * Restart Grafana server to see the newly added datasource.
 
-## How to setup OGC SensorThings Datasource?
+## Setup
 
 1. Go to Grafana Configuration.
 2. Click "Add data source".
 3. Then, provide the necessary details to connect with OGC SensorThings server. Look at the image below for reference.
 
-![](https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
+![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
 
 Name | Description
 ------------ | -------------
@@ -44,29 +50,30 @@ To visualize the observations from OGC SensorThings server,
 4. Then select a specific sensor or thing from the list, to get the list of datastreams.
 5. Finally, select a datastream to visualize the observations in the graph.
 
-![](https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/graph_demo.gif)
+![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/graph_demo.gif)
 
 ### Table view
 Using table view, one can see list of observation recorded based on Sensors/Things, and also list of historical Locations visited by a "Thing" or list of historical things that has been in a specific "Location".
 
 1. Add a table panel.
 2. Select "OGC SensorThings Datasource" datasource.
-3. Select "Sensor" or "Things" or "Location" or "Thing(HL)" from the intial dropdown list. (Note: HL -> Historical Location)
+3. Select "Sensor" or "Things" or "Location(HL)" or "Thing(HL)" from the intial dropdown list. (Note: HL -> Historical Location)
 4. See the demo below for better understand.
 
-![](https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/raw/img/table_demo.gif)
+![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/table_demo.gif)
 
 Name | Description
 ------------ | -------------
 Sensor | A Sensor in SensorThings API is an instrument that observes a property or phenomenon with the goal of producing an estimate of the value of the property.
 Thing | A Thing is an object of the physical world (physical Things) or the information world (virtual Things) that is capable of being identified and integrated into communication networks [ITU-T Y.2060].
-Location (HL) | Returns list of historical things that has been attached/visited in the selected location.
+Location (HL) | Returns list of historical things that has been attached/visited in the selected location. 
 Thing (HL) | Returns list of historical locations that has been  attached/visited in the selected thing
 
 ### Dev setup
 
 This plugin requires node 6.10.0
-
-`npm install -g yarn`
-`yarn install`
-`npm run build`
+```
+npm install -g yarn
+yarn install
+npm run build
+```
