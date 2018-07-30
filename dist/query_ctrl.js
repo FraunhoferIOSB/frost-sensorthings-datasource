@@ -99,12 +99,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }
 
                 _createClass(GenericDatasourceQueryCtrl, [{
-                    key: 'sleep',
-                    value: function sleep(delay) {
-                        var start = new Date().getTime();
-                        while (new Date().getTime() < start + delay) {};
-                    }
-                }, {
                     key: 'getTargetTypes',
                     value: function getTargetTypes() {
                         var targetTypes = ['Sensors', 'Things'];
