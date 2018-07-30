@@ -23,16 +23,7 @@ export class GenericDatasource {
         return key + " gt " + from + " and "+ key + " lt " + to;
     }
 
-    sleep(delay) {
-        var start = new Date().getTime();
-        while (new Date().getTime() < start + delay){
-        };
-    }
-
     query(options) {
-
-//         let allCoordinates = [ { "key": "fraunhofer cafeteria", "latitude": 50.7495107, "longitude": 7.1948428, "name": "fraunhofer cafeteria",value:2 }, { "key": "charleroi", "latitude": 50.4108, "longitude": 4.4446, "name": "Charleroi",value:3}, { "key": "frankfurt", "latitude": 50.110924, "longitude": 8.682127, "name": "Frankfurt", }, { "key": "london", "latitude": 51.503399, "longitude": -0.119519, "name": "London", }, { "key": "paris", "latitude": 48.864716, "longitude": 2.349014, "name": "Paris" } ];
-// return {data: allCoordinates};
         // Filter targets that are set to hidden
         options.targets = _.filter(options.targets, target => {
             return target.hide != true;
@@ -69,9 +60,6 @@ export class GenericDatasource {
 
         let self = this;
         let allTargetResults = {data:[]};
-
-
-        // /Datastreams(16)/Observations?$filter=phenomenonTime%20gt%202018-03-14T16:00:12.749Z%20and%20phenomenonTime%20lt%202018-03-14T17:00:12.749Z&$select=result,phenomenonTime
 
         _.forEach(options.targets,function(target){
             let self = this;
@@ -180,29 +168,6 @@ export class GenericDatasource {
         });
     }
 
-    annotationQuery(options) {
-        var query = this.templateSrv.replace(options.annotation.query, {}, 'glob');
-        var annotationQuery = {
-            range: options.range,
-            annotation: {
-                name: options.annotation.name,
-                datasource: options.annotation.datasource,
-                enable: options.annotation.enable,
-                iconColor: options.annotation.iconColor,
-                query: query
-            },
-            rangeRaw: options.rangeRaw
-        };
-
-        return this.doRequest({
-            url: this.url + '/annotations',
-            method: 'POST',
-            data: annotationQuery
-        }).then(result => {
-            return result.data;
-        });
-    }
-
     metricFindQuery(query,suburl,type) {
         return this.doRequest({
             url: this.url + suburl,
@@ -240,24 +205,5 @@ export class GenericDatasource {
 
         return this.backendSrv.datasourceRequest(options);
 
-    }
-
-    buildQueryParameters(options) {
-        //remove placeholder targets
-        options.targets = _.filter(options.targets, target => {
-            return target.dsTarget !== 'select metric';
-        });
-
-        var targets = _.map(options.targets, target => {
-            return {
-                target: this.templateSrv.replace(target.dsTarget.toString(), options.scopedVars, 'regex') ,
-                refId: target.refId,
-                hide: target.hide,
-                type: target.type || 'timeserie'
-            };
-        });
-
-        options.targets = targets;
-        return options;
     }
 }
