@@ -1,10 +1,10 @@
 {
-  "name": "OGC SensorThings",
+  "name": "LinkSmart SensorThings",
   "id": "linksmart-sensorthings-datasource",
   "type": "datasource",
 
   "partials": {
-    "config": "public/app/plugins/datasource/ogc-sensorthings-datasource/partials/config.html"
+    "config": "public/app/plugins/datasource/linksmart-sensorthings-datasource/partials/config.html"
   },
 
   "metrics": true,
@@ -13,8 +13,8 @@
   "info": {
     "description": "A Grafana datasource plugin for OGC SensorThings API",
     "author": {
-      "name": "LinkSmart",
-      "url": "https://linksmart.eu"
+      "name": "Fraunhofer FIT",
+      "url": "http://www.fit.fraunhofer.de/en.html"
     },
     "keywords": ["time-series", "location", "sensorthings", "datasource", "linksmart"],
     "logos": {
