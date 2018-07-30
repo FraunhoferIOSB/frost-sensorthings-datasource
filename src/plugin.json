@@ -1,37 +1,37 @@
 {
-  "name": "SensorThings DataSource",
-  "id": "grafana-sensorthings-datasource",
+  "name": "OGC SensorThings",
+  "id": "linksmart-sensorthings-datasource",
   "type": "datasource",
 
   "partials": {
-    "config": "public/app/plugins/datasource/grafana-sensorthings-datasource/partials/config.html"
+    "config": "public/app/plugins/datasource/ogc-sensorthings-datasource/partials/config.html"
   },
 
   "metrics": true,
   "annotations": false,
 
   "info": {
-    "description": "Grafana datasource plugin for OGC SensorThings API",
+    "description": "A Grafana datasource plugin for OGC SensorThings API",
     "author": {
-      "name": "Fraunhofer FIT",
-      "url": "http://www.fit.fraunhofer.de/en.html"
+      "name": "LinkSmart",
+      "url": "https://linksmart.eu"
     },
+    "keywords": ["time-series", "location", "sensorthings", "datasource", "linksmart"],
     "logos": {
       "small": "img/simpleJson_logo.svg",
       "large": "img/simpleJson_logo.svg"
     },
     "links": [
-        {"name": "SensorThings DataSource", "url": "http://developers.sensorup.com/docs/"},
-        {"name": "Source Codes", "url": "https://code.linksmart.eu/projects/GST/repos/grafana-sensorthings-datasource/"},
-        {"name": "Apache License", "url": "https://code.linksmart.eu/projects/HDS/repos/grafana-hds-datasource/raw/LICENSE"},
-        {"name": "MIT License", "url": "https://github.com/grafana/simple-json-datasource/blob/master/LICENSE"}
+        {"name": "LinkSmart", "url": "https://linksmart.eu"},
+        {"name": "Source Codes", "url": "https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource"},
+        {"name": "OGC SensorThings API", "url": "https://github.com/opengeospatial/sensorthings"}
     ],
-    "version": "0.1.0",
-    "updated": "2018-06-"
+    "version": "1.0.0",
+    "updated": "2018-07-30"
   },
 
   "dependencies": {
-    "grafanaVersion": "5.1.x",
+    "grafanaVersion": "4.x.x",
     "plugins": [ ]
   }
 }
