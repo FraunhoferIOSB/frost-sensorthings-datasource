@@ -36,13 +36,6 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         // Location init end
     }
 
-    sleep(delay) {
-        var start = new Date().getTime();
-        while (new Date().getTime() < start + delay){
-
-        };
-    }
-
     getTargetTypes() {
         let targetTypes = ['Sensors', 'Things'];
         if (this.target.panelType == 'table') {
