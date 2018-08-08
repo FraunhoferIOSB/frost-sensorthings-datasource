@@ -115,7 +115,7 @@ export class GenericDatasource {
                 "key": lastLocation.name,
                 "latitude": lastLocation.location.coordinates[0],
                 "longitude": lastLocation.location.coordinates[1],
-                "name": location.name + " | " +target.selectedThingName + " | " + moment(values[0].time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
+                "name": lastLocation.name + " | " +target.selectedThingName + " | " + moment(values[0].time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
                 "value": targetIndex+1,
             });
         }

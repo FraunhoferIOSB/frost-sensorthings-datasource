@@ -153,7 +153,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                                 "key": _lastLocation.name,
                                 "latitude": _lastLocation.location.coordinates[0],
                                 "longitude": _lastLocation.location.coordinates[1],
-                                "name": location.name + " | " + target.selectedThingName + " | " + moment(values[0].time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
+                                "name": _lastLocation.name + " | " + target.selectedThingName + " | " + moment(values[0].time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
                                 "value": targetIndex + 1
                             });
                         }
