@@ -103,7 +103,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                     value: function getTargetTypes() {
                         var targetTypes = ['Sensors', 'Things'];
                         if (this.target.panelType == 'table') {
-                            targetTypes.push('Location', 'Historical Location');
+                            targetTypes.push('Locations', 'Historical Locations');
                         }
                         return targetTypes;
                     }
@@ -180,7 +180,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showThings',
                     value: function showThings() {
-                        return this.target.type == 'Things' || this.target.type == 'Historical Location' || this.target.panelType == 'grafana-worldmap-panel';
+                        return this.target.type == 'Things' || this.target.type == 'Historical Locations' || this.target.panelType == 'grafana-worldmap-panel';
                     }
                 }, {
                     key: 'getThings',
@@ -200,7 +200,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 }, {
                     key: 'showLocations',
                     value: function showLocations() {
-                        return this.target.type == 'Location';
+                        return this.target.type == 'Locations';
                     }
                 }, {
                     key: 'getLocations',

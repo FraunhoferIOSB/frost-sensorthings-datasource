@@ -103,11 +103,11 @@ System.register(["lodash", "moment"], function (_export, _context) {
                             var self = this;
                             var suburl = '';
 
-                            if (_.isEqual(target.type, "Location")) {
+                            if (_.isEqual(target.type, "Locations")) {
                                 if (target.selectedLocationId == 0) return;
                                 var timeFilter = this.getTimeFilter(options, "time");
                                 suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things';
-                            } else if (_.isEqual(target.type, "Historical Location")) {
+                            } else if (_.isEqual(target.type, "Historical Locations")) {
                                 if (target.selectedThingId == 0) return;
                                 var _timeFilter = this.getTimeFilter(options, "time");
                                 suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?' + '$filter=' + _timeFilter + '&$expand=Locations';
@@ -122,9 +122,9 @@ System.register(["lodash", "moment"], function (_export, _context) {
                                 method: 'GET'
                             }).then(function (response) {
                                 var transformedResults = [];
-                                if (_.isEqual(target.type, "Location")) {
+                                if (_.isEqual(target.type, "Locations")) {
                                     transformedResults = self.transformThings(target, response.data.value);
-                                } else if (_.isEqual(target.type, "Historical Location")) {
+                                } else if (_.isEqual(target.type, "Historical Locations")) {
                                     transformedResults = self.transformLocations(target, response.data.value);
                                 } else {
                                     transformedResults = self.transformDataSource(target, response.data.value);

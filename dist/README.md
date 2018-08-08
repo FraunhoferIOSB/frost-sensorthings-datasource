@@ -1,5 +1,5 @@
 # OGC SensorThings Data Source Plugin
-This plugin enables the visualization of sensor and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) on [Grafana](http://grafana.org/). 
+This plugin enables the visualization of sensor and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) on [Grafana](http://grafana.org/).
 
 It provides:
 * Time-series visualization on [Graph](https://grafana.com/plugins/graph)
@@ -57,17 +57,17 @@ Using table view, one can see list of observation recorded based on Sensors/Thin
 
 1. Add a table panel.
 2. Select "OGC SensorThings Datasource" datasource.
-3. Select "Sensor" or "Things" or "Location(HL)" or "Thing(HL)" from the intial dropdown list. (Note: HL -> Historical Location)
+3. Select "Sensors" or "Things" or "Locations" or "Historical Locations" from the intial dropdown list.
 4. See the demo below for better understand.
 
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/table_demo.gif)
 
 Name | Description
 ------------ | -------------
-Sensor | A Sensor in SensorThings API is an instrument that observes a property or phenomenon with the goal of producing an estimate of the value of the property.
-Thing | A Thing is an object of the physical world (physical Things) or the information world (virtual Things) that is capable of being identified and integrated into communication networks [ITU-T Y.2060].
-Location (HL) | Returns list of historical things that has been attached/visited in the selected location. 
-Thing (HL) | Returns list of historical locations that has been  attached/visited in the selected thing
+Sensors | A Sensor in SensorThings API is an instrument that observes a property or phenomenon with the goal of producing an estimate of the value of the property.
+Things | A Thing is an object of the physical world (physical Things) or the information world (virtual Things) that is capable of being identified and integrated into communication networks [ITU-T Y.2060].
+Locations | Returns list of historical things that has been attached/visited in the selected location.
+Historical Locations | Returns list of historical locations that has been  attached/visited in the selected thing
 
 ### Dev setup
 
