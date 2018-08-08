@@ -65,11 +65,11 @@ export class GenericDatasource {
             let self = this;
             let suburl = '';
 
-            if (_.isEqual(target.type,"Location")) {
+            if (_.isEqual(target.type,"Locations")) {
                 if (target.selectedLocationId == 0) return;
                 let timeFilter = this.getTimeFilter(options,"time");
                 suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things';
-            } else if(_.isEqual(target.type,"Historical Location")){
+            } else if(_.isEqual(target.type,"Historical Locations")){
                 if (target.selectedThingId == 0) return;
                 let timeFilter = this.getTimeFilter(options,"time");
                 suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
@@ -84,9 +84,9 @@ export class GenericDatasource {
                 method: 'GET'
             }).then(function(response){
                 let transformedResults = [];
-                if (_.isEqual(target.type,"Location")) {
+                if (_.isEqual(target.type,"Locations")) {
                     transformedResults = self.transformThings(target,response.data.value);
-                } else if(_.isEqual(target.type,"Historical Location")){
+                } else if(_.isEqual(target.type,"Historical Locations")){
                     transformedResults = self.transformLocations(target,response.data.value);
                 } else {
                     transformedResults = self.transformDataSource(target,response.data.value);

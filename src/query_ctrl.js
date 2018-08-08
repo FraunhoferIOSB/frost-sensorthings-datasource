@@ -39,7 +39,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     getTargetTypes() {
         let targetTypes = ['Sensors', 'Things'];
         if (this.target.panelType == 'table') {
-            targetTypes.push('Location','Historical Location');
+            targetTypes.push('Locations','Historical Locations');
         }
         return targetTypes;
     }
@@ -114,7 +114,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //thing starts
     showThings(){
-        return this.target.type == 'Things' || this.target.type == 'Historical Location' || (this.target.panelType == 'grafana-worldmap-panel');
+        return this.target.type == 'Things' || this.target.type == 'Historical Locations' || (this.target.panelType == 'grafana-worldmap-panel');
     }
 
     getThings(query) {
@@ -133,7 +133,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //location starts
     showLocations(){
-        return this.target.type == 'Location';
+        return this.target.type == 'Locations';
     }
 
     getLocations(query) {
