@@ -31,9 +31,7 @@ git clone https://code.linksmart.eu/scm/ogc-st/grafana-sensorthings-datasource.g
 
 1. Go to Grafana Configuration.
 2. Select `Add data source`.
-3. Provide the necessary details to connect with OGC SensorThings server. Look at the image below for reference.
-
-![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
+3. Provide the necessary details to connect with OGC SensorThings server.
 
 Name | Description
 ------------ | -------------
@@ -43,6 +41,12 @@ Type | Choose SensorThings Datasource.
 Url | OGC SensorThings API root URL (e.g. http://localhost:8080/v1.0). Note the URL has no trailing slash ("/").
 Access | Proxy: Let Grafana server proxy the requests to OGC SensorThings API server.
 Basic Auth | Authenticate to OGC SensorThings API server (if required, provide User and Password)
+
+![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
+
+4. Save & Test, you should see this confirmation:
+
+![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup_confirmation.png)
 
 ## Query Configuration
 
@@ -76,27 +80,20 @@ Using world map view, one can see the current Location of a Thing on the map.
 1. Install world map panel from grafana plugin store.
 2. Add a world map panel in dashboard
 3. In "Worldmap" tab:
-- Select `Center`->`Last GeoHash`
-- Set `Min Circle Size` and `Max Circle Size` to 5
-- Select `Location Data`->`json result`
-
+    * Select `Center`->`Last GeoHash`
+    * Set `Min Circle Size` and `Max Circle Size` to 5
+    * Select `Location Data`->`json result`<br/>
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/worldmap_config.png)
 
 4. In "Metrics" tab:
-- Select the OGC SensorThings Datasource.
-- Select a "Thing" from dropdown list.
+    * Select the OGC SensorThings Datasource.
+    * Select a "Thing" from dropdown list.
 
 See the demo below for better understanding:
 
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/worldmap_demo.gif)
 
 
-Name | Description
------------- | -------------
-Sensors | A Sensor in SensorThings API is an instrument that observes a property or phenomenon with the goal of producing an estimate of the value of the property.
-Things | A Thing is an object of the physical world (physical Things) or the information world (virtual Things) that is capable of being identified and integrated into communication networks [ITU-T Y.2060].
-Locations | Returns list of historical things that has been attached/visited in the selected location.
-Historical Locations | Returns list of historical locations that has been  attached/visited in the selected thing
 
 ### Dev setup
 
