@@ -44,7 +44,7 @@ Basic Auth | Authenticate to OGC SensorThings API server (if required, provide U
 
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
 
-4. Save & Test, you should see this confirmation:<br>
+4. Save & Test, you should see this confirmation:  
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup_confirmation.png)
 
 ## Query Configuration
@@ -81,7 +81,7 @@ Using world map view, one can see the current Location of a Thing on the map.
 3. In "Worldmap" tab:
     * Select `Center`->`Last GeoHash`
     * Set `Min Circle Size` and `Max Circle Size` to 5
-    * Select `Location Data`->`json result`<br/>
+    * Select `Location Data`->`json result`  
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/worldmap_config.png)
 
 4. In "Metrics" tab:
