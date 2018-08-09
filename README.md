@@ -44,8 +44,7 @@ Basic Auth | Authenticate to OGC SensorThings API server (if required, provide U
 
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
 
-4. Save & Test, you should see this confirmation:
-
+4. Save & Test, you should see this confirmation:<br>
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup_confirmation.png)
 
 ## Query Configuration
