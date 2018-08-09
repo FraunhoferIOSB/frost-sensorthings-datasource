@@ -1,5 +1,5 @@
 # LinkSmart SensorThings Data Source Plugin
-This plugin enables the visualization of sensor and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) on [Grafana](http://grafana.org/).
+This plugin enables the visualization of sensor and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) server on [Grafana](http://grafana.org/).
 
 It provides:
 * Time-series visualization on [Graph](https://grafana.com/plugins/graph)
