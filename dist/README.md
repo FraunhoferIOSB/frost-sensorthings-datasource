@@ -10,6 +10,8 @@ It provides:
 ## Demo
 A live dashboard showing SensorThings data in Grafana panels: [SensorThings Dashboard](https://demo.linksmart.eu/grafana/d/OUQUMYDmz/ogc-sensorthings)
 
+[![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/dashboard_small.png)](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/dashboard.png)
+
 ## Installation
 
 ### Install via grafana-cli
