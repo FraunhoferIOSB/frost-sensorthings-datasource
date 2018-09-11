@@ -18,8 +18,8 @@
     },
     "keywords": ["time-series", "location", "sensorthings", "datasource", "linksmart"],
     "logos": {
-      "small": "img/simpleJson_logo.svg",
-      "large": "img/simpleJson_logo.svg"
+      "small": "img/LinkSmart_SensorThings_logo.svg",
+      "large": "img/LinkSmart_SensorThings_logo.svg"
     },
     "links": [
         {"name": "LinkSmart", "url": "https://linksmart.eu"},
