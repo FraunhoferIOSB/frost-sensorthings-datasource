@@ -45,10 +45,11 @@ Basic Auth | Authenticate to OGC SensorThings API server (if required, provide U
 To visualize the observations from OGC SensorThings server,
 
 1. Add a graph panel.
-2. Select "OGC SensorThings Datasource" datasource.
+2. Select "OGC SensorThings Datasource".
 3. Select "Sensor" or "Things" to get the list of sensors or things which is already available in your sensorthings database.
 4. Then select a specific sensor or thing from the list, to get the list of datastreams.
 5. Finally, select a datastream to visualize the observations in the graph.
+6. See the demo below for better understanding.
 
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/graph_demo.gif)
 
@@ -56,11 +57,27 @@ To visualize the observations from OGC SensorThings server,
 Using table view, one can see list of observation recorded based on Sensors/Things, and also list of historical Locations visited by a "Thing" or list of historical things that has been in a specific "Location".
 
 1. Add a table panel.
-2. Select "OGC SensorThings Datasource" datasource.
+2. Select "OGC SensorThings Datasource".
 3. Select "Sensors" or "Things" or "Locations" or "Historical Locations" from the intial dropdown list.
-4. See the demo below for better understand.
+4. See the demo below for better understanding.
 
 ![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/table_demo.gif)
+
+### World Map view
+Using world map view, one can see the current location of a thing in the map with live status.
+
+1. Install world map panel from grafana plugin store.
+2. Add a world map panel in dashboard
+3. Select "OGC SensorThings Datasource".
+4. Go to "Worldmap" tab.
+5. Under "Map Data Options", select "json result" for "Location Data"
+6. Set "Min Circle size" and "Max Circle size" as "5".
+7. Select "Last GeoHash" for "Center".
+8. Now come back to "Metrics" section and select a "Thing" from dropdown list.
+9. See the demo below for better understanding.
+
+![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/map_demo.gif)
+
 
 Name | Description
 ------------ | -------------

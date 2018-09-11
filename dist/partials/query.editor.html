@@ -39,8 +39,8 @@
               model="ctrl.target.selectedDatastreamId"
               allow-custom="true"
               lookup-text="true"
-              get-options="ctrl.getDataSources($query)"
-              on-change="ctrl.onDataSourceChange($query)">
+              get-options="ctrl.getDataStreams($query)"
+              on-change="ctrl.onDataStreamChange($query)">
           </gf-form-dropdown>
           </div>
           <div class="gf-form">
@@ -55,13 +55,11 @@
           </div>
       </div>
     </div>
-
-    <div >
-
-    </div>
-
     <div class="gf-form gf-form--grow">
       <div class="gf-form-label gf-form-label--grow"></div>
     </div>
+  </div>
+  <div class="gf-form" ng-show="ctrl.lastQueryError">
+      <pre class="gf-form-pre alert alert-error">{{ctrl.lastQueryError}}</pre>
   </div>
 </query-editor-row>

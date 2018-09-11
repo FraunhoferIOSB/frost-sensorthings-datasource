@@ -64,6 +64,13 @@ export class GenericDatasource {
         _.forEach(options.targets,function(target){
             let self = this;
             let suburl = '';
+            if (target.selectedDatastreamDirty) {
+                allTargetResults.data.push({
+                    'target' : target.selectedDatastreamName.toString(),
+                    'datapoints' : [],
+                });
+                return;
+            }
 
             if (_.isEqual(target.type,"Locations")) {
                 if (target.selectedLocationId == 0) return;
@@ -169,6 +176,7 @@ export class GenericDatasource {
     }
 
     metricFindQuery(query,suburl,type) {
+        // console.log("here");
         return this.doRequest({
             url: this.url + suburl,
             method: 'GET',

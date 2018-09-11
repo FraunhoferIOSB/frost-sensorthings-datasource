@@ -102,6 +102,13 @@ System.register(["lodash", "moment"], function (_export, _context) {
                         _.forEach(options.targets, function (target) {
                             var self = this;
                             var suburl = '';
+                            if (target.selectedDatastreamDirty) {
+                                allTargetResults.data.push({
+                                    'target': target.selectedDatastreamName.toString(),
+                                    'datapoints': []
+                                });
+                                return;
+                            }
 
                             if (_.isEqual(target.type, "Locations")) {
                                 if (target.selectedLocationId == 0) return;
@@ -214,6 +221,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                     value: function metricFindQuery(query, suburl, type) {
                         var _this = this;
 
+                        // console.log("here");
                         return this.doRequest({
                             url: this.url + suburl,
                             method: 'GET'
