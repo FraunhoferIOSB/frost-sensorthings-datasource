@@ -137,7 +137,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'onDataError',
                     value: function onDataError(err) {
-                        // console.log(err);
                         this.handleQueryCtrlError(err);
                     }
                 }, {

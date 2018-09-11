@@ -154,7 +154,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
                         var timestamp = "";
                         var lastLocation = false;
                         var lastLocationValue = "";
-                        if (values.length > 0) {
+                        if (values && values.length > 0) {
                             var _lastLocation = values[0].Locations[0];
                             result.push({
                                 "key": _lastLocation.name,
@@ -221,7 +221,6 @@ System.register(["lodash", "moment"], function (_export, _context) {
                     value: function metricFindQuery(query, suburl, type) {
                         var _this = this;
 
-                        // console.log("here");
                         return this.doRequest({
                             url: this.url + suburl,
                             method: 'GET'

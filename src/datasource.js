@@ -116,7 +116,7 @@ export class GenericDatasource {
         let timestamp = "";
         let lastLocation = false;
         let lastLocationValue = "";
-        if (values.length > 0) {
+        if (values && values.length > 0) {
             let lastLocation = values[0].Locations[0];
             result.push({
                 "key": lastLocation.name,
@@ -176,7 +176,6 @@ export class GenericDatasource {
     }
 
     metricFindQuery(query,suburl,type) {
-        // console.log("here");
         return this.doRequest({
             url: this.url + suburl,
             method: 'GET',

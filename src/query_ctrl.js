@@ -74,7 +74,6 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
 
     onDataError(err) {
-        // console.log(err);
         this.handleQueryCtrlError(err);
     }
 
