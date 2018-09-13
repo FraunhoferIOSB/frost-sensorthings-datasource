@@ -23,6 +23,10 @@ export class GenericDatasource {
         return key + " gt " + from + " and "+ key + " lt " + to;
     }
 
+    getFormatedId(id) {
+        return (Number.isInteger(id) || !isNaN(id)) ? id : "'"+id+"'";
+    }
+
     query(options) {
         // Filter targets that are set to hidden
         options.targets = _.filter(options.targets, target => {
@@ -38,7 +42,7 @@ export class GenericDatasource {
 
                 if (target.selectedThingId == 0) return;
                 let timeFilter = this.getTimeFilter(options,"time");
-                suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
 
                 allPromises.push(this.doRequest({
                     url: this.url + suburl,
@@ -75,15 +79,15 @@ export class GenericDatasource {
             if (_.isEqual(target.type,"Locations")) {
                 if (target.selectedLocationId == 0) return;
                 let timeFilter = this.getTimeFilter(options,"time");
-                suburl = '/Locations(' + target.selectedLocationId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things';
+                suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things';
             } else if(_.isEqual(target.type,"Historical Locations")){
                 if (target.selectedThingId == 0) return;
                 let timeFilter = this.getTimeFilter(options,"time");
-                suburl = '/Things(' + target.selectedThingId + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
             } else {
                 if (target.selectedDatastreamId == 0) return;
                 let timeFilter = this.getTimeFilter(options,"phenomenonTime");
-                suburl = '/Datastreams('+target.selectedDatastreamId+')/Observations?'+'$filter='+timeFilter;
+                suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+'$filter='+timeFilter;
             }
 
             allPromises.push(this.doRequest({

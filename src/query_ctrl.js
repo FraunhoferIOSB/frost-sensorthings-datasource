@@ -7,7 +7,6 @@ import { AlertSrv} from 'app/core/core';
 export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     constructor($scope, $injector,alertSrv)  {
-        console.log(33333434);
 
         super($scope, $injector);
 
@@ -152,19 +151,16 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     getDataStreams(query) {
         let self = this;
         let targetUrl = "";
-        console.log(334);
         if (this.target.selectedThingDirty || this.target.selectedSensorDirty) {
             return [{
                 text: "select a datastream",
                 value: 0
             }];
         }
-        console.log(33);
         if (this.target.type == 'Sensors') {
             targetUrl = "/Sensors("+this.getFormatedId(this.target.selectedSensorId)+")/Datastreams";
         } else {
             targetUrl = "/Things("+this.getFormatedId(this.target.selectedThingId)+")/Datastreams";
-            console.log(targetUrl);
         }
         return this.datasource.metricFindQuery((query || ''),targetUrl,'datastream').then((result)=>{
             self.allDataSources = result;
@@ -174,11 +170,6 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     getFormatedId(id) {
         return (Number.isInteger(id) || !isNaN(id)) ? id : "'"+id+"'";
-        // if (Number.isInteger(id) || !isNaN(id)) {
-        //     return id;
-        // } else {
-        //     return "'"+id+"'";
-        // }
     }
 
     onDataStreamChange(query) {
