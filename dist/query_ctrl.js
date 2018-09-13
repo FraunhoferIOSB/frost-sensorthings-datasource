@@ -67,6 +67,8 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 function GenericDatasourceQueryCtrl($scope, $injector, alertSrv) {
                     _classCallCheck(this, GenericDatasourceQueryCtrl);
 
+                    console.log(33333434);
+
                     var _this = _possibleConstructorReturn(this, (GenericDatasourceQueryCtrl.__proto__ || Object.getPrototypeOf(GenericDatasourceQueryCtrl)).call(this, $scope, $injector));
 
                     _this.scope = $scope;
@@ -216,21 +218,34 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                     value: function getDataStreams(query) {
                         var self = this;
                         var targetUrl = "";
+                        console.log(334);
                         if (this.target.selectedThingDirty || this.target.selectedSensorDirty) {
                             return [{
                                 text: "select a datastream",
                                 value: 0
                             }];
                         }
+                        console.log(33);
                         if (this.target.type == 'Sensors') {
-                            targetUrl = "/Sensors(" + this.target.selectedSensorId + ")/Datastreams";
+                            targetUrl = "/Sensors(" + this.getFormatedId(this.target.selectedSensorId) + ")/Datastreams";
                         } else {
-                            targetUrl = "/Things(" + this.target.selectedThingId + ")/Datastreams";
+                            targetUrl = "/Things(" + this.getFormatedId(this.target.selectedThingId) + ")/Datastreams";
+                            console.log(targetUrl);
                         }
                         return this.datasource.metricFindQuery(query || '', targetUrl, 'datastream').then(function (result) {
                             self.allDataSources = result;
                             return result;
                         }).catch(this.handleQueryCtrlError.bind(this));
+                    }
+                }, {
+                    key: 'getFormatedId',
+                    value: function getFormatedId(id) {
+                        return Number.isInteger(id) || !isNaN(id) ? id : "'" + id + "'";
+                        // if (Number.isInteger(id) || !isNaN(id)) {
+                        //     return id;
+                        // } else {
+                        //     return "'"+id+"'";
+                        // }
                     }
                 }, {
                     key: 'onDataStreamChange',
