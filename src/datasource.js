@@ -1,5 +1,6 @@
 import _ from "lodash";
 import moment from "moment";
+
 export class GenericDatasource {
 
     constructor(instanceSettings, $q, backendSrv, templateSrv) {
@@ -28,6 +29,15 @@ export class GenericDatasource {
     }
 
     query(options) {
+        // var cities = [
+        //     { name: "London", "population": 8615246 },
+        //     { name: "Berlin", "population": 3517424 },
+        //     { name: "Madrid", "population": 3165235 },
+        //     { name: "Rome",   "population": 2870528 }
+        // ];
+        // var names = jsonpath.query(cities, '$..name');
+        //
+        // console.log(names);
         // Filter targets that are set to hidden
         options.targets = _.filter(options.targets, target => {
             return target.hide != true;
@@ -140,6 +150,7 @@ export class GenericDatasource {
                 if (target.panelType == "table") {
                     return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                 }
+                console.log(value.result);
                 // graph panel type expects the value in float/double/int and not as strings
                 return [value.result,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
             })
@@ -199,12 +210,14 @@ export class GenericDatasource {
         }
         let transformedMetrics = [{
             text: placeholder,
-            value: 0
+            value: 0,
+            type: ''
         }];
         _.forEach(metrics, (metric,index) => {
             transformedMetrics.push({
                 text: metric.name + " ( " + metric['@iot.id'] + " )",
-                value: metric['@iot.id']
+                value: metric['@iot.id'],
+                type: metric['observationType']
             });
         });
         return transformedMetrics;

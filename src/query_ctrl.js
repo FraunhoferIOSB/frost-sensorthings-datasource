@@ -4,6 +4,9 @@ import './css/query-editor.css!';
 import { appEvents} from 'app/core/core';
 import { AlertSrv} from 'app/core/core';
 
+// import * as jp from './libs/parser';
+// var jp = require('jsonpath');
+
 export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     constructor($scope, $injector,alertSrv)  {
@@ -22,6 +25,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         this.target.selectedDatastreamId = this.target.selectedDatastreamId || 0;
         this.target.selectedDatastreamName = this.target.selectedDatastreamName || 'select a datastream';
         this.target.selectedDatastreamDirty = this.target.selectedDatastreamDirty || false;
+        this.target.selectedDatastreamObservationType = this.target.selectedDatastreamObservationType || '';
         this.allDataSources  = {};
         // datasource init end
 
@@ -49,6 +53,8 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
         this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
         this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
+
+        this.target.jsonQuery = this.target.jsonQuery || '';
         // appEvents.emit('alert-success', ['Test notification sent', '']);
 
         if (this.target.selectedThingDirty) {
@@ -130,7 +136,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         let sensor = _.find(this.allSensors, { 'value' : this.target.selectedSensorId });
 
         if(sensor) {
-            this.target.selectedSensorName =sensor.text;
+            this.target.selectedSensorName = sensor.text;
             this.target.selectedSensorDirty = false;
         } else {
             this.target.selectedSensorDirty = true;
@@ -176,16 +182,42 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         if (this.target.selectedThingDirty || this.target.selectedSensorDirty) {
             return;
         }
+
         let datastream = _.find(this.allDataSources, { 'value' : this.target.selectedDatastreamId });
+
         if(datastream) {
-            this.target.selectedDatastreamName = _.find(this.allDataSources, { 'value' : this.target.selectedDatastreamId }).text;
+            this.target.selectedDatastreamName = datastream.text;
+            this.target.selectedDatastreamObservationType = datastream.type.toLowerCase();
             this.target.selectedDatastreamDirty = false;
         } else {
             this.target.selectedDatastreamDirty = true;
             this.target.selectedDatastreamName = this.target.selectedDatastreamId;
+            this.target.selectedDatastreamObservationType = '';
             this.alertSrv.set("Datastream Not Found", this.target.selectedDatastreamName + " is not a valid datastream name", 'error', this.notificationShowTime);
         }
+
+        if (this.isOmObservationType(this.target.selectedDatastreamObservationType)) {
+
+        } else {
+            this.panelCtrl.refresh();
+        }
+    }
+
+    onJsonQueryChange() {
+        console.log(this.target.jsonQuery);
         this.panelCtrl.refresh();
+    }
+
+    isOmObservationType(type) {
+        if (_.isEmpty(type)) {
+            return false;
+        }
+
+        if (!type.includes('om_observation')) {
+            return false;
+        }
+
+        return true;
     }
 
     resetDataSource(){
