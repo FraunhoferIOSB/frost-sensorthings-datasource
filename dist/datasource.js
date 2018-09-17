@@ -1,9 +1,9 @@
 "use strict";
 
-System.register(["lodash", "moment"], function (_export, _context) {
+System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _context) {
     "use strict";
 
-    var _, moment, _createClass, GenericDatasource;
+    var _, moment, jp, _createClass, GenericDatasource;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -16,6 +16,8 @@ System.register(["lodash", "moment"], function (_export, _context) {
             _ = _lodash.default;
         }, function (_moment) {
             moment = _moment.default;
+        }, function (_libsJsonpathJs) {
+            jp = _libsJsonpathJs;
         }],
         execute: function () {
             _createClass = function () {
@@ -37,7 +39,7 @@ System.register(["lodash", "moment"], function (_export, _context) {
             }();
 
             _export("GenericDatasource", GenericDatasource = function () {
-                function GenericDatasource(instanceSettings, $q, backendSrv, templateSrv) {
+                function GenericDatasource(instanceSettings, $q, backendSrv, templateSrv, alertSrv, contextSrv, dashboardSrv) {
                     _classCallCheck(this, GenericDatasource);
 
                     this.type = instanceSettings.type;
@@ -48,6 +50,10 @@ System.register(["lodash", "moment"], function (_export, _context) {
                     this.templateSrv = templateSrv;
                     this.withCredentials = instanceSettings.withCredentials;
                     this.headers = { 'Content-Type': 'application/json' };
+                    this.alertSrv = alertSrv;
+                    this.contextSrv = contextSrv;
+                    this.dashboardSrv = dashboardSrv;
+                    this.notificationShowTime = 5000;
                     if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
                         this.headers['Authorization'] = instanceSettings.basicAuth;
                     }
@@ -183,17 +189,61 @@ System.register(["lodash", "moment"], function (_export, _context) {
                 }, {
                     key: "transformDataSource",
                     value: function transformDataSource(target, values) {
-                        return {
+                        var self = this;
+                        self.events.emit('data-error', 'sd');
+                        var transformedObservations = {
                             'target': target.selectedDatastreamName.toString(),
                             'datapoints': _.map(values, function (value, index) {
                                 if (target.panelType == "table") {
                                     return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                                 }
-                                console.log(value.result);
+
+                                if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
+                                    var data = value.result.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":');
+                                    data = $.parseJSON(data);
+                                    if (_.isEmpty(target.jsonQuery)) {
+                                        return [0.0, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                    }
+                                    try {
+
+                                        var result = JSONPath({ json: data, path: target.jsonQuery });
+                                    } catch (err) {
+                                        console.log('dfe');
+                                        console.log(err);
+                                        console.log(self.events);
+                                    }
+                                    return [result[0], parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                }
+
                                 // graph panel type expects the value in float/double/int and not as strings
                                 return [value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                             })
                         };
+
+                        if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
+                            // filter undefined value datapoints
+                            var filteredDatapoints = _.filter(transformedObservations.datapoints, function (o) {
+                                return o[0] !== undefined;
+                            });
+                            if (filteredDatapoints.length == 0) {
+                                this.alertSrv.set("Json path error", "No data points found for given json path expression", 'error');
+                            }
+                        }
+
+                        return transformedObservations;
+                    }
+                }, {
+                    key: "isOmObservationType",
+                    value: function isOmObservationType(type) {
+                        if (_.isEmpty(type)) {
+                            return false;
+                        }
+
+                        if (!type.includes('om_observation')) {
+                            return false;
+                        }
+
+                        return true;
                     }
                 }, {
                     key: "transformThings",
