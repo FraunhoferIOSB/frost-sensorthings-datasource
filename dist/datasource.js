@@ -190,7 +190,6 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                     key: "transformDataSource",
                     value: function transformDataSource(target, values) {
                         var self = this;
-                        self.events.emit('data-error', 'sd');
                         var transformedObservations = {
                             'target': target.selectedDatastreamName.toString(),
                             'datapoints': _.map(values, function (value, index) {
@@ -204,14 +203,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                                     if (_.isEmpty(target.jsonQuery)) {
                                         return [0.0, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                                     }
-                                    try {
-
-                                        var result = JSONPath({ json: data, path: target.jsonQuery });
-                                    } catch (err) {
-                                        console.log('dfe');
-                                        console.log(err);
-                                        console.log(self.events);
-                                    }
+                                    var result = JSONPath({ json: data, path: target.jsonQuery });
                                     return [result[0], parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                                 }
 
@@ -219,16 +211,6 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                                 return [value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                             })
                         };
-
-                        if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-                            // filter undefined value datapoints
-                            var filteredDatapoints = _.filter(transformedObservations.datapoints, function (o) {
-                                return o[0] !== undefined;
-                            });
-                            if (filteredDatapoints.length == 0) {
-                                this.alertSrv.set("Json path error", "No data points found for given json path expression", 'error');
-                            }
-                        }
 
                         return transformedObservations;
                     }

@@ -131,23 +131,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
                         _this.alertSrv.set("Location Not Found", _this.target.selectedLocationId + " is not a valid location name", 'error', _this.notificationShowTime);
                     }
 
-                    // var cities = [
-                    //     { name: "London", "population": 8615246 },
-                    //     { name: "Berlin", "population": 3517424 },
-                    //     { name: "Madrid", "population": 3165235 },
-                    //     { name: "33",   "population": 333 }
-                    // ];
-                    // var result = JSONPath({json: cities, path: '$..name'});
-                    // console.log(result);
-                    // let temp  = $.parseJSON( '{[{name: "x", "number": 3}, {"name": "y", "number": 4}]}' );
-                    // console.log(temp);
-                    // var result = JSONPath({json: temp, path: '$..name'});
-                    // console.log(result);
-                    //
-                    // {
-                    //     "result" : [{name: "x", "number": 3}, {"name": "y", "number": 4}]
-                    // }
-
                     return _this;
                 }
 
@@ -164,26 +147,19 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
                 }, {
                     key: 'handleQueryCtrlError',
                     value: function handleQueryCtrlError(err) {
-                        console.log(err);
                         if (err.query && err.query.refId && err.query.refId !== this.target.refId) {
-                            console.log(1);
                             return;
                         }
 
                         if (err.error && err.error.data && err.error.data.error) {
-                            console.log(2);
                             this.lastQueryError = err.error.data.error.message;
                         } else if (err.error && err.error.data) {
-                            console.log(3);
                             this.lastQueryError = err.error.data.message;
                         } else if (err.data && err.data.error) {
-                            console.log(4);
                             this.lastQueryError = err.data.error.message;
                         } else if (err.data && err.data.message) {
-                            console.log(5);
                             this.lastQueryError = err.data.message;
                         } else {
-                            console.log(6);
                             this.lastQueryError = err;
                         }
                     }

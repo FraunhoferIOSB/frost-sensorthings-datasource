@@ -150,7 +150,6 @@ export class GenericDatasource {
 
     transformDataSource(target,values){
         let self = this;
-        self.events.emit('data-error', 'sd');
         let transformedObservations = {
             'target' : target.selectedDatastreamName.toString(),
             'datapoints' : _.map(values,function(value,index){
@@ -164,14 +163,7 @@ export class GenericDatasource {
                     if (_.isEmpty(target.jsonQuery)) {
                         return [0.0,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                     }
-                    try {
-
-                        var result = JSONPath({json: data, path: target.jsonQuery});
-                    } catch(err) {
-                        console.log('dfe');
-                        console.log(err);
-                        console.log(self.events);
-                    }
+                    var result = JSONPath({json: data, path: target.jsonQuery});
                     return [result[0],parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                 }
 
@@ -179,14 +171,6 @@ export class GenericDatasource {
                 return [value.result,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
             })
         };
-
-        if (self.isOmObservationType(target.selectedDatastreamObservationType) ) {
-            // filter undefined value datapoints
-            let filteredDatapoints = _.filter(transformedObservations.datapoints, function(o) {return (o[0] !== undefined); });
-            if (filteredDatapoints.length == 0) {
-                this.alertSrv.set("Json path error","No data points found for given json path expression", 'error');
-            }
-        }
 
         return transformedObservations;
     }
