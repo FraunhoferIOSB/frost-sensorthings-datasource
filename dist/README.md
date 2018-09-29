@@ -103,5 +103,8 @@ yarn install
 npm run build
 ```
 
-## Issues
-Please report any issues on [LinkSmart Boards](https://boards.linksmart.eu).
+## Links
+* [Changelog](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/browse/CHANGELOG.md)
+* [License](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/LICENSE)
+
+Please report any issues on [LinkSmart Board](https://boards.linksmart.eu).

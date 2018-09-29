@@ -24,10 +24,11 @@
     "links": [
         {"name": "LinkSmart", "url": "https://linksmart.eu"},
         {"name": "Source Codes", "url": "https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource"},
+        {"name": "Changelog", "url": "https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/browse/CHANGELOG.md"},
         {"name": "OGC SensorThings API", "url": "https://github.com/opengeospatial/sensorthings"}
     ],
-    "version": "1.0.0",
-    "updated": "2018-07-30"
+    "version": "1.1.0",
+    "updated": "2018-09-29"
   },
 
   "dependencies": {
