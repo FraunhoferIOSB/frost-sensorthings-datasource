@@ -269,7 +269,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
                 }, {
                     key: 'onJsonQueryChange',
                     value: function onJsonQueryChange() {
-                        console.log(this.target.jsonQuery);
                         this.panelCtrl.refresh();
                     }
                 }, {

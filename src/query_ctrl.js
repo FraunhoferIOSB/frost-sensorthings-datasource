@@ -204,7 +204,6 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
 
     onJsonQueryChange() {
-        console.log(this.target.jsonQuery);
         this.panelCtrl.refresh();
     }
 

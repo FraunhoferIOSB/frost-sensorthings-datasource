@@ -54,7 +54,7 @@
             </gf-form-dropdown>
           </div>
           <div class="gf-form">
-              <input ng-if="ctrl.isOmObservationType(ctrl.target.selectedDatastreamObservationType)" class="gf-form-input" rows="5" ng-model-options='{ debounce: 300 }' ng-model="ctrl.target.jsonQuery" spellcheck="false" ng-change="ctrl.onJsonQueryChange()" />
+              <input ng-if="ctrl.isOmObservationType(ctrl.target.selectedDatastreamObservationType)" class="gf-form-input" rows="5" ng-model-options='{ debounce: 300 }' ng-model="ctrl.target.jsonQuery" spellcheck="false" ng-change="ctrl.onJsonQueryChange()" placeHolder="JSONPath Expression" />
           </div>
       </div>
     </div>
