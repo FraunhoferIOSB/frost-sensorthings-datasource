@@ -198,12 +198,10 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                                 }
 
                                 if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-                                    var data = value.result.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":');
-                                    data = $.parseJSON(data);
                                     if (_.isEmpty(target.jsonQuery)) {
                                         return [0.0, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                                     }
-                                    var result = JSONPath({ json: data, path: target.jsonQuery });
+                                    var result = JSONPath({ json: value.result, path: target.jsonQuery });
                                     return [result[0], parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                                 }
 
