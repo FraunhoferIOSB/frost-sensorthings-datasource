@@ -153,9 +153,9 @@ export class GenericDatasource {
         let transformedObservations = {
             'target' : target.selectedDatastreamName.toString(),
             'datapoints' : _.map(values,function(value,index){
-                if (target.panelType == "table") {
-                    return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-                }
+                // if (target.panelType == "table") {
+                //     return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                // }
 
                 if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
                     if (_.isEmpty(target.jsonQuery)) {
