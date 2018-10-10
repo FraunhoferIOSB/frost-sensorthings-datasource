@@ -6,7 +6,6 @@ import { AlertSrv} from 'app/core/core';
 
 import * as jp from './libs/jsonpath.js';
 
-
 export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     constructor($scope, $injector,alertSrv)  {
@@ -55,6 +54,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
 
         this.target.jsonQuery = this.target.jsonQuery || '';
+        this.target.jsonQueryPlaceholder = 'JSONPath Expression' ;
         // appEvents.emit('alert-success', ['Test notification sent', '']);
 
         if (this.target.selectedThingDirty) {
@@ -122,6 +122,12 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     showSensors(){
         return this.target.type == 'Sensors' &&
                 (this.target.panelType != 'grafana-worldmap-panel');
+    }
+
+    jsonQueryClick(type) {
+        if(!this.isOmObservationType(type)){
+            this.alertSrv.set("Not supported observation type", "JSONPath expression supports only for OM observation type" , 'error', this.notificationShowTime);
+        }
     }
 
     getSensors(query) {
@@ -209,13 +215,18 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     isOmObservationType(type) {
         if (_.isEmpty(type)) {
+            this.target.jsonQuery = "";
+            this.target.jsonQueryPlaceholder = "JSONPath disabled";
             return false;
         }
 
         if (!type.includes('om_observation')) {
+            this.target.jsonQuery = "";
+            this.target.jsonQueryPlaceholder = "JSONPath disabled";
             return false;
         }
 
+        this.target.jsonQueryPlaceholder = "JSONPath Expression";
         return true;
     }
 

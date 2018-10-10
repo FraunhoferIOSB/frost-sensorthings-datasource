@@ -190,17 +190,23 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                     key: "transformDataSource",
                     value: function transformDataSource(target, values) {
                         var self = this;
+
+                        if (self.isOmObservationType(target.selectedDatastreamObservationType) && _.isEmpty(target.jsonQuery)) {
+                            return {
+                                'target': target.selectedDatastreamName.toString(),
+                                'datapoints': []
+                            };
+                        }
+
                         var transformedObservations = {
                             'target': target.selectedDatastreamName.toString(),
                             'datapoints': _.map(values, function (value, index) {
-                                // if (target.panelType == "table") {
-                                //     return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-                                // }
+
+                                if (target.panelType == "table") {
+                                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                }
 
                                 if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-                                    if (_.isEmpty(target.jsonQuery)) {
-                                        return [0.0, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-                                    }
                                     var result = JSONPath({ json: value.result, path: target.jsonQuery });
                                     return [result[0], parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                                 }
