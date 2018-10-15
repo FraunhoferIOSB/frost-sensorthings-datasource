@@ -280,6 +280,11 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
                         this.panelCtrl.refresh();
                     }
                 }, {
+                    key: 'showJsonQuery',
+                    value: function showJsonQuery() {
+                        return this.target.selectedDatastreamId != 0 && (this.target.type == "Sensors" || this.target.type == "Things") && this.target.panelType != 'grafana-worldmap-panel';
+                    }
+                }, {
                     key: 'isOmObservationType',
                     value: function isOmObservationType(type) {
                         if (_.isEmpty(type)) {

@@ -213,6 +213,12 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         this.panelCtrl.refresh();
     }
 
+    showJsonQuery() {
+        return (this.target.selectedDatastreamId!=0) &&
+                (this.target.type == "Sensors" || this.target.type == "Things") &&
+                (this.target.panelType != 'grafana-worldmap-panel');
+    }
+
     isOmObservationType(type) {
         if (_.isEmpty(type)) {
             this.target.jsonQuery = "";
