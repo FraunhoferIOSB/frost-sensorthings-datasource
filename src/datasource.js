@@ -160,26 +160,31 @@ export class GenericDatasource {
 
         let datapoints = _.map(values,function(value,index){
 
-            if (target.panelType == "table") {
+            if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
 
-                if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-                    var result = JSONPath({json: value.result, path: target.jsonQuery});
+                var result = JSONPath({json: value.result, path: target.jsonQuery});
+
+                if (target.panelType == "table" || target.panelType == "singlestat") {
+                    result = (typeof result[0]==="object") ? JSON.stringify(result[0]) : result[0];
+                    return [result,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                } else {
                     return [result[0],parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                 }
 
-                return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-            }
+            } else {
 
-            if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-                var result = JSONPath({json:value.result, path: target.jsonQuery});
-                return [result[0],parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-            }
+                if (target.panelType == "table") {
+                    return [_.isEmpty(value.result.toString()) ? '-' : value.result ,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                } else {
+                    return [value.result,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                }
 
-            // graph panel type expects the value in float/double/int and not as strings
-            return [value.result,parseInt(moment(value.phenomenonTime,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+            }
         });
 
-        datapoints = _.filter(datapoints, function(datapoint) { return (typeof datapoint[0] === "string" || typeof datapoint[0] === "number" || (Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0)); });
+        datapoints = _.filter(datapoints, function(datapoint) {
+             return (typeof datapoint[0] === "string" || typeof datapoint[0] === "number" || (Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0));
+         });
 
         let transformedObservations = {
             'target' : target.selectedDatastreamName.toString(),

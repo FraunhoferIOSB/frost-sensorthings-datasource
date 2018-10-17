@@ -3,7 +3,7 @@
 System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _context) {
     "use strict";
 
-    var _, moment, jp, _createClass, GenericDatasource;
+    var _, moment, jp, _typeof, _createClass, GenericDatasource;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -20,6 +20,12 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
             jp = _libsJsonpathJs;
         }],
         execute: function () {
+            _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+                return typeof obj;
+            } : function (obj) {
+                return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+            };
+
             _createClass = function () {
                 function defineProperties(target, props) {
                     for (var i = 0; i < props.length; i++) {
@@ -200,23 +206,24 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
 
                         var datapoints = _.map(values, function (value, index) {
 
-                            if (target.panelType == "table") {
+                            if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
 
-                                if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-                                    var result = JSONPath({ json: value.result, path: target.jsonQuery });
+                                var result = JSONPath({ json: value.result, path: target.jsonQuery });
+
+                                if (target.panelType == "table" || target.panelType == "singlestat") {
+                                    result = _typeof(result[0]) === "object" ? JSON.stringify(result[0]) : result[0];
+                                    return [result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                } else {
                                     return [result[0], parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                                 }
+                            } else {
 
-                                return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                if (target.panelType == "table") {
+                                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                } else {
+                                    return [value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                }
                             }
-
-                            if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-                                var result = JSONPath({ json: value.result, path: target.jsonQuery });
-                                return [result[0], parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-                            }
-
-                            // graph panel type expects the value in float/double/int and not as strings
-                            return [value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
                         });
 
                         datapoints = _.filter(datapoints, function (datapoint) {
