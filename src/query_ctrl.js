@@ -54,7 +54,6 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
 
         this.target.jsonQuery = this.target.jsonQuery || '';
-        this.target.jsonQueryPlaceholder = 'JSONPath Expression' ;
         // appEvents.emit('alert-success', ['Test notification sent', '']);
 
         if (this.target.selectedThingDirty) {
@@ -126,7 +125,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     jsonQueryClick(type) {
         if(!this.isOmObservationType(type)){
-            this.alertSrv.set("Not supported observation type", "JSONPath expression supports only for OM observation type" , 'error', this.notificationShowTime);
+            this.alertSrv.set("Unsupported Observation Type", "JSONPath only works when Datastream.observationType is OM_Observation" , 'warning', this.notificationShowTime);
         }
     }
 
@@ -220,19 +219,10 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
 
     isOmObservationType(type) {
-        if (_.isEmpty(type)) {
+        if (_.isEmpty(type) || !type.includes('om_observation')) {
             this.target.jsonQuery = "";
-            this.target.jsonQueryPlaceholder = "JSONPath disabled";
             return false;
         }
-
-        if (!type.includes('om_observation')) {
-            this.target.jsonQuery = "";
-            this.target.jsonQueryPlaceholder = "JSONPath disabled";
-            return false;
-        }
-
-        this.target.jsonQueryPlaceholder = "JSONPath Expression";
         return true;
     }
 

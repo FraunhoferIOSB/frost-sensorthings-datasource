@@ -113,7 +113,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
                     _this.panelCtrl.events.on('data-error', _this.onDataError.bind(_this), $scope);
 
                     _this.target.jsonQuery = _this.target.jsonQuery || '';
-                    _this.target.jsonQueryPlaceholder = 'JSONPath Expression';
                     // appEvents.emit('alert-success', ['Test notification sent', '']);
 
                     if (_this.target.selectedThingDirty) {
@@ -192,7 +191,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
                     key: 'jsonQueryClick',
                     value: function jsonQueryClick(type) {
                         if (!this.isOmObservationType(type)) {
-                            this.alertSrv.set("Not supported observation type", "JSONPath expression supports only for OM observation type", 'error', this.notificationShowTime);
+                            this.alertSrv.set("Unsupported Observation Type", "JSONPath only works when Datastream.observationType is OM_Observation", 'warning', this.notificationShowTime);
                         }
                     }
                 }, {
@@ -287,19 +286,10 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
                 }, {
                     key: 'isOmObservationType',
                     value: function isOmObservationType(type) {
-                        if (_.isEmpty(type)) {
+                        if (_.isEmpty(type) || !type.includes('om_observation')) {
                             this.target.jsonQuery = "";
-                            this.target.jsonQueryPlaceholder = "JSONPath disabled";
                             return false;
                         }
-
-                        if (!type.includes('om_observation')) {
-                            this.target.jsonQuery = "";
-                            this.target.jsonQueryPlaceholder = "JSONPath disabled";
-                            return false;
-                        }
-
-                        this.target.jsonQueryPlaceholder = "JSONPath Expression";
                         return true;
                     }
                 }, {
