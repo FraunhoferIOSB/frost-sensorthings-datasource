@@ -60,6 +60,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                     this.contextSrv = contextSrv;
                     this.dashboardSrv = dashboardSrv;
                     this.notificationShowTime = 5000;
+                    this.topCount = 1000;
                     if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
                         this.headers['Authorization'] = instanceSettings.basicAuth;
                     }
@@ -145,12 +146,12 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                             } else {
                                 if (target.selectedDatastreamId == 0) return;
                                 var _timeFilter2 = _this.getTimeFilter(options, "phenomenonTime");
-                                suburl = '/Datastreams(' + _this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + '$filter=' + _timeFilter2;
+                                suburl = '/Datastreams(' + _this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + ("$filter=" + _timeFilter2 + "&$select=phenomenonTime,result");
                             }
 
                             var transformedResults = [];
                             var hasNextLink = true;
-                            var fullUrl = _this.url + suburl + "&$top=10000";
+                            var fullUrl = _this.url + suburl + ("&$top=" + _this.topCount);
 
                             while (hasNextLink) {
                                 var response = await _this.doRequest({
@@ -304,7 +305,9 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                         }];
 
                         var hasNextLink = true;
-                        var fullUrl = this.url + suburl + "?$top=10000";
+                        var selectParam = type == "datastream" ? "$select=name,@iot.id,observationType" : "$select=name,@iot.id";
+                        var fullUrl = this.url + suburl + ("?$top=" + this.topCount + "&" + selectParam);
+
                         while (hasNextLink) {
                             var result = await this.doRequest({
                                 url: fullUrl,

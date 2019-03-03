@@ -18,6 +18,7 @@ export class GenericDatasource {
         this.contextSrv = contextSrv;
         this.dashboardSrv = dashboardSrv;
         this.notificationShowTime = 5000;
+        this.topCount = 1000;
         if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
             this.headers['Authorization'] = instanceSettings.basicAuth;
         }
@@ -95,12 +96,12 @@ export class GenericDatasource {
           } else {
               if (target.selectedDatastreamId == 0) return;
               let timeFilter = this.getTimeFilter(options,"phenomenonTime");
-              suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+'$filter='+timeFilter;
+              suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+ `$filter=${timeFilter}&$select=phenomenonTime,result`;
           }
 
           let transformedResults = [];
           let hasNextLink = true;
-          let fullUrl = this.url + suburl + "&$top=10000";
+          let fullUrl = this.url + suburl + `&$top=${this.topCount}`;
 
           while(hasNextLink) {
             let response = await this.doRequest({
@@ -251,8 +252,11 @@ export class GenericDatasource {
           type: ''
       }];
 
+
       let hasNextLink = true;
-      let fullUrl = this.url + suburl + "?$top=10000";
+      let selectParam = (type == "datastream") ? "$select=name,@iot.id,observationType" : "$select=name,@iot.id";
+      let fullUrl = this.url + suburl + `?$top=${this.topCount}&${selectParam}`;
+
       while(hasNextLink) {
         let result = await this.doRequest({
             url: fullUrl,
