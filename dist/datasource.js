@@ -80,16 +80,8 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                 }, {
                     key: "query",
                     value: function query(options) {
-                        // var cities = [
-                        //     { name: "London", "population": 8615246 },
-                        //     { name: "Berlin", "population": 3517424 },
-                        //     { name: "Madrid", "population": 3165235 },
-                        //     { name: "Rome",   "population": 2870528 }
-                        // ];
-                        // var names = jsonpath.query(cities, '$..name');
-                        //
-                        // console.log(names);
-                        // Filter targets that are set to hidden
+                        var _this = this;
+
                         options.targets = _.filter(options.targets, function (target) {
                             return target.hide != true;
                         });
@@ -122,54 +114,72 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                             });
                         }
 
+                        options.targets = _.filter(options.targets, function (target) {
+                            return target.selectedDatastreamId != 0;
+                        });
+
                         var self = this;
                         var allTargetResults = { data: [] };
 
-                        _.forEach(options.targets, function (target) {
-                            var self = this;
+                        var testPromises = options.targets.map(async function (target) {
+
+                            var self = _this;
                             var suburl = '';
+                            var thisTargetResult = {
+                                'target': target.selectedDatastreamName.toString(),
+                                'datapoints': []
+                            };
+
                             if (target.selectedDatastreamDirty) {
-                                allTargetResults.data.push({
-                                    'target': target.selectedDatastreamName.toString(),
-                                    'datapoints': []
-                                });
-                                return;
+                                return thisTargetResult;
                             }
 
                             if (_.isEqual(target.type, "Locations")) {
                                 if (target.selectedLocationId == 0) return;
-                                var timeFilter = this.getTimeFilter(options, "time");
-                                suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things';
+                                var timeFilter = _this.getTimeFilter(options, "time");
+                                suburl = '/Locations(' + _this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things';
                             } else if (_.isEqual(target.type, "Historical Locations")) {
                                 if (target.selectedThingId == 0) return;
-                                var _timeFilter = this.getTimeFilter(options, "time");
-                                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + _timeFilter + '&$expand=Locations';
+                                var _timeFilter = _this.getTimeFilter(options, "time");
+                                suburl = '/Things(' + _this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + _timeFilter + '&$expand=Locations';
                             } else {
                                 if (target.selectedDatastreamId == 0) return;
-                                var _timeFilter2 = this.getTimeFilter(options, "phenomenonTime");
-                                suburl = '/Datastreams(' + this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + '$filter=' + _timeFilter2;
+                                var _timeFilter2 = _this.getTimeFilter(options, "phenomenonTime");
+                                suburl = '/Datastreams(' + _this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + '$filter=' + _timeFilter2;
                             }
 
-                            allPromises.push(this.doRequest({
-                                url: this.url + suburl,
-                                method: 'GET'
-                            }).then(function (response) {
-                                var transformedResults = [];
-                                if (_.isEqual(target.type, "Locations")) {
-                                    transformedResults = self.transformThings(target, response.data.value);
-                                } else if (_.isEqual(target.type, "Historical Locations")) {
-                                    transformedResults = self.transformLocations(target, response.data.value);
-                                } else {
-                                    transformedResults = self.transformDataSource(target, response.data.value);
-                                }
-                                return transformedResults;
-                            }));
-                        }.bind(this));
+                            var transformedResults = [];
+                            var hasNextLink = true;
+                            var fullUrl = _this.url + suburl + "&$top=10000";
 
-                        return Promise.all(allPromises).then(function (values) {
-                            _.forEach(values, function (value) {
-                                allTargetResults.data.push(value);
-                            });
+                            while (hasNextLink) {
+                                var response = await _this.doRequest({
+                                    url: fullUrl,
+                                    method: 'GET'
+                                });
+
+                                hasNextLink = _.has(response.data, "@iot.nextLink");
+                                if (hasNextLink) {
+                                    suburl = suburl.split('?')[0];
+                                    fullUrl = _this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
+                                }
+
+                                if (_.isEqual(target.type, "Locations")) {
+                                    transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
+                                } else if (_.isEqual(target.type, "Historical Locations")) {
+                                    transformedResults = transformedResults.concat(self.transformLocations(target, response.data.value));
+                                } else {
+                                    transformedResults = transformedResults.concat(self.transformDataSource(target, response.data.value));
+                                }
+                            }
+
+                            thisTargetResult.datapoints = transformedResults;
+
+                            return thisTargetResult;
+                        });
+
+                        return Promise.all(testPromises).then(function (values) {
+                            allTargetResults.data = values;
                             return allTargetResults;
                         });
                     }
@@ -198,10 +208,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                         var self = this;
 
                         if (self.isOmObservationType(target.selectedDatastreamObservationType) && _.isEmpty(target.jsonQuery)) {
-                            return {
-                                'target': target.selectedDatastreamName.toString(),
-                                'datapoints': []
-                            };
+                            return [];
                         }
 
                         var datapoints = _.map(values, function (value, index) {
@@ -230,12 +237,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                             return typeof datapoint[0] === "string" || typeof datapoint[0] === "number" || Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0;
                         });
 
-                        var transformedObservations = {
-                            'target': target.selectedDatastreamName.toString(),
-                            'datapoints': datapoints
-                        };
-
-                        return transformedObservations;
+                        return datapoints;
                     }
                 }, {
                     key: "isOmObservationType",
@@ -253,12 +255,10 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                 }, {
                     key: "transformThings",
                     value: function transformThings(target, values) {
-                        return {
-                            'target': target.selectedLocationName.toString(),
-                            'datapoints': _.map(values, function (value, index) {
-                                return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-                            })
-                        };
+
+                        return _.map(values, function (value) {
+                            return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                        });
                     }
                 }, {
                     key: "transformLocations",
@@ -269,10 +269,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                                 result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
                             });
                         });
-                        return {
-                            'target': target.selectedThingName.toString(),
-                            'datapoints': result
-                        };
+                        return result;
                     }
                 }, {
                     key: "testDatasource",
@@ -288,20 +285,10 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                     }
                 }, {
                     key: "metricFindQuery",
-                    value: function metricFindQuery(query, suburl, type) {
-                        var _this = this;
+                    value: async function metricFindQuery(query, suburl, type) {
 
-                        return this.doRequest({
-                            url: this.url + suburl,
-                            method: 'GET'
-                        }).then(function (result) {
-                            return _this.transformMetrics(result.data.value, type);
-                        });
-                    }
-                }, {
-                    key: "transformMetrics",
-                    value: function transformMetrics(metrics, type) {
                         var placeholder = "select a sensor";
+
                         if (type == "thing") {
                             placeholder = "select a thing";
                         } else if (type == "datastream") {
@@ -309,11 +296,35 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                         } else if (type == "location") {
                             placeholder = "select a location";
                         }
+
                         var transformedMetrics = [{
                             text: placeholder,
                             value: 0,
                             type: ''
                         }];
+
+                        var hasNextLink = true;
+                        var fullUrl = this.url + suburl + "?$top=10000";
+                        while (hasNextLink) {
+                            var result = await this.doRequest({
+                                url: fullUrl,
+                                method: 'GET'
+                            });
+                            hasNextLink = _.has(result.data, "@iot.nextLink");
+                            if (hasNextLink) {
+                                fullUrl = this.url + suburl + "?" + result.data["@iot.nextLink"].split('?')[1];
+                            }
+                            transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
+                        }
+
+                        return transformedMetrics;
+                    }
+                }, {
+                    key: "transformMetrics",
+                    value: function transformMetrics(metrics, type) {
+
+                        var transformedMetrics = [];
+
                         _.forEach(metrics, function (metric, index) {
                             transformedMetrics.push({
                                 text: metric.name + " ( " + metric['@iot.id'] + " )",
@@ -321,6 +332,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                                 type: metric['observationType']
                             });
                         });
+
                         return transformedMetrics;
                     }
                 }, {

@@ -34,19 +34,8 @@ export class GenericDatasource {
     }
 
     query(options) {
-        // var cities = [
-        //     { name: "London", "population": 8615246 },
-        //     { name: "Berlin", "population": 3517424 },
-        //     { name: "Madrid", "population": 3165235 },
-        //     { name: "Rome",   "population": 2870528 }
-        // ];
-        // var names = jsonpath.query(cities, '$..name');
-        //
-        // console.log(names);
-        // Filter targets that are set to hidden
-        options.targets = _.filter(options.targets, target => {
-            return target.hide != true;
-        });
+
+        options.targets = _.filter(options.targets, target => target.hide != true);
 
         let allPromises = [];
 
@@ -77,57 +66,74 @@ export class GenericDatasource {
             });
         }
 
+        options.targets = _.filter(options.targets, target => target.selectedDatastreamId != 0);
+
         let self = this;
         let allTargetResults = {data:[]};
 
-        _.forEach(options.targets,function(target){
-            let self = this;
-            let suburl = '';
-            if (target.selectedDatastreamDirty) {
-                allTargetResults.data.push({
-                    'target' : target.selectedDatastreamName.toString(),
-                    'datapoints' : [],
-                });
-                return;
+        let testPromises = options.targets.map(async target => {
+
+          let self = this;
+          let suburl = '';
+          let thisTargetResult = {
+            'target' : target.selectedDatastreamName.toString(),
+            'datapoints' : [],
+          };
+
+          if (target.selectedDatastreamDirty) {
+              return thisTargetResult;
+          }
+
+          if (_.isEqual(target.type,"Locations")) {
+              if (target.selectedLocationId == 0) return;
+              let timeFilter = this.getTimeFilter(options,"time");
+              suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things';
+          } else if(_.isEqual(target.type,"Historical Locations")){
+              if (target.selectedThingId == 0) return;
+              let timeFilter = this.getTimeFilter(options,"time");
+              suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+          } else {
+              if (target.selectedDatastreamId == 0) return;
+              let timeFilter = this.getTimeFilter(options,"phenomenonTime");
+              suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+'$filter='+timeFilter;
+          }
+
+          let transformedResults = [];
+          let hasNextLink = true;
+          let fullUrl = this.url + suburl + "&$top=10000";
+
+          while(hasNextLink) {
+            let response = await this.doRequest({
+              url: fullUrl,
+              method: 'GET'
+            });
+
+            hasNextLink = _.has(response.data,"@iot.nextLink");
+            if (hasNextLink) {
+              suburl = suburl.split('?')[0];
+              fullUrl = this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
             }
 
             if (_.isEqual(target.type,"Locations")) {
-                if (target.selectedLocationId == 0) return;
-                let timeFilter = this.getTimeFilter(options,"time");
-                suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things';
+                transformedResults = transformedResults.concat(self.transformThings(target,response.data.value));
             } else if(_.isEqual(target.type,"Historical Locations")){
-                if (target.selectedThingId == 0) return;
-                let timeFilter = this.getTimeFilter(options,"time");
-                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+                transformedResults = transformedResults.concat(self.transformLocations(target,response.data.value));
             } else {
-                if (target.selectedDatastreamId == 0) return;
-                let timeFilter = this.getTimeFilter(options,"phenomenonTime");
-                suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+'$filter='+timeFilter;
+                transformedResults = transformedResults.concat(self.transformDataSource(target,response.data.value));
             }
+          }
 
-            allPromises.push(this.doRequest({
-                url: this.url + suburl,
-                method: 'GET'
-            }).then(function(response){
-                let transformedResults = [];
-                if (_.isEqual(target.type,"Locations")) {
-                    transformedResults = self.transformThings(target,response.data.value);
-                } else if(_.isEqual(target.type,"Historical Locations")){
-                    transformedResults = self.transformLocations(target,response.data.value);
-                } else {
-                    transformedResults = self.transformDataSource(target,response.data.value);
-                }
-                return transformedResults;
-            }));
+          thisTargetResult.datapoints = transformedResults
 
-        }.bind(this));
+          return thisTargetResult;
 
-        return Promise.all(allPromises).then(function(values) {
-            _.forEach(values,function(value){
-                allTargetResults.data.push(value);
-            });
-            return allTargetResults;
         });
+
+        return Promise.all(testPromises).then(function(values) {
+          allTargetResults.data = values;
+          return allTargetResults;
+        });
+
     }
 
     transformLocationsCoordinates(target,targetIndex,values){
@@ -152,10 +158,7 @@ export class GenericDatasource {
         let self = this;
 
         if (self.isOmObservationType(target.selectedDatastreamObservationType) && _.isEmpty(target.jsonQuery)) {
-            return {
-                'target' : target.selectedDatastreamName.toString(),
-                'datapoints' : []
-            };
+          return [];
         }
 
         let datapoints = _.map(values,function(value,index){
@@ -186,12 +189,7 @@ export class GenericDatasource {
              return (typeof datapoint[0] === "string" || typeof datapoint[0] === "number" || (Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0));
          });
 
-        let transformedObservations = {
-            'target' : target.selectedDatastreamName.toString(),
-            'datapoints' : datapoints
-        };
-
-        return transformedObservations;
+         return datapoints;
     }
 
     isOmObservationType(type) {
@@ -207,12 +205,11 @@ export class GenericDatasource {
     }
 
     transformThings(target,values){
-        return {
-            'target' : target.selectedLocationName.toString(),
-            'datapoints' : _.map(values,function(value,index){
-                return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-            })
-        };
+
+      return _.map(values,value => {
+          return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+      })
+
     }
 
     transformLocations(target,values) {
@@ -222,10 +219,7 @@ export class GenericDatasource {
                 result.push([_.isEmpty(location.name) ? '-' : location.name,parseInt(moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
             });
         });
-        return {
-            'target' : target.selectedThingName.toString(),
-            'datapoints' : result
-        };
+        return result;
     }
 
     testDatasource() {
@@ -239,29 +233,45 @@ export class GenericDatasource {
         });
     }
 
-    metricFindQuery(query,suburl,type) {
-        return this.doRequest({
-            url: this.url + suburl,
+    async metricFindQuery(query,suburl,type) {
+
+      let placeholder = "select a sensor";
+
+      if (type == "thing") {
+          placeholder = "select a thing";
+      } else if (type == "datastream") {
+          placeholder = "select a datastream";
+      } else if (type == "location") {
+          placeholder = "select a location";
+      }
+
+      let transformedMetrics = [{
+          text: placeholder,
+          value: 0,
+          type: ''
+      }];
+
+      let hasNextLink = true;
+      let fullUrl = this.url + suburl + "?$top=10000";
+      while(hasNextLink) {
+        let result = await this.doRequest({
+            url: fullUrl,
             method: 'GET',
-        }).then((result) => {
-            return this.transformMetrics(result.data.value,type);
         });
+        hasNextLink = _.has(result.data,"@iot.nextLink");
+        if (hasNextLink) {
+          fullUrl = this.url + suburl + "?" + result.data["@iot.nextLink"].split('?')[1];
+        }
+        transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value,type));
+      }
+
+      return transformedMetrics;
     }
 
     transformMetrics(metrics,type) {
-        let placeholder = "select a sensor";
-        if (type == "thing") {
-            placeholder = "select a thing";
-        } else if (type == "datastream") {
-            placeholder = "select a datastream";
-        } else if (type == "location") {
-            placeholder = "select a location";
-        }
-        let transformedMetrics = [{
-            text: placeholder,
-            value: 0,
-            type: ''
-        }];
+
+        let transformedMetrics = [];
+
         _.forEach(metrics, (metric,index) => {
             transformedMetrics.push({
                 text: metric.name + " ( " + metric['@iot.id'] + " )",
@@ -269,6 +279,7 @@ export class GenericDatasource {
                 type: metric['observationType']
             });
         });
+
         return transformedMetrics;
     }
 
