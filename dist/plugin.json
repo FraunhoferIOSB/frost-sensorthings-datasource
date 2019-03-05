@@ -27,8 +27,8 @@
         {"name": "Changelog", "url": "https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/browse/CHANGELOG.md"},
         {"name": "OGC SensorThings API", "url": "https://github.com/opengeospatial/sensorthings"}
     ],
-    "version": "1.1.0",
-    "updated": "2018-10-18"
+    "version": "1.2.0",
+    "updated": "2019-03-05"
   },
 
   "dependencies": {
