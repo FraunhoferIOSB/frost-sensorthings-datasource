@@ -254,7 +254,7 @@ export class GenericDatasource {
 
 
       let hasNextLink = true;
-      let selectParam = (type == "datastream") ? "$select=name,@iot.id,observationType" : "$select=name,@iot.id";
+      let selectParam = (type == "datastream") ? "$select=name,id,observationType" : "$select=name,id";
       let fullUrl = this.url + suburl + `?$top=${this.topCount}&${selectParam}`;
 
       while(hasNextLink) {

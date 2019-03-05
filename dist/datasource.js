@@ -305,7 +305,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                         }];
 
                         var hasNextLink = true;
-                        var selectParam = type == "datastream" ? "$select=name,@iot.id,observationType" : "$select=name,@iot.id";
+                        var selectParam = type == "datastream" ? "$select=name,id,observationType" : "$select=name,id";
                         var fullUrl = this.url + suburl + ("?$top=" + this.topCount + "&" + selectParam);
 
                         while (hasNextLink) {
