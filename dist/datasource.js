@@ -96,7 +96,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
 
                                 if (target.selectedThingId == 0) return;
                                 var timeFilter = this.getTimeFilter(options, "time");
-                                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations';
+                                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name,location)&$top=1&$select=time';
 
                                 allPromises.push(this.doRequest({
                                     url: this.url + suburl,
@@ -115,10 +115,6 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                             });
                         }
 
-                        options.targets = _.filter(options.targets, function (target) {
-                            return target.selectedDatastreamId != 0;
-                        });
-
                         var self = this;
                         var allTargetResults = { data: [] };
 
@@ -136,15 +132,15 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                             }
 
                             if (_.isEqual(target.type, "Locations")) {
-                                if (target.selectedLocationId == 0) return;
+                                if (target.selectedLocationId == 0) return thisTargetResult;
                                 var timeFilter = _this.getTimeFilter(options, "time");
-                                suburl = '/Locations(' + _this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things';
+                                suburl = '/Locations(' + _this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';
                             } else if (_.isEqual(target.type, "Historical Locations")) {
-                                if (target.selectedThingId == 0) return;
+                                if (target.selectedThingId == 0) return thisTargetResult;
                                 var _timeFilter = _this.getTimeFilter(options, "time");
-                                suburl = '/Things(' + _this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + _timeFilter + '&$expand=Locations';
+                                suburl = '/Things(' + _this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + _timeFilter + '&$expand=Locations($select=name)&$select=time';
                             } else {
-                                if (target.selectedDatastreamId == 0) return;
+                                if (target.selectedDatastreamId == 0) return thisTargetResult;
                                 var _timeFilter2 = _this.getTimeFilter(options, "phenomenonTime");
                                 suburl = '/Datastreams(' + _this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + ("$filter=" + _timeFilter2 + "&$select=phenomenonTime,result");
                             }
@@ -186,18 +182,21 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                     }
                 }, {
                     key: "transformLocationsCoordinates",
-                    value: function transformLocationsCoordinates(target, targetIndex, values) {
+                    value: function transformLocationsCoordinates(target, targetIndex, value) {
                         var result = [];
                         var timestamp = "";
                         var lastLocation = false;
                         var lastLocationValue = "";
-                        if (values && values.length > 0) {
-                            var _lastLocation = values[0].Locations[0];
+
+                        if (Array.isArray(value)) return result;
+
+                        if (value) {
+                            var _lastLocation = value.Locations[0];
                             result.push({
                                 "key": _lastLocation.name,
                                 "latitude": _lastLocation.location.coordinates[0],
                                 "longitude": _lastLocation.location.coordinates[1],
-                                "name": _lastLocation.name + " | " + target.selectedThingName + " | " + moment(values[0].time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
+                                "name": _lastLocation.name + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
                                 "value": targetIndex + 1
                             });
                         }

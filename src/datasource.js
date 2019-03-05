@@ -47,7 +47,7 @@ export class GenericDatasource {
 
                 if (target.selectedThingId == 0) return;
                 let timeFilter = this.getTimeFilter(options,"time");
-                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations($select=name,location)&$top=1&$select=time';
 
                 allPromises.push(this.doRequest({
                     url: this.url + suburl,
@@ -67,8 +67,6 @@ export class GenericDatasource {
             });
         }
 
-        options.targets = _.filter(options.targets, target => target.selectedDatastreamId != 0);
-
         let self = this;
         let allTargetResults = {data:[]};
 
@@ -86,15 +84,15 @@ export class GenericDatasource {
           }
 
           if (_.isEqual(target.type,"Locations")) {
-              if (target.selectedLocationId == 0) return;
+              if (target.selectedLocationId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"time");
-              suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things';
+              suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things($select=name)&$select=time';
           } else if(_.isEqual(target.type,"Historical Locations")){
-              if (target.selectedThingId == 0) return;
+              if (target.selectedThingId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"time");
-              suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations';
+              suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations($select=name)&$select=time';
           } else {
-              if (target.selectedDatastreamId == 0) return;
+              if (target.selectedDatastreamId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"phenomenonTime");
               suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+ `$filter=${timeFilter}&$select=phenomenonTime,result`;
           }
@@ -137,18 +135,21 @@ export class GenericDatasource {
 
     }
 
-    transformLocationsCoordinates(target,targetIndex,values){
+    transformLocationsCoordinates(target,targetIndex,value){
         let result = [];
         let timestamp = "";
         let lastLocation = false;
         let lastLocationValue = "";
-        if (values && values.length > 0) {
-            let lastLocation = values[0].Locations[0];
+
+        if (Array.isArray(value)) return result;
+
+        if (value) {
+            let lastLocation = value.Locations[0];
             result.push({
                 "key": lastLocation.name,
                 "latitude": lastLocation.location.coordinates[0],
                 "longitude": lastLocation.location.coordinates[1],
-                "name": lastLocation.name + " | " +target.selectedThingName + " | " + moment(values[0].time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
+                "name": lastLocation.name + " | " +target.selectedThingName + " | " + moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
                 "value": targetIndex+1,
             });
         }
