@@ -141,20 +141,31 @@ export class GenericDatasource {
         let lastLocation = false;
         let lastLocationValue = "";
 
-        if (Array.isArray(value)) return result;
+        if (value == null || value == undefined) {
+          console.log("Invalid data...");
+          return result;
+        }
+
+        if (Array.isArray(value)) {
+          if (value.length == 0) {
+            return result;
+          } else {
+            value = value[0];
+          }
+        }
 
         if (value) {
-            let lastLocation = value.Locations[0];
-            result.push({
-                "key": lastLocation.name,
-                "latitude": lastLocation.location.coordinates[0],
-                "longitude": lastLocation.location.coordinates[1],
-                "name": lastLocation.name + " | " +target.selectedThingName + " | " + moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
-                "value": targetIndex+1,
-            });
+          let lastLocation = value.Locations[0];
+          result.push({
+            "key": lastLocation.name,
+            "latitude": lastLocation.location.coordinates[0],
+            "longitude": lastLocation.location.coordinates[1],
+            "name": lastLocation.name + " | " +target.selectedThingName + " | " + moment(value.time,"YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
+            "value": targetIndex+1,
+          });
         }
         return result;
-    }
+      }
 
     transformDataSource(target,values){
         let self = this;

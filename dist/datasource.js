@@ -188,7 +188,18 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
                         var lastLocation = false;
                         var lastLocationValue = "";
 
-                        if (Array.isArray(value)) return result;
+                        if (value == null || value == undefined) {
+                            console.log("Invalid data...");
+                            return result;
+                        }
+
+                        if (Array.isArray(value)) {
+                            if (value.length == 0) {
+                                return result;
+                            } else {
+                                value = value[0];
+                            }
+                        }
 
                         if (value) {
                             var _lastLocation = value.Locations[0];
