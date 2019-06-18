@@ -2,12 +2,11 @@
   "name": "linksmart-sensorthings-datasource",
   "private": true,
   "scripts": {
-    "build": "./node_modules/grunt-cli/bin/grunt",
-    "watch": "npm run build && ./node_modules/grunt-cli/bin/grunt watch"
+    "build": "grunt",
+    "watch": "grunt && grunt watch"
   },
   "engineStrict": true,
   "devDependencies": {
-    "babel": "^6.23.0",
     "chai": "~3.5.0",
     "grunt": "^1.0.1",
     "grunt-babel": "~6.0.0",
@@ -31,8 +30,6 @@
     "jsonpath": "^1.0.0",
     "lodash": "^4.17.11",
     "mocha": "^6.0.2",
-    "moment": "^2.21.0",
-    "tippy.js": "^3.0.5",
-    "yarn": "^1.9.2"
+    "moment": "^2.21.0"
   }
 }

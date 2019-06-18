@@ -24,7 +24,7 @@ sudo grafana-cli plugins install linksmart-sensorthings-datasource
 
 * Clone the repository into Grafana's [plugin directory](http://docs.grafana.org/plugins/installation/#grafana-plugin-directory):
 ```
-git clone https://code.linksmart.eu/scm/ogc-st/grafana-sensorthings-datasource.git linksmart-sensorthings-datasource
+git clone https://github.com/linksmart/grafana-sensorthings-datasource.git linksmart-sensorthings-datasource
 ```
 * Restart Grafana server to see the newly added datasource.
 
@@ -39,7 +39,7 @@ Name | Description
 Name | The data source name.
 Default | Set this as the default plugin for new panels.
 Type | Choose SensorThings Datasource.
-Url | OGC SensorThings API root URL (e.g. http://localhost:8080/v1.0). Note the URL has no trailing slash ("/").
+Url | OGC SensorThings API root URL (e.g. `http://localhost:8080/v1.0`). Note the URL has no trailing slash ("/").
 Access | Proxy: Let Grafana server proxy the requests to OGC SensorThings API server.
 Basic Auth | Authenticate to OGC SensorThings API server (if required, provide User and Password)
 
@@ -96,16 +96,12 @@ See the demo below for better understanding:
 
 
 ### Dev setup
-
-This plugin requires node 6.10.0
 ```
-npm install -g yarn
-yarn install
-npm run build
+npm install
+grunt watch
 ```
 
 ## Links
-* [Changelog](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/browse/CHANGELOG.md)
-* [License](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/LICENSE)
-
-Please report any issues on [LinkSmart Board](https://boards.linksmart.eu).
+* [Changelog](https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/CHANGELOG.md)
+* [License](https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/LICENSE)
+* [Issues](https://github.com/linksmart/grafana-sensorthings-datasource/issues)

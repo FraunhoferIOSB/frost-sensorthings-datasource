@@ -1,6 +1,6 @@
 import _ from "lodash";
 import moment from "moment";
-import * as jp from './libs/jsonpath.js';
+import 'jsonpath';
 
 export class GenericDatasource {
 

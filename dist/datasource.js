@@ -1,9 +1,9 @@
 "use strict";
 
-System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _context) {
+System.register(["lodash", "moment", "jsonpath"], function (_export, _context) {
     "use strict";
 
-    var _, moment, jp, _typeof, _createClass, GenericDatasource;
+    var _, moment, _typeof, _createClass, GenericDatasource;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -16,9 +16,7 @@ System.register(["lodash", "moment", "./libs/jsonpath.js"], function (_export, _
             _ = _lodash.default;
         }, function (_moment) {
             moment = _moment.default;
-        }, function (_libsJsonpathJs) {
-            jp = _libsJsonpathJs;
-        }],
+        }, function (_jsonpath) {}],
         execute: function () {
             _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
                 return typeof obj;
