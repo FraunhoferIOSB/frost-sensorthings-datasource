@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', './libs/jsonpath.js'], function (_export, _context) {
+System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'], function (_export, _context) {
     "use strict";
 
-    var QueryCtrl, appEvents, AlertSrv, jp, _createClass, GenericDatasourceQueryCtrl;
+    var QueryCtrl, appEvents, AlertSrv, _createClass, GenericDatasourceQueryCtrl;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -41,8 +41,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
         }, function (_cssQueryEditorCss) {}, function (_appCoreCore) {
             appEvents = _appCoreCore.appEvents;
             AlertSrv = _appCoreCore.AlertSrv;
-        }, function (_libsJsonpathJs) {
-            jp = _libsJsonpathJs;
         }],
         execute: function () {
             _createClass = function () {
@@ -79,35 +77,27 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core', 
 
                     _this.target.type = _this.target.type || 'Sensors';
 
-                    // datasource init start
+                    // datastream init
                     _this.target.selectedDatastreamId = _this.target.selectedDatastreamId || 0;
                     _this.target.selectedDatastreamName = _this.target.selectedDatastreamName || 'select a datastream';
                     _this.target.selectedDatastreamDirty = _this.target.selectedDatastreamDirty || false;
                     _this.target.selectedDatastreamObservationType = _this.target.selectedDatastreamObservationType || '';
                     _this.allDataSources = {};
-                    // datasource init end
-
-                    // sensor init start
+                    // sensor init
                     _this.target.selectedSensorId = _this.target.selectedSensorId || 0;
                     _this.target.selectedSensorName = _this.target.selectedSensorName || 'select a sensor';
                     _this.target.selectedSensorDirty = _this.target.selectedSensorDirty || false;
                     _this.allSensors = {};
-                    // sensor init end
-
                     // thing init start
                     _this.target.selectedThingId = _this.target.selectedThingId || 0;
                     _this.target.selectedThingName = _this.target.selectedThingName || 'select a thing';
                     _this.target.selectedThingDirty = _this.target.selectedThingDirty || false;
                     _this.allThings = {};
-                    // thing init end
-
-
-                    // Location init start
+                    // location init start
                     _this.target.selectedLocationId = _this.target.selectedLocationId || 0;
                     _this.target.selectedLocationName = _this.target.selectedLocationName || 'select a location';
                     _this.target.selectedLocationDirty = _this.target.selectedLocationDirty || false;
                     _this.allLocations = {};
-                    // Location init end
 
                     _this.panelCtrl.events.on('data-received', _this.onDataReceived.bind(_this), $scope);
                     _this.panelCtrl.events.on('data-error', _this.onDataError.bind(_this), $scope);

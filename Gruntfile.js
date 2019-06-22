@@ -20,7 +20,14 @@ module.exports = function(grunt) {
         expand: true,
         src: ['README.md'],
         dest: 'dist'
-      }
+      },
+      externals: {
+        cwd: 'node_modules',
+        expand: true,
+        src: ['jsonpath-plus/src/jsonpath.js'],
+        dest: 'dist/external',
+        flatten: true
+      },
     },
 
     watch: {
@@ -46,7 +53,15 @@ module.exports = function(grunt) {
           src: ['**/*.js'],
           dest: 'dist',
           ext:'.js'
-        }]
+        },
+        {
+          cwd: 'dist/external',
+          expand: true,
+          src: ['**/*.js'],
+          dest: 'dist/external',
+          ext:'.js'
+        }
+      ]
       },
       distTestNoSystemJs: {
         files: [{
@@ -69,5 +84,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:pluginDef', 'babel']);
+  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:pluginDef', 'copy:externals', 'babel']);
 };

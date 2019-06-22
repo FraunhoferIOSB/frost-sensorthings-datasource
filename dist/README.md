@@ -98,7 +98,7 @@ See the demo below for better understanding:
 ### Dev setup
 ```
 npm install
-grunt watch
+npm run watch
 ```
 
 ## Links

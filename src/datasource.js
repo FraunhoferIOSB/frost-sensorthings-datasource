@@ -1,6 +1,7 @@
 import _ from "lodash";
 import moment from "moment";
-import 'jsonpath';
+
+import {JSONPath} from './external/jsonpath.js'; // copied with grunt
 
 export class GenericDatasource {
 

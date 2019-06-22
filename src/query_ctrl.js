@@ -4,8 +4,6 @@ import './css/query-editor.css!';
 import { appEvents} from 'app/core/core';
 import { AlertSrv} from 'app/core/core';
 
-import * as jp from './libs/jsonpath.js';
-
 export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     constructor($scope, $injector,alertSrv)  {
@@ -20,35 +18,27 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
         this.target.type = this.target.type || 'Sensors';
 
-        // datasource init start
+        // datastream init
         this.target.selectedDatastreamId = this.target.selectedDatastreamId || 0;
         this.target.selectedDatastreamName = this.target.selectedDatastreamName || 'select a datastream';
         this.target.selectedDatastreamDirty = this.target.selectedDatastreamDirty || false;
         this.target.selectedDatastreamObservationType = this.target.selectedDatastreamObservationType || '';
         this.allDataSources  = {};
-        // datasource init end
-
-        // sensor init start
+        // sensor init
         this.target.selectedSensorId = this.target.selectedSensorId || 0;
         this.target.selectedSensorName = this.target.selectedSensorName || 'select a sensor';
         this.target.selectedSensorDirty = this.target.selectedSensorDirty || false;
         this.allSensors  = {};
-        // sensor init end
-
         // thing init start
         this.target.selectedThingId = this.target.selectedThingId || 0;
         this.target.selectedThingName = this.target.selectedThingName || 'select a thing';
         this.target.selectedThingDirty = this.target.selectedThingDirty || false;
         this.allThings  = {};
-        // thing init end
-
-
-        // Location init start
+        // location init start
         this.target.selectedLocationId = this.target.selectedLocationId || 0;
         this.target.selectedLocationName = this.target.selectedLocationName || 'select a location';
         this.target.selectedLocationDirty = this.target.selectedLocationDirty || false;
         this.allLocations = {};
-        // Location init end
 
         this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
         this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);

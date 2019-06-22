@@ -1,9 +1,9 @@
 "use strict";
 
-System.register(["lodash", "moment", "jsonpath"], function (_export, _context) {
+System.register(["lodash", "moment", "./external/jsonpath.js"], function (_export, _context) {
     "use strict";
 
-    var _, moment, _typeof, _createClass, GenericDatasource;
+    var _, moment, JSONPath, _typeof, _createClass, GenericDatasource;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -16,7 +16,9 @@ System.register(["lodash", "moment", "jsonpath"], function (_export, _context) {
             _ = _lodash.default;
         }, function (_moment) {
             moment = _moment.default;
-        }, function (_jsonpath) {}],
+        }, function (_externalJsonpathJs) {
+            JSONPath = _externalJsonpathJs.JSONPath;
+        }],
         execute: function () {
             _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
                 return typeof obj;
@@ -117,7 +119,6 @@ System.register(["lodash", "moment", "jsonpath"], function (_export, _context) {
                         var allTargetResults = { data: [] };
 
                         var testPromises = options.targets.map(async function (target) {
-
                             var self = _this;
                             var suburl = '';
                             var thisTargetResult = {
