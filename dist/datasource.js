@@ -119,6 +119,7 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                         var allTargetResults = { data: [] };
 
                         var testPromises = options.targets.map(async function (target) {
+
                             var self = _this;
                             var suburl = '';
                             var thisTargetResult = {

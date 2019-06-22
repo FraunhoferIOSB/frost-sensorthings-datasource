@@ -2,16 +2,13 @@
   "name": "LinkSmart SensorThings",
   "id": "linksmart-sensorthings-datasource",
   "type": "datasource",
-
   "partials": {
     "config": "public/app/plugins/datasource/linksmart-sensorthings-datasource/partials/config.html"
   },
-
   "metrics": true,
   "annotations": false,
-
   "info": {
-    "description": "A Grafana datasource plugin for OGC SensorThings API",
+    "description": "OGC SensorThings datasource plugin",
     "author": {
       "name": "Fraunhofer FIT",
       "url": "http://www.fit.fraunhofer.de/en.html"
@@ -22,15 +19,14 @@
       "large": "img/LinkSmart_SensorThings_logo.svg"
     },
     "links": [
-        {"name": "LinkSmart", "url": "https://linksmart.eu"},
-        {"name": "Source Codes", "url": "https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource"},
-        {"name": "Changelog", "url": "https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/browse/CHANGELOG.md"},
-        {"name": "OGC SensorThings API", "url": "https://github.com/opengeospatial/sensorthings"}
+      {"name": "Changelog", "url": "https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/CHANGELOG.md"},
+      {"name": "Source Codes", "url": "https://github.com/linksmart/grafana-sensorthings-datasource"},
+      {"name": "OGC SensorThings API", "url": "https://github.com/opengeospatial/sensorthings"},
+      {"name": "LinkSmart", "url": "https://linksmart.eu"}
     ],
-    "version": "1.2.0",
-    "updated": "2019-03-05"
+    "version": "1.2.1",
+    "updated": "2019-06-22"
   },
-
   "dependencies": {
     "grafanaVersion": "4.x.x",
     "plugins": [ ]

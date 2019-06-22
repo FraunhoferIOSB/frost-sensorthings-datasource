@@ -1,4 +1,4 @@
-# LinkSmart SensorThings Data Source Plugin
+# Grafana OGC SensorThings Plugin
 This plugin enables the visualization of sensor and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) server on [Grafana](http://grafana.org/).
 
 It provides:
@@ -105,3 +105,5 @@ npm run watch
 * [Changelog](https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/CHANGELOG.md)
 * [License](https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/LICENSE)
 * [Issues](https://github.com/linksmart/grafana-sensorthings-datasource/issues)
+* [SensorThings faker for testing](https://github.com/linksmart/sensorthings-faker)
+* [Plugin page on Grafana Labs](https://grafana.com/plugins/linksmart-sensorthings-datasource)
