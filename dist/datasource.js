@@ -197,22 +197,23 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                             }
                         }
 
-                        var lastLocation = value.Locations[0];
+                        var locationName = value.Locations[0].name;
+                        var location = value.Locations[0].location;
                         var coordinates = void 0;
-                        if (lastLocation.location.type == "Feature" && lastLocation.location.geometry.type == "Point") {
-                            coordinates = lastLocation.location.geometry.coordinates;
-                        } else if (lastLocation.location.type == "Point") {
-                            coordinates = lastLocation.location.coordinates;
+                        if (location.type == "Feature" && location.geometry.type == "Point") {
+                            coordinates = location.geometry.coordinates;
+                        } else if (location.type == "Point") {
+                            coordinates = location.coordinates;
                         } else {
                             console.error("Unsupported location type for Thing " + target.selectedThingId + ". Expected GeoJSON Feature.Point or Point.");
                             return [];
                         }
 
                         return [{
-                            "key": lastLocation.name,
+                            "key": locationName,
                             "longitude": coordinates[0], // longitude is the first element
                             "latitude": coordinates[1],
-                            "name": lastLocation.name + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
+                            "name": locationName + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
                             "value": targetIndex + 1
                         }];
                     }
