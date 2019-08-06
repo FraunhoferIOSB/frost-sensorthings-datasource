@@ -11,7 +11,7 @@ It provides:
 ## Demo
 A live dashboard showing SensorThings data in Grafana panels: [SensorThings Dashboard](https://demo.linksmart.eu/grafana/d/OUQUMYDmz/ogc-sensorthings)
 
-[![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/dashboard_small.png)](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/dashboard.png)
+[![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/dashboard_small.png)](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/dashboard.png)
 
 ## Installation
 
@@ -43,10 +43,10 @@ Url | OGC SensorThings API root URL (e.g. `http://localhost:8080/v1.0`). Note th
 Access | Proxy: Let Grafana server proxy the requests to OGC SensorThings API server.
 Basic Auth | Authenticate to OGC SensorThings API server (if required, provide User and Password)
 
-![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup.png)
+![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/datasource_setup.png)
 
 4. Save & Test, you should see this confirmation:  
-![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/datasource_setup_confirmation.png)
+![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/datasource_setup_confirmation.png)
 
 ## Query Configuration
 
@@ -61,7 +61,7 @@ To visualize the observations from OGC SensorThings server,
 
 See the demo below for better understanding:
 
-![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/graph_demo.gif)
+![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/graph_demo.gif)
 
 ### Table view
 Using table view, one can see list of observation recorded based on Sensors/Things, and also list of Locations visited by a Thing or list of Things that has been in a specific Location.
@@ -72,7 +72,7 @@ Using table view, one can see list of observation recorded based on Sensors/Thin
 
 See the demo below for better understanding:
 
-![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/table_demo.gif)
+![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/table_demo.gif)
 
 ### World Map view
 Using world map view, one can see the current Location of a Thing on the map.
@@ -83,7 +83,7 @@ Using world map view, one can see the current Location of a Thing on the map.
     * Select `Center`->`Last GeoHash`
     * Set `Min Circle Size` and `Max Circle Size` to 5
     * Select `Location Data`->`json result`  
-![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/worldmap_config.png)
+![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap_config.png)
 
 4. In "Metrics" tab:
     * Select the OGC SensorThings Datasource.
@@ -91,7 +91,7 @@ Using world map view, one can see the current Location of a Thing on the map.
 
 See the demo below for better understanding:
 
-![](https://code.linksmart.eu/projects/OGC-ST/repos/grafana-sensorthings-datasource/raw/img/worldmap_demo.gif)
+![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap_demo.gif)
 
 
 
