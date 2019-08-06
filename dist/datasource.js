@@ -183,35 +183,38 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                 }, {
                     key: "transformLocationsCoordinates",
                     value: function transformLocationsCoordinates(target, targetIndex, value) {
-                        var result = [];
-                        var timestamp = "";
-                        var lastLocation = false;
-                        var lastLocationValue = "";
-
-                        if (value == null || value == undefined) {
-                            console.log("Invalid data...");
-                            return result;
+                        if (!value) {
+                            console.error("Invalid location data for Thing " + target.selectedThingId);
+                            return [];
                         }
 
                         if (Array.isArray(value)) {
                             if (value.length == 0) {
-                                return result;
+                                console.log("No location for Thing " + target.selectedThingId);
+                                return [];
                             } else {
                                 value = value[0];
                             }
                         }
 
-                        if (value) {
-                            var _lastLocation = value.Locations[0];
-                            result.push({
-                                "key": _lastLocation.name,
-                                "latitude": _lastLocation.location.coordinates[0],
-                                "longitude": _lastLocation.location.coordinates[1],
-                                "name": _lastLocation.name + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
-                                "value": targetIndex + 1
-                            });
+                        var lastLocation = value.Locations[0];
+                        var coordinates = void 0;
+                        if (lastLocation.location.type == "Feature" && lastLocation.location.geometry.type == "Point") {
+                            coordinates = lastLocation.location.geometry.coordinates;
+                        } else if (lastLocation.location.type == "Point") {
+                            coordinates = lastLocation.location.coordinates;
+                        } else {
+                            console.error("Unsupported location type for Thing " + target.selectedThingId + ". Expected GeoJSON Feature.Point or Point.");
+                            return [];
                         }
-                        return result;
+
+                        return [{
+                            "key": lastLocation.name,
+                            "longitude": coordinates[0], // longitude is the first element
+                            "latitude": coordinates[1],
+                            "name": lastLocation.name + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
+                            "value": targetIndex + 1
+                        }];
                     }
                 }, {
                     key: "transformDataSource",
