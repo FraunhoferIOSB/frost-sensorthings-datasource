@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.3.0] - 2019-08-06
+### Added
+- Support for Feature-type GeoJSON with a Point as location: [#26]
+
 ### Changed
 - Links to source code and issue tracker
 
@@ -42,3 +45,4 @@ Initial release
 [#6]: https://github.com/linksmart/grafana-sensorthings-datasource/issues/6
 [#7]: https://github.com/linksmart/grafana-sensorthings-datasource/issues/7
 [#8]: https://github.com/linksmart/grafana-sensorthings-datasource/issues/8
+[#26]: https://github.com/linksmart/grafana-sensorthings-datasource/issues/26
