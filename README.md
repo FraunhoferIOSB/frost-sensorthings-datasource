@@ -1,4 +1,7 @@
-# Grafana OGC SensorThings Plugin
+Grafana OGC SensorThings Plugin
+===============================
+[![GitHub tag (latest release)](https://img.shields.io/github/tag/linksmart/grafana-sensorthings-datasource.svg?label=release)](https://github.com/linksmart/grafana-sensorthings-datasource/tags)
+
 This plugin enables the visualization of sensor and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) server on [Grafana](http://grafana.org/).
 
 It provides:
