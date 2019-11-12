@@ -89,7 +89,7 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
 
                         var allPromises = [];
 
-                        if (_.find(options.targets, { "panelType": 'grafana-worldmap-panel' })) {
+                        if (_.find(options.targets, { 'panelType': 'grafana-worldmap-panel' })) {
                             _.forEach(options.targets, function (target, targetIndex) {
                                 var self = this;
                                 var suburl = '';
@@ -102,7 +102,7 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                                     url: this.url + suburl,
                                     method: 'GET'
                                 }).then(function (response) {
-                                    return self.transformLocationsCoordinates(target, targetIndex, response.data.value);
+                                    return self.transformLocationsCoordinates(target, response.data.value);
                                 }));
                             }.bind(this));
 
@@ -115,7 +115,6 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                             });
                         }
 
-                        var self = this;
                         var allTargetResults = { data: [] };
 
                         var testPromises = options.targets.map(async function (target) {
@@ -156,6 +155,7 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                                 });
 
                                 hasNextLink = _.has(response.data, "@iot.nextLink");
+
                                 if (hasNextLink) {
                                     suburl = suburl.split('?')[0];
                                     fullUrl = _this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
@@ -182,7 +182,7 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                     }
                 }, {
                     key: "transformLocationsCoordinates",
-                    value: function transformLocationsCoordinates(target, targetIndex, value) {
+                    value: function transformLocationsCoordinates(target, value) {
                         if (!value) {
                             console.error("Invalid location data for Thing " + target.selectedThingId);
                             return [];
@@ -209,13 +209,16 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                             return [];
                         }
 
-                        return [{
-                            "key": locationName,
-                            "longitude": coordinates[0], // longitude is the first element
-                            "latitude": coordinates[1],
-                            "name": locationName + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
-                            "value": targetIndex + 1
-                        }];
+                        return {
+                            'target': target.selectedDatastreamName.toString(),
+                            'type': 'docs',
+                            'datapoints': [{
+                                "key": locationName,
+                                "longitude": coordinates[0], // longitude is the first element
+                                "latitude": coordinates[1],
+                                "name": locationName + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS')
+                            }]
+                        };
                     }
                 }, {
                     key: "transformDataSource",
