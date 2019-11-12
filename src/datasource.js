@@ -1,5 +1,5 @@
-import _ from "lodash";
-import moment from "moment";
+import _ from 'lodash';
+import moment from 'moment';
 
 import {JSONPath} from './external/jsonpath.js'; // copied with grunt
 export class GenericDatasource {
@@ -25,18 +25,18 @@ export class GenericDatasource {
     }
 
     getTimeFilter(options, key) {
-        let from = options.range.from.utc().format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
-        let to = options.range.to.utc().format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
-        return key + " gt " + from + " and " + key + " lt " + to;
+        let from = options.range.from.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+        let to = options.range.to.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+        return key + ' gt ' + from + ' and ' + key + ' lt ' + to;
     }
 
     getFormatedId(id) {
-        return (Number.isInteger(id) || !isNaN(id)) ? id : "'" + id + "'";
+        return (Number.isInteger(id) || !isNaN(id)) ? id : '"' + id + '"';
     }
 
     query(options) {
 
-        options.targets = _.filter(options.targets, target => target.hide != true);
+        options.targets = _.filter(options.targets, target => target.hide !== true);
 
         let allPromises = [];
 
@@ -45,8 +45,10 @@ export class GenericDatasource {
                 let self = this;
                 let suburl = '';
 
-                if (target.selectedThingId == 0) return;
-                let timeFilter = this.getTimeFilter(options, "time");
+                if (target.selectedThingId === 0) {
+                    return;
+                }
+                let timeFilter = this.getTimeFilter(options, 'time');
                 suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name,location)&$top=1&$select=time';
 
                 allPromises.push(this.doRequest({
@@ -82,17 +84,23 @@ export class GenericDatasource {
                 return thisTargetResult;
             }
 
-            if (_.isEqual(target.type, "Locations")) {
-                if (target.selectedLocationId == 0) return thisTargetResult;
-                let timeFilter = this.getTimeFilter(options, "time");
+            if (_.isEqual(target.type, 'Locations')) {
+                if (target.selectedLocationId === 0) {
+                    return thisTargetResult;
+                }
+                let timeFilter = this.getTimeFilter(options, 'time');
                 suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';
-            } else if (_.isEqual(target.type, "Historical Locations")) {
-                if (target.selectedThingId == 0) return thisTargetResult;
-                let timeFilter = this.getTimeFilter(options, "time");
+            } else if (_.isEqual(target.type, 'Historical Locations')) {
+                if (target.selectedThingId === 0) {
+                    return thisTargetResult;
+                }
+                let timeFilter = this.getTimeFilter(options, 'time');
                 suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name)&$select=time';
             } else {
-                if (target.selectedDatastreamId == 0) return thisTargetResult;
-                let timeFilter = this.getTimeFilter(options, "phenomenonTime");
+                if (target.selectedDatastreamId === 0) {
+                    return thisTargetResult;
+                }
+                let timeFilter = this.getTimeFilter(options, 'phenomenonTime');
                 suburl = '/Datastreams(' + this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + `$filter=${timeFilter}&$select=phenomenonTime,result`;
             }
 
@@ -106,16 +114,16 @@ export class GenericDatasource {
                     method: 'GET'
                 });
 
-                hasNextLink = _.has(response.data, "@iot.nextLink");
+                hasNextLink = _.has(response.data, '@iot.nextLink');
 
                 if (hasNextLink) {
                     suburl = suburl.split('?')[0];
-                    fullUrl = this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
+                    fullUrl = this.url + suburl + '?' + response.data['@iot.nextLink'].split('?')[1];
                 }
 
-                if (_.isEqual(target.type, "Locations")) {
+                if (_.isEqual(target.type, 'Locations')) {
                     transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-                } else if (_.isEqual(target.type, "Historical Locations")) {
+                } else if (_.isEqual(target.type, 'Historical Locations')) {
                     transformedResults = transformedResults.concat(self.transformLocations(target, response.data.value));
                 } else {
                     transformedResults = transformedResults.concat(self.transformDataSource(target, response.data.value));
@@ -137,13 +145,13 @@ export class GenericDatasource {
 
     transformLocationsCoordinates(target, value) {
         if (!value) {
-            console.error("Invalid location data for Thing " + target.selectedThingId);
+            console.error('Invalid location data for Thing ' + target.selectedThingId);
             return [];
         }
 
         if (Array.isArray(value)) {
-            if (value.length == 0) {
-                console.log("No location for Thing " + target.selectedThingId);
+            if (value.length === 0) {
+                console.log('No location for Thing ' + target.selectedThingId);
                 return [];
             } else {
                 value = value[0];
@@ -153,12 +161,12 @@ export class GenericDatasource {
         let locationName = value.Locations[0].name;
         let location = value.Locations[0].location;
         let coordinates;
-        if (location.type == "Feature" && location.geometry.type == "Point") {
+        if (location.type === 'Feature' && location.geometry.type === 'Point') {
             coordinates = location.geometry.coordinates;
-        } else if (location.type == "Point") {
+        } else if (location.type === 'Point') {
             coordinates = location.coordinates;
         } else {
-            console.error("Unsupported location type for Thing " + target.selectedThingId + ". Expected GeoJSON Feature.Point or Point.")
+            console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
             return [];
         }
 
@@ -166,10 +174,10 @@ export class GenericDatasource {
             'target': target.selectedDatastreamName.toString(),
             'type': 'docs',
             'datapoints': [{
-                "key": locationName,
-                "longitude": coordinates[0], // longitude is the first element
-                "latitude": coordinates[1],
-                "name": locationName + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS')
+                'key': locationName,
+                'longitude': coordinates[0], // longitude is the first element
+                'latitude': coordinates[1],
+                'name': locationName + ' | ' + target.selectedThingName + ' | ' + moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('YYYY-MM-DD HH:mm:ss.SSS')
             }],
         };
     }
@@ -185,28 +193,28 @@ export class GenericDatasource {
 
             if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
 
-                var result = JSONPath({ json: value.result, path: target.jsonQuery });
+                var result = new JSONPath({ json: value.result, path: target.jsonQuery });
 
-                if (target.panelType == "table" || target.panelType == "singlestat") {
-                    result = (typeof result[0] === "object") ? JSON.stringify(result[0]) : result[0];
-                    return [result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                if (target.panelType === 'table' || target.panelType === 'singlestat') {
+                    result = (typeof result[0] === 'object') ? JSON.stringify(result[0]) : result[0];
+                    return [result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                 } else {
-                    return [result[0], parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                    return [result[0], parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                 }
 
             } else {
 
-                if (target.panelType == "table") {
-                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                if (target.panelType === 'table') {
+                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                 } else {
-                    return [value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                    return [value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                 }
 
             }
         });
 
         datapoints = _.filter(datapoints, function (datapoint) {
-            return (typeof datapoint[0] === "string" || typeof datapoint[0] === "number" || (Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0));
+            return (typeof datapoint[0] === 'string' || typeof datapoint[0] === 'number' || (Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0));
         });
 
         return datapoints;
@@ -227,8 +235,8 @@ export class GenericDatasource {
     transformThings(target, values) {
 
         return _.map(values, value => {
-            return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
-        })
+            return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
+        });
 
     }
 
@@ -236,7 +244,7 @@ export class GenericDatasource {
         let result = [];
         _.forEach(values, function (value) {
             _.forEach(value.Locations, function (location) {
-                result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
+                result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))]);
             });
         });
         return result;
@@ -248,21 +256,21 @@ export class GenericDatasource {
             method: 'GET',
         }).then(response => {
             if (response.status === 200) {
-                return { status: "success", message: "Data source is working", title: "Success" };
+                return { status: 'success', message: 'Data source is working', title: 'Success' };
             }
         });
     }
 
     async metricFindQuery(query, suburl, type) {
 
-        let placeholder = "select a sensor";
+        let placeholder = 'select a sensor';
 
-        if (type == "thing") {
-            placeholder = "select a thing";
-        } else if (type == "datastream") {
-            placeholder = "select a datastream";
-        } else if (type == "location") {
-            placeholder = "select a location";
+        if (type === 'thing') {
+            placeholder = 'select a thing';
+        } else if (type === 'datastream') {
+            placeholder = 'select a datastream';
+        } else if (type === 'location') {
+            placeholder = 'select a location';
         }
 
         let transformedMetrics = [{
@@ -273,7 +281,7 @@ export class GenericDatasource {
 
 
         let hasNextLink = true;
-        let selectParam = (type == "datastream") ? "$select=name,id,observationType" : "$select=name,id";
+        let selectParam = (type === 'datastream') ? '$select=name,id,observationType' : '$select=name,id';
         let fullUrl = this.url + suburl + `?$top=${this.topCount}&${selectParam}`;
 
         while (hasNextLink) {
@@ -281,9 +289,9 @@ export class GenericDatasource {
                 url: fullUrl,
                 method: 'GET',
             });
-            hasNextLink = _.has(result.data, "@iot.nextLink");
+            hasNextLink = _.has(result.data, '@iot.nextLink');
             if (hasNextLink) {
-                fullUrl = this.url + suburl + "?" + result.data["@iot.nextLink"].split('?')[1];
+                fullUrl = this.url + suburl + '?' + result.data['@iot.nextLink'].split('?')[1];
             }
             transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
         }
@@ -297,7 +305,7 @@ export class GenericDatasource {
 
         _.forEach(metrics, (metric, index) => {
             transformedMetrics.push({
-                text: metric.name + " ( " + metric['@iot.id'] + " )",
+                text: metric.name + ' ( ' + metric['@iot.id'] + ' )',
                 value: metric['@iot.id'],
                 type: metric['observationType']
             });
