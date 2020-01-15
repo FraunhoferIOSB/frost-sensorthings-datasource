@@ -77,6 +77,8 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
 
                     _this.target.type = _this.target.type || 'Sensors';
 
+                    _this.mapPanelName = 'grafana-map-panel';
+
                     // datastream init
                     _this.target.selectedDatastreamId = _this.target.selectedDatastreamId || 0;
                     _this.target.selectedDatastreamName = _this.target.selectedDatastreamName || 'select a datastream';
@@ -165,7 +167,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showControlTypes',
                     value: function showControlTypes() {
-                        return this.target.panelType !== 'grafana-map-panel';
+                        return this.target.panelType !== this.mapPanelName;
                     }
                 }, {
                     key: 'toggleEditorMode',
@@ -175,7 +177,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showSensors',
                     value: function showSensors() {
-                        return this.target.type === 'Sensors' && this.target.panelType !== 'grafana-map-panel';
+                        return this.target.type === 'Sensors' && this.target.panelType !== this.mapPanelName;
                     }
                 }, {
                     key: 'jsonQueryClick',
@@ -212,7 +214,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showDatastreams',
                     value: function showDatastreams() {
-                        return (this.target.selectedSensorId !== 0 || this.target.selectedThingId !== 0) && (this.target.type === 'Sensors' || this.target.type === 'Things') && this.target.panelType !== 'grafana-map-panel';
+                        return (this.target.selectedSensorId !== 0 || this.target.selectedThingId !== 0) && (this.target.type === 'Sensors' || this.target.type === 'Things') && this.target.panelType !== this.mapPanelName;
                     }
                 }, {
                     key: 'getDataStreams',
@@ -272,7 +274,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showJsonQuery',
                     value: function showJsonQuery() {
-                        return this.target.selectedDatastreamId !== 0 && (this.target.type === 'Sensors' || this.target.type === 'Things') && this.target.panelType !== 'grafana-map-panel';
+                        return this.target.selectedDatastreamId !== 0 && (this.target.type === 'Sensors' || this.target.type === 'Things') && this.target.panelType !== this.mapPanelName;
                     }
                 }, {
                     key: 'isOmObservationType',
@@ -300,7 +302,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showThings',
                     value: function showThings() {
-                        return this.target.type === 'Things' || this.target.type === 'Historical Locations' || this.target.panelType === 'grafana-map-panel';
+                        return this.target.type === 'Things' || this.target.type === 'Historical Locations' || this.target.panelType === this.mapPanelName;
                     }
                 }, {
                     key: 'getThings',

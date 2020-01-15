@@ -61,6 +61,7 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
                     this.dashboardSrv = dashboardSrv;
                     this.notificationShowTime = 5000;
                     this.topCount = 1000;
+                    this.mapPanelName = 'grafana-map-panel';
                     if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
                         this.headers['Authorization'] = instanceSettings.basicAuth;
                     }
@@ -89,7 +90,7 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
 
                         var allPromises = [];
 
-                        if (_.find(options.targets, { 'panelType': 'grafana-map-panel' })) {
+                        if (_.find(options.targets, { 'panelType': this.mapPanelName })) {
                             _.forEach(options.targets, function (target, targetIndex) {
                                 var self = this;
                                 var suburl = '';
