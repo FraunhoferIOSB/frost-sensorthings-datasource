@@ -89,7 +89,7 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
 
                         var allPromises = [];
 
-                        if (_.find(options.targets, { 'panelType': 'grafana-worldmap-panel' })) {
+                        if (_.find(options.targets, { 'panelType': 'grafana-map-panel' })) {
                             _.forEach(options.targets, function (target, targetIndex) {
                                 var self = this;
                                 var suburl = '';

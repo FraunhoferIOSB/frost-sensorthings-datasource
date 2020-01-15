@@ -19,6 +19,7 @@ export class GenericDatasource {
         this.dashboardSrv = dashboardSrv;
         this.notificationShowTime = 5000;
         this.topCount = 1000;
+        this.mapPanelName = 'grafana-map-panel';
         if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
             this.headers['Authorization'] = instanceSettings.basicAuth;
         }
@@ -40,7 +41,7 @@ export class GenericDatasource {
 
         let allPromises = [];
 
-        if (_.find(options.targets, { 'panelType': 'grafana-worldmap-panel' })) {
+        if (_.find(options.targets, { 'panelType': this.mapPanelName })) {
             _.forEach(options.targets, function (target, targetIndex) {
                 let self = this;
                 let suburl = '';

@@ -106,19 +106,19 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                     // appEvents.emit('alert-success', ['Test notification sent', '']);
 
                     if (_this.target.selectedThingDirty) {
-                        _this.alertSrv.set("Thing Not Found", _this.target.selectedThingId + " is not a valid thing name", 'error', _this.notificationShowTime);
+                        _this.alertSrv.set('Thing Not Found', _this.target.selectedThingId + ' is not a valid thing name', 'error', _this.notificationShowTime);
                     }
 
                     if (_this.target.selectedSensorDirty) {
-                        _this.alertSrv.set("Sensor Not Found", _this.target.selectedSensorId + " is not a valid sensor name", 'error', _this.notificationShowTime);
+                        _this.alertSrv.set('Sensor Not Found', _this.target.selectedSensorId + ' is not a valid sensor name', 'error', _this.notificationShowTime);
                     }
 
                     if (_this.target.selectedDatastreamDirty) {
-                        _this.alertSrv.set("Datastream Not Found", _this.target.selectedDatastreamName + " is not a valid datastream name", 'error', _this.notificationShowTime);
+                        _this.alertSrv.set('Datastream Not Found', _this.target.selectedDatastreamName + ' is not a valid datastream name', 'error', _this.notificationShowTime);
                     }
 
                     if (_this.target.selectedLocationDirty) {
-                        _this.alertSrv.set("Location Not Found", _this.target.selectedLocationId + " is not a valid location name", 'error', _this.notificationShowTime);
+                        _this.alertSrv.set('Location Not Found', _this.target.selectedLocationId + ' is not a valid location name', 'error', _this.notificationShowTime);
                     }
 
                     return _this;
@@ -157,7 +157,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                     key: 'getTargetTypes',
                     value: function getTargetTypes() {
                         var targetTypes = ['Sensors', 'Things'];
-                        if (this.target.panelType == 'table') {
+                        if (this.target.panelType === 'table') {
                             targetTypes.push('Locations', 'Historical Locations');
                         }
                         return targetTypes;
@@ -165,7 +165,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showControlTypes',
                     value: function showControlTypes() {
-                        return this.target.panelType != 'grafana-worldmap-panel';
+                        return this.target.panelType !== 'grafana-map-panel';
                     }
                 }, {
                     key: 'toggleEditorMode',
@@ -175,20 +175,20 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showSensors',
                     value: function showSensors() {
-                        return this.target.type == 'Sensors' && this.target.panelType != 'grafana-worldmap-panel';
+                        return this.target.type === 'Sensors' && this.target.panelType !== 'grafana-map-panel';
                     }
                 }, {
                     key: 'jsonQueryClick',
                     value: function jsonQueryClick(type) {
                         if (!this.isOmObservationType(type)) {
-                            this.alertSrv.set("Unsupported Observation Type", "JSONPath only works when Datastream.observationType is OM_Observation", 'warning', this.notificationShowTime);
+                            this.alertSrv.set('Unsupported Observation Type', 'JSONPath only works when Datastream.observationType is OM_Observation', 'warning', this.notificationShowTime);
                         }
                     }
                 }, {
                     key: 'getSensors',
                     value: function getSensors(query) {
                         var self = this;
-                        return this.datasource.metricFindQuery(query || '', "/Sensors", 'sensor').then(function (result) {
+                        return this.datasource.metricFindQuery(query || '', '/Sensors', 'sensor').then(function (result) {
                             self.allSensors = result;
                             return result;
                         }).catch(this.handleQueryCtrlError.bind(this));
@@ -197,6 +197,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                     key: 'onSensorChange',
                     value: function onSensorChange(query, selectedSensorId) {
                         var sensor = _.find(this.allSensors, { 'value': this.target.selectedSensorId });
+                        console.log('find all sensors');
 
                         if (sensor) {
                             this.target.selectedSensorName = sensor.text;
@@ -204,30 +205,30 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                         } else {
                             this.target.selectedSensorDirty = true;
                             this.target.selectedDatastreamId = 0;
-                            this.alertSrv.set("Sensor Not Found", this.target.selectedSensorId + " is not a valid sensor name", 'error', this.notificationShowTime);
+                            this.alertSrv.set('Sensor Not Found', this.target.selectedSensorId + ' is not a valid sensor name', 'error', this.notificationShowTime);
                         }
                         this.resetDataSource();
                     }
                 }, {
                     key: 'showDatastreams',
                     value: function showDatastreams() {
-                        return (this.target.selectedSensorId != 0 || this.target.selectedThingId != 0) && (this.target.type == "Sensors" || this.target.type == "Things") && this.target.panelType != 'grafana-worldmap-panel';
+                        return (this.target.selectedSensorId !== 0 || this.target.selectedThingId !== 0) && (this.target.type === 'Sensors' || this.target.type === 'Things') && this.target.panelType !== 'grafana-map-panel';
                     }
                 }, {
                     key: 'getDataStreams',
                     value: function getDataStreams(query) {
                         var self = this;
-                        var targetUrl = "";
+                        var targetUrl = '';
                         if (this.target.selectedThingDirty || this.target.selectedSensorDirty) {
                             return [{
-                                text: "select a datastream",
+                                text: 'select a datastream',
                                 value: 0
                             }];
                         }
-                        if (this.target.type == 'Sensors') {
-                            targetUrl = "/Sensors(" + this.getFormatedId(this.target.selectedSensorId) + ")/Datastreams";
+                        if (this.target.type === 'Sensors') {
+                            targetUrl = '/Sensors(' + this.getFormatedId(this.target.selectedSensorId) + ')/Datastreams';
                         } else {
-                            targetUrl = "/Things(" + this.getFormatedId(this.target.selectedThingId) + ")/Datastreams";
+                            targetUrl = '/Things(' + this.getFormatedId(this.target.selectedThingId) + ')/Datastreams';
                         }
                         return this.datasource.metricFindQuery(query || '', targetUrl, 'datastream').then(function (result) {
                             self.allDataSources = result;
@@ -237,7 +238,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'getFormatedId',
                     value: function getFormatedId(id) {
-                        return Number.isInteger(id) || !isNaN(id) ? id : "'" + id + "'";
+                        return Number.isInteger(id) || !isNaN(id) ? id : '"' + id + '"';
                     }
                 }, {
                     key: 'onDataStreamChange',
@@ -256,7 +257,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                             this.target.selectedDatastreamDirty = true;
                             this.target.selectedDatastreamName = this.target.selectedDatastreamId;
                             this.target.selectedDatastreamObservationType = '';
-                            this.alertSrv.set("Datastream Not Found", this.target.selectedDatastreamName + " is not a valid datastream name", 'error', this.notificationShowTime);
+                            this.alertSrv.set('Datastream Not Found', this.target.selectedDatastreamName + ' is not a valid datastream name', 'error', this.notificationShowTime);
                         }
 
                         if (this.isOmObservationType(this.target.selectedDatastreamObservationType)) {} else {
@@ -271,13 +272,13 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showJsonQuery',
                     value: function showJsonQuery() {
-                        return this.target.selectedDatastreamId != 0 && (this.target.type == "Sensors" || this.target.type == "Things") && this.target.panelType != 'grafana-worldmap-panel';
+                        return this.target.selectedDatastreamId !== 0 && (this.target.type === 'Sensors' || this.target.type === 'Things') && this.target.panelType !== 'grafana-map-panel';
                     }
                 }, {
                     key: 'isOmObservationType',
                     value: function isOmObservationType(type) {
                         if (_.isEmpty(type) || !type.includes('om_observation')) {
-                            this.target.jsonQuery = "";
+                            this.target.jsonQuery = '';
                             return false;
                         }
                         return true;
@@ -286,7 +287,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                     key: 'resetDataSource',
                     value: function resetDataSource() {
                         this.target.selectedDatastreamId = 0;
-                        this.target.selectedDatastreamName = "select a datastream";
+                        this.target.selectedDatastreamName = 'select a datastream';
                         this.panelCtrl.refresh();
                     }
                 }, {
@@ -299,13 +300,13 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showThings',
                     value: function showThings() {
-                        return this.target.type == 'Things' || this.target.type == 'Historical Locations' || this.target.panelType == 'grafana-worldmap-panel';
+                        return this.target.type === 'Things' || this.target.type === 'Historical Locations' || this.target.panelType === 'grafana-map-panel';
                     }
                 }, {
                     key: 'getThings',
                     value: function getThings(query) {
                         var self = this;
-                        return this.datasource.metricFindQuery(query || '', "/Things", 'thing').then(function (result) {
+                        return this.datasource.metricFindQuery(query || '', '/Things', 'thing').then(function (result) {
                             self.allThings = result;
                             return result;
                         }).catch(this.handleQueryCtrlError.bind(this));
@@ -321,20 +322,20 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                         } else {
                             this.target.selectedThingDirty = true;
                             this.target.selectedDatastreamId = 0;
-                            this.alertSrv.set("Thing Not Found", this.target.selectedThingId + " is not a valid thing name", 'error', this.notificationShowTime);
+                            this.alertSrv.set('Thing Not Found', this.target.selectedThingId + ' is not a valid thing name', 'error', this.notificationShowTime);
                         }
                         this.resetDataSource();
                     }
                 }, {
                     key: 'showLocations',
                     value: function showLocations() {
-                        return this.target.type == 'Locations';
+                        return this.target.type === 'Locations';
                     }
                 }, {
                     key: 'getLocations',
                     value: function getLocations(query) {
                         var self = this;
-                        return this.datasource.metricFindQuery(query || '', "/Locations", 'location').then(function (result) {
+                        return this.datasource.metricFindQuery(query || '', '/Locations', 'location').then(function (result) {
                             self.allLocations = result;
                             return result;
                         }).catch(this.handleQueryCtrlError.bind(this));
@@ -350,7 +351,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                             this.target.selectedLocationDirty = false;
                         } else {
                             this.target.selectedLocationDirty = true;
-                            this.alertSrv.set("Location Not Found", this.target.selectedLocationId + " is not a valid location name", 'error', this.notificationShowTime);
+                            this.alertSrv.set('Location Not Found', this.target.selectedLocationId + ' is not a valid location name', 'error', this.notificationShowTime);
                         }
 
                         this.panelCtrl.refresh();
