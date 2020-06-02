@@ -95,7 +95,7 @@ export class GenericDatasource {
           } else {
               if (target.selectedDatastreamId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"phenomenonTime");
-              suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+ `$filter=${timeFilter}&$select=phenomenonTime,result`;
+              suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+ `$filter=${timeFilter}&$select=phenomenonTime,result&$orderby=phenomenonTime desc`;
           }
 
           let transformedResults = [];
