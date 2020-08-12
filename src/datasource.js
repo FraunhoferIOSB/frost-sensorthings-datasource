@@ -74,12 +74,40 @@ export class GenericDatasource {
 
         let testPromises = options.targets.map(async target => {
 
-            let self = this;
-            let suburl = '';
-            let thisTargetResult = {
-                'target': target.selectedDatastreamName.toString(),
-                'datapoints': [],
-            };
+          let self = this;
+          let suburl = '';
+          let thisTargetResult = {
+            'target' : target.selectedDatastreamName.toString(),
+            'datapoints' : [],
+          };
+
+          if (target.selectedDatastreamDirty) {
+              return thisTargetResult;
+          }
+
+          if (_.isEqual(target.type,"Locations")) {
+              if (target.selectedLocationId == 0) return thisTargetResult;
+              let timeFilter = this.getTimeFilter(options,"time");
+              suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things($select=name)&$select=time';
+          } else if(_.isEqual(target.type,"Historical Locations")){
+              if (target.selectedThingId == 0) return thisTargetResult;
+              let timeFilter = this.getTimeFilter(options,"time");
+              suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations($select=name)&$select=time';
+          } else {
+              if (target.selectedDatastreamId == 0) return thisTargetResult;
+              let timeFilter = this.getTimeFilter(options,"phenomenonTime");
+              suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+ `$filter=${timeFilter}&$select=phenomenonTime,result&$orderby=phenomenonTime desc`;
+          }
+
+          let transformedResults = [];
+          let hasNextLink = true;
+          let fullUrl = this.url + suburl + `&$top=${this.topCount}`;
+
+          while(hasNextLink) {
+            let response = await this.doRequest({
+              url: fullUrl,
+              method: 'GET'
+            });
 
             if (target.selectedDatastreamDirty) {
                 return thisTargetResult;
