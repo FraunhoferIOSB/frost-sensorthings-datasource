@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-System.register(["lodash", "moment", "./external/jsonpath.js"], function (_export, _context) {
+System.register(['lodash', 'moment', './external/jsonpath.js'], function (_export, _context) {
     "use strict";
 
     var _, moment, JSONPath, _typeof, _createClass, GenericDatasource;
@@ -44,7 +44,7 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                 };
             }();
 
-            _export("GenericDatasource", GenericDatasource = function () {
+            _export('GenericDatasource', GenericDatasource = function () {
                 function GenericDatasource(instanceSettings, $q, backendSrv, templateSrv, alertSrv, contextSrv, dashboardSrv) {
                     _classCallCheck(this, GenericDatasource);
 
@@ -61,48 +61,51 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                     this.dashboardSrv = dashboardSrv;
                     this.notificationShowTime = 5000;
                     this.topCount = 1000;
+                    this.mapPanelName = 'grafana-map-panel';
                     if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
                         this.headers['Authorization'] = instanceSettings.basicAuth;
                     }
                 }
 
                 _createClass(GenericDatasource, [{
-                    key: "getTimeFilter",
+                    key: 'getTimeFilter',
                     value: function getTimeFilter(options, key) {
-                        var from = options.range.from.utc().format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
-                        var to = options.range.to.utc().format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
-                        return key + " gt " + from + " and " + key + " lt " + to;
+                        var from = options.range.from.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+                        var to = options.range.to.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+                        return key + ' gt ' + from + ' and ' + key + ' lt ' + to;
                     }
                 }, {
-                    key: "getFormatedId",
+                    key: 'getFormatedId',
                     value: function getFormatedId(id) {
-                        return Number.isInteger(id) || !isNaN(id) ? id : "'" + id + "'";
+                        return Number.isInteger(id) || !isNaN(id) ? id : '"' + id + '"';
                     }
                 }, {
-                    key: "query",
+                    key: 'query',
                     value: function query(options) {
                         var _this = this;
 
                         options.targets = _.filter(options.targets, function (target) {
-                            return target.hide != true;
+                            return target.hide !== true;
                         });
 
                         var allPromises = [];
 
-                        if (_.find(options.targets, { "panelType": 'grafana-worldmap-panel' })) {
+                        if (_.find(options.targets, { 'panelType': this.mapPanelName })) {
                             _.forEach(options.targets, function (target, targetIndex) {
                                 var self = this;
                                 var suburl = '';
 
-                                if (target.selectedThingId == 0) return;
-                                var timeFilter = this.getTimeFilter(options, "time");
+                                if (target.selectedThingId === 0) {
+                                    return;
+                                }
+                                var timeFilter = this.getTimeFilter(options, 'time');
                                 suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name,location)&$top=1&$select=time';
 
                                 allPromises.push(this.doRequest({
                                     url: this.url + suburl,
                                     method: 'GET'
                                 }).then(function (response) {
-                                    return self.transformLocationsCoordinates(target, targetIndex, response.data.value);
+                                    return self.transformLocationsCoordinates(target, response.data.value);
                                 }));
                             }.bind(this));
 
@@ -115,7 +118,6 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                             });
                         }
 
-                        var self = this;
                         var allTargetResults = { data: [] };
 
                         var testPromises = options.targets.map(async function (target) {
@@ -131,23 +133,29 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                                 return thisTargetResult;
                             }
 
-                            if (_.isEqual(target.type, "Locations")) {
-                                if (target.selectedLocationId == 0) return thisTargetResult;
-                                var timeFilter = _this.getTimeFilter(options, "time");
+                            if (_.isEqual(target.type, 'Locations')) {
+                                if (target.selectedLocationId === 0) {
+                                    return thisTargetResult;
+                                }
+                                var timeFilter = _this.getTimeFilter(options, 'time');
                                 suburl = '/Locations(' + _this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';
-                            } else if (_.isEqual(target.type, "Historical Locations")) {
-                                if (target.selectedThingId == 0) return thisTargetResult;
-                                var _timeFilter = _this.getTimeFilter(options, "time");
+                            } else if (_.isEqual(target.type, 'Historical Locations')) {
+                                if (target.selectedThingId === 0) {
+                                    return thisTargetResult;
+                                }
+                                var _timeFilter = _this.getTimeFilter(options, 'time');
                                 suburl = '/Things(' + _this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + _timeFilter + '&$expand=Locations($select=name)&$select=time';
                             } else {
-                                if (target.selectedDatastreamId == 0) return thisTargetResult;
-                                var _timeFilter2 = _this.getTimeFilter(options, "phenomenonTime");
-                                suburl = '/Datastreams(' + _this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + ("$filter=" + _timeFilter2 + "&$select=phenomenonTime,result");
+                                if (target.selectedDatastreamId === 0) {
+                                    return thisTargetResult;
+                                }
+                                var _timeFilter2 = _this.getTimeFilter(options, 'phenomenonTime');
+                                suburl = '/Datastreams(' + _this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + ('$filter=' + _timeFilter2 + '&$select=phenomenonTime,result');
                             }
 
                             var transformedResults = [];
                             var hasNextLink = true;
-                            var fullUrl = _this.url + suburl + ("&$top=" + _this.topCount);
+                            var fullUrl = _this.url + suburl + ('&$top=' + _this.topCount);
 
                             while (hasNextLink) {
                                 var response = await _this.doRequest({
@@ -155,15 +163,16 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                                     method: 'GET'
                                 });
 
-                                hasNextLink = _.has(response.data, "@iot.nextLink");
+                                hasNextLink = _.has(response.data, '@iot.nextLink');
+
                                 if (hasNextLink) {
                                     suburl = suburl.split('?')[0];
-                                    fullUrl = _this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
+                                    fullUrl = _this.url + suburl + '?' + response.data['@iot.nextLink'].split('?')[1];
                                 }
 
-                                if (_.isEqual(target.type, "Locations")) {
+                                if (_.isEqual(target.type, 'Locations')) {
                                     transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-                                } else if (_.isEqual(target.type, "Historical Locations")) {
+                                } else if (_.isEqual(target.type, 'Historical Locations')) {
                                     transformedResults = transformedResults.concat(self.transformLocations(target, response.data.value));
                                 } else {
                                     transformedResults = transformedResults.concat(self.transformDataSource(target, response.data.value));
@@ -181,16 +190,16 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                         });
                     }
                 }, {
-                    key: "transformLocationsCoordinates",
-                    value: function transformLocationsCoordinates(target, targetIndex, value) {
+                    key: 'transformLocationsCoordinates',
+                    value: function transformLocationsCoordinates(target, value) {
                         if (!value) {
-                            console.error("Invalid location data for Thing " + target.selectedThingId);
+                            console.error('Invalid location data for Thing ' + target.selectedThingId);
                             return [];
                         }
 
                         if (Array.isArray(value)) {
-                            if (value.length == 0) {
-                                console.log("No location for Thing " + target.selectedThingId);
+                            if (value.length === 0) {
+                                console.log('No location for Thing ' + target.selectedThingId);
                                 return [];
                             } else {
                                 value = value[0];
@@ -200,25 +209,28 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                         var locationName = value.Locations[0].name;
                         var location = value.Locations[0].location;
                         var coordinates = void 0;
-                        if (location.type == "Feature" && location.geometry.type == "Point") {
+                        if (location.type === 'Feature' && location.geometry.type === 'Point') {
                             coordinates = location.geometry.coordinates;
-                        } else if (location.type == "Point") {
+                        } else if (location.type === 'Point') {
                             coordinates = location.coordinates;
                         } else {
-                            console.error("Unsupported location type for Thing " + target.selectedThingId + ". Expected GeoJSON Feature.Point or Point.");
+                            console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
                             return [];
                         }
 
-                        return [{
-                            "key": locationName,
-                            "longitude": coordinates[0], // longitude is the first element
-                            "latitude": coordinates[1],
-                            "name": locationName + " | " + target.selectedThingName + " | " + moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('YYYY-MM-DD HH:mm:ss.SSS'),
-                            "value": targetIndex + 1
-                        }];
+                        return {
+                            'target': target.selectedDatastreamName.toString(),
+                            'type': 'docs',
+                            'datapoints': [{
+                                'key': locationName,
+                                'longitude': coordinates[0], // longitude is the first element
+                                'latitude': coordinates[1],
+                                'name': locationName + ' | ' + target.selectedThingName + ' | ' + moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('YYYY-MM-DD HH:mm:ss.SSS')
+                            }]
+                        };
                     }
                 }, {
-                    key: "transformDataSource",
+                    key: 'transformDataSource',
                     value: function transformDataSource(target, values) {
                         var self = this;
 
@@ -230,32 +242,32 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
 
                             if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
 
-                                var result = JSONPath({ json: value.result, path: target.jsonQuery });
+                                var result = new JSONPath({ json: value.result, path: target.jsonQuery });
 
-                                if (target.panelType == "table" || target.panelType == "singlestat") {
-                                    result = _typeof(result[0]) === "object" ? JSON.stringify(result[0]) : result[0];
-                                    return [result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                if (target.panelType === 'table' || target.panelType === 'singlestat') {
+                                    result = _typeof(result[0]) === 'object' ? JSON.stringify(result[0]) : result[0];
+                                    return [result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                                 } else {
-                                    return [result[0], parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                    return [result[0], parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                                 }
                             } else {
 
-                                if (target.panelType == "table") {
-                                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                if (target.panelType === 'table') {
+                                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                                 } else {
-                                    return [value.result, parseInt(moment(value.phenomenonTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                                    return [value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                                 }
                             }
                         });
 
                         datapoints = _.filter(datapoints, function (datapoint) {
-                            return typeof datapoint[0] === "string" || typeof datapoint[0] === "number" || Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0;
+                            return typeof datapoint[0] === 'string' || typeof datapoint[0] === 'number' || Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0;
                         });
 
                         return datapoints;
                     }
                 }, {
-                    key: "isOmObservationType",
+                    key: 'isOmObservationType',
                     value: function isOmObservationType(type) {
                         if (_.isEmpty(type)) {
                             return false;
@@ -268,48 +280,48 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                         return true;
                     }
                 }, {
-                    key: "transformThings",
+                    key: 'transformThings',
                     value: function transformThings(target, values) {
 
                         return _.map(values, function (value) {
-                            return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))];
+                            return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
                         });
                     }
                 }, {
-                    key: "transformLocations",
+                    key: 'transformLocations',
                     value: function transformLocations(target, values) {
                         var result = [];
                         _.forEach(values, function (value) {
                             _.forEach(value.Locations, function (location) {
-                                result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format('x'))]);
+                                result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))]);
                             });
                         });
                         return result;
                     }
                 }, {
-                    key: "testDatasource",
+                    key: 'testDatasource',
                     value: function testDatasource() {
                         return this.doRequest({
                             url: this.url,
                             method: 'GET'
                         }).then(function (response) {
                             if (response.status === 200) {
-                                return { status: "success", message: "Data source is working", title: "Success" };
+                                return { status: 'success', message: 'Data source is working', title: 'Success' };
                             }
                         });
                     }
                 }, {
-                    key: "metricFindQuery",
+                    key: 'metricFindQuery',
                     value: async function metricFindQuery(query, suburl, type) {
 
-                        var placeholder = "select a sensor";
+                        var placeholder = 'select a sensor';
 
-                        if (type == "thing") {
-                            placeholder = "select a thing";
-                        } else if (type == "datastream") {
-                            placeholder = "select a datastream";
-                        } else if (type == "location") {
-                            placeholder = "select a location";
+                        if (type === 'thing') {
+                            placeholder = 'select a thing';
+                        } else if (type === 'datastream') {
+                            placeholder = 'select a datastream';
+                        } else if (type === 'location') {
+                            placeholder = 'select a location';
                         }
 
                         var transformedMetrics = [{
@@ -319,17 +331,17 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                         }];
 
                         var hasNextLink = true;
-                        var selectParam = type == "datastream" ? "$select=name,id,observationType" : "$select=name,id";
-                        var fullUrl = this.url + suburl + ("?$top=" + this.topCount + "&" + selectParam);
+                        var selectParam = type === 'datastream' ? '$select=name,id,observationType' : '$select=name,id';
+                        var fullUrl = this.url + suburl + ('?$top=' + this.topCount + '&' + selectParam);
 
                         while (hasNextLink) {
                             var result = await this.doRequest({
                                 url: fullUrl,
                                 method: 'GET'
                             });
-                            hasNextLink = _.has(result.data, "@iot.nextLink");
+                            hasNextLink = _.has(result.data, '@iot.nextLink');
                             if (hasNextLink) {
-                                fullUrl = this.url + suburl + "?" + result.data["@iot.nextLink"].split('?')[1];
+                                fullUrl = this.url + suburl + '?' + result.data['@iot.nextLink'].split('?')[1];
                             }
                             transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
                         }
@@ -337,14 +349,14 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                         return transformedMetrics;
                     }
                 }, {
-                    key: "transformMetrics",
+                    key: 'transformMetrics',
                     value: function transformMetrics(metrics, type) {
 
                         var transformedMetrics = [];
 
                         _.forEach(metrics, function (metric, index) {
                             transformedMetrics.push({
-                                text: metric.name + " ( " + metric['@iot.id'] + " )",
+                                text: metric.name + ' ( ' + metric['@iot.id'] + ' )',
                                 value: metric['@iot.id'],
                                 type: metric['observationType']
                             });
@@ -353,7 +365,7 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                         return transformedMetrics;
                     }
                 }, {
-                    key: "doRequest",
+                    key: 'doRequest',
                     value: function doRequest(options) {
                         options.withCredentials = this.withCredentials;
                         options.headers = this.headers;
@@ -365,7 +377,7 @@ System.register(["lodash", "moment", "./external/jsonpath.js"], function (_expor
                 return GenericDatasource;
             }());
 
-            _export("GenericDatasource", GenericDatasource);
+            _export('GenericDatasource', GenericDatasource);
         }
     };
 });

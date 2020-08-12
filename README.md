@@ -74,24 +74,31 @@ See the demo below for better understanding:
 
 ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/table_demo.gif)
 
-### World Map view
-Using world map view, one can see the current Location of a Thing on the map.
+### Map view
+Using the Grafana Map Panel view, one can see the current Location of a Thing on the map.
 
-1. Install world map panel from grafana plugin store.
-2. Add a world map panel in dashboard
-3. In "Worldmap" tab:
-    * Select `Center`->`Last GeoHash`
-    * Set `Min Circle Size` and `Max Circle Size` to 5
-    * Select `Location Data`->`json result`  
-![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap_config.png)
+1. Download the Grafana map panel from here (https://github.com/panodata/grafana-map-panel) and copy it to your grafana/plugins directory
+2. Add the map panel in dashboard
+3. In "Panel" tab in the "Worldmap" section:
+    * Under `Location source`
+        * Set `Data format and mapping` -> `JSON from data source`
+        * Set `Aggregation` -> `current` 
+       ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap-tab-1.png)
+       
+    * Under `Visual options`
+        * Select `Center`->`Last GeoHash`
+        * Set `Zoom level` to 12
+        ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap-tab-2.png)
+        
+        * Under `Circle parameters` set `Minimum size` and `Maximum size` to 5
+        ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap-tab-3.png)
 
-4. In "Metrics" tab:
-    * Select the OGC SensorThings Datasource.
+
+4. In "Query" tab:
+    * Select the LinkSmart SensorThings Datasource.
     * Select a "Thing" from dropdown list.
+    ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/query-tab.png)
 
-See the demo below for better understanding:
-
-![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap_demo.gif)
 
 
 
