@@ -6,7 +6,7 @@ It provides:
 * Time-series and location history in [Table](https://grafana.com/plugins/table)
 * Sensor data in [Singlestat](https://grafana.com/plugins/singlestat)
 * Location of things on [Worldmap Panel](https://grafana.com/plugins/grafana-worldmap-panel)
-* [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2) support for extracting values from [OM_Observation](http://docs.opengeospatial.org/is/15-078r6/15-078r6.html#table_12) observations
+* [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2) support for extracting values from [OM_Observation](http://docs.opengeospatial.org/is/15-078r6/15-078r6.html#table_12) observations (See [examples](https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/JSONPath.md))
 
 ## Demo
 A live dashboard showing SensorThings data in Grafana panels: [SensorThings Dashboard](https://demo.linksmart.eu/grafana/d/OUQUMYDmz/ogc-sensorthings)
