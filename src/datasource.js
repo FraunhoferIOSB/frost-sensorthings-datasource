@@ -19,7 +19,7 @@ export class GenericDatasource {
         this.dashboardSrv = dashboardSrv;
         this.notificationShowTime = 5000;
         this.topCount = 1000;
-        this.mapPanelName = 'grafana-map-panel';
+        this.mapPanelName = 'grafana-worldmap-panel';
         if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
             this.headers['Authorization'] = instanceSettings.basicAuth;
         }
@@ -109,31 +109,40 @@ export class GenericDatasource {
               method: 'GET'
             });
 
-            if (target.selectedDatastreamDirty) {
-                return thisTargetResult;
+            hasNextLink = _.has(response.data, "@iot.nextLink");
+            if (hasNextLink) {
+              suburl = suburl.split('?')[0];
+              fullUrl = this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
+
+            //if (target.selectedDatastreamDirty) {
+            //    return thisTargetResult;
             }
 
             if (_.isEqual(target.type, 'Locations')) {
-                if (target.selectedLocationId === 0) {
+              transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
+                /*if (target.selectedLocationId === 0) {
                     return thisTargetResult;
                 }
                 let timeFilter = this.getTimeFilter(options, 'time');
-                suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';
+                suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';*/
             } else if (_.isEqual(target.type, 'Historical Locations')) {
-                if (target.selectedThingId === 0) {
+              transformedResults = transformedResults.concat(self.transformLocations(target,response.data.value));
+              /*  if (target.selectedThingId === 0) {
                     return thisTargetResult;
                 }
                 let timeFilter = this.getTimeFilter(options, 'time');
-                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name)&$select=time';
+                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name)&$select=time';*/
             } else {
-                if (target.selectedDatastreamId === 0) {
+              transformedResults = transformedResults.concat(self.transformDataSource(target,response.data.value));
+              /*  if (target.selectedDatastreamId === 0) {
                     return thisTargetResult;
                 }
                 let timeFilter = this.getTimeFilter(options, 'phenomenonTime');
-                suburl = '/Datastreams(' + this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + `$filter=${timeFilter}&$select=phenomenonTime,result`;
+                suburl = '/Datastreams(' + this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + `$filter=${timeFilter}&$select=phenomenonTime,result`;*/
             }
+          }
 
-            let transformedResults = [];
+            /*let transformedResults = [];
             let hasNextLink = true;
             let fullUrl = this.url + suburl + `&$top=${this.topCount}`;
 
@@ -157,7 +166,7 @@ export class GenericDatasource {
                 } else {
                     transformedResults = transformedResults.concat(self.transformDataSource(target, response.data.value));
                 }
-            }
+            }*/
 
             thisTargetResult.datapoints = transformedResults;
 
@@ -200,15 +209,21 @@ export class GenericDatasource {
         }
 
         return {
-            'target': target.selectedDatastreamName.toString(),
-            'type': 'docs',
-            'datapoints': [{
-                'key': locationName,
-                'longitude': coordinates[0], // longitude is the first element
-                'latitude': coordinates[1],
-                'name': locationName + ' | ' + target.selectedThingName + ' | ' + moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('YYYY-MM-DD HH:mm:ss.SSS')
-            }],
-        };
+          columnMap: {},
+          columns: [
+            {text: "Time", type: "time"},
+            {text: "longitude"},
+            {text: "latitude"},
+            {text: "metric"},
+            {text: "name"}
+          ],
+          meta: {},
+          refId: target.refId,
+          rows: [
+            [value.time, coordinates[0], coordinates[1], target.selectedThingId, target.selectedThingName]
+          ],
+          type: "table"
+        }
     }
 
     transformDataSource(target, values) {

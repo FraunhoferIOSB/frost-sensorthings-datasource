@@ -18,7 +18,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
         this.target.type = this.target.type || 'Sensors';
 
-        this.mapPanelName = 'grafana-map-panel';
+        this.mapPanelName = 'grafana-worldmap-panel';
 
         // datastream init
         this.target.selectedDatastreamId = this.target.selectedDatastreamId || 0;
