@@ -19,7 +19,7 @@ export class GenericDatasource {
         this.dashboardSrv = dashboardSrv;
         this.notificationShowTime = 5000;
         this.topCount = 1000;
-        this.mapPanelName = 'grafana-worldmap-panel';
+
         if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
             this.headers['Authorization'] = instanceSettings.basicAuth;
         }
@@ -38,37 +38,6 @@ export class GenericDatasource {
     query(options) {
 
         options.targets = _.filter(options.targets, target => target.hide !== true);
-
-        let allPromises = [];
-
-        if (_.find(options.targets, { 'panelType': this.mapPanelName })) {
-            _.forEach(options.targets, function (target, targetIndex) {
-                let self = this;
-                let suburl = '';
-
-                if (target.selectedThingId === 0) {
-                    return;
-                }
-                let timeFilter = this.getTimeFilter(options, 'time');
-                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name,location)&$top=1&$select=time';
-
-                allPromises.push(this.doRequest({
-                    url: this.url + suburl,
-                    method: 'GET'
-                }).then(function (response) {
-                    return self.transformLocationsCoordinates(target, response.data.value);
-                }));
-
-            }.bind(this));
-
-            return Promise.all(allPromises).then(function (values) {
-                let allCoordinates = [];
-                _.forEach(values, function (value) {
-                    allCoordinates = allCoordinates.concat(value);
-                });
-                return { data: allCoordinates };
-            });
-        }
 
         let allTargetResults = { data: [] };
 
@@ -118,63 +87,19 @@ export class GenericDatasource {
             if (hasNextLink) {
               suburl = suburl.split('?')[0];
               fullUrl = this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
-
-            //if (target.selectedDatastreamDirty) {
-            //    return thisTargetResult;
             }
 
             if (target.type=='Locations') {
               transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-                /*if (target.selectedLocationId === 0) {
-                    return thisTargetResult;
-                }
-                let timeFilter = this.getTimeFilter(options, 'time');
-                suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';*/
             } else if (target.type=="Things" && target.selectedThingOption=="Historical Locations") {
               transformedResults = transformedResults.concat(self.transformLocations(target,response.data.value));
-              /*  if (target.selectedThingId === 0) {
-                    return thisTargetResult;
-                }
-                let timeFilter = this.getTimeFilter(options, 'time');
-                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name)&$select=time';*/
             } else if (target.type=="Things" && target.selectedThingOption=="Last Location Coordinates"){
                 // stop here, as we only need 1 value
                 return self.transformLocationsCoordinates(target, response.data.value);
             } else {
               transformedResults = transformedResults.concat(self.transformDataSource(target,response.data.value));
-              /*  if (target.selectedDatastreamId === 0) {
-                    return thisTargetResult;
-                }
-                let timeFilter = this.getTimeFilter(options, 'phenomenonTime');
-                suburl = '/Datastreams(' + this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + `$filter=${timeFilter}&$select=phenomenonTime,result`;*/
             }
           }
-
-            /*let transformedResults = [];
-            let hasNextLink = true;
-            let fullUrl = this.url + suburl + `&$top=${this.topCount}`;
-
-            while (hasNextLink) {
-                let response = await this.doRequest({
-                    url: fullUrl,
-                    method: 'GET'
-                });
-
-                hasNextLink = _.has(response.data, '@iot.nextLink');
-
-                if (hasNextLink) {
-                    suburl = suburl.split('?')[0];
-                    fullUrl = this.url + suburl + '?' + response.data['@iot.nextLink'].split('?')[1];
-                }
-
-                if (_.isEqual(target.type, 'Locations')) {
-                    transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-                } else if (_.isEqual(target.type, 'Historical Locations')) {
-                    transformedResults = transformedResults.concat(self.transformLocations(target, response.data.value));
-                } else {
-                    transformedResults = transformedResults.concat(self.transformDataSource(target, response.data.value));
-                }
-            }*/
 
             thisTargetResult.datapoints = transformedResults;
 
