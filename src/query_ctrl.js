@@ -16,9 +16,11 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
         this.target.panelType = this.scope.ctrl.panel.type;
 
-        this.target.type = this.target.type || 'Sensors';
+        this.queryTypes = ['Sensors', 'Things','Locations'];
+        this.queryThingOptions = ['Datastreams', 'Historical Locations','Last Location Coordinates'];
 
-        this.mapPanelName = 'grafana-worldmap-panel';
+        this.target.type = this.target.type || this.queryTypes[0]; // rename to selectedType?
+        this.target.selectedThingOption = this.target.selectedThingOption || this.queryThingOptions[0];
 
         // datastream init
         this.target.selectedDatastreamId = this.target.selectedDatastreamId || 0;
@@ -92,18 +94,6 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         }
     }
 
-    getTargetTypes() {
-        let targetTypes = ['Sensors', 'Things'];
-        if (this.target.panelType === 'table') {
-            targetTypes.push('Locations','Historical Locations');
-        }
-        return targetTypes;
-    }
-
-    showControlTypes(){
-        return (this.target.panelType !== this.mapPanelName);
-    }
-
     toggleEditorMode() {
         this.target.rawQuery = !this.target.rawQuery;
     }
@@ -111,8 +101,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //sensor starts
     showSensors(){
-        return this.target.type === 'Sensors' &&
-                (this.target.panelType !== this.mapPanelName);
+        return this.target.type === 'Sensors';
     }
 
     jsonQueryClick(type) {
@@ -145,11 +134,14 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
     //sensor ends
 
+    showThingOptions(){
+        return this.target.selectedThingId !== 0 && this.target.type === 'Things';
+    }
+
     //datastream starts
     showDatastreams(){
-        return (this.target.selectedSensorId !== 0 || this.target.selectedThingId !== 0) &&
-                (this.target.type === 'Sensors' || this.target.type === 'Things') &&
-                (this.target.panelType !== this.mapPanelName);
+        return (this.target.type === 'Sensors' && this.target.selectedSensorId !== 0) ||
+            (this.target.type === 'Things' && this.target.selectedThingId !== 0 && this.target.selectedThingOption === 'Datastreams');
     }
 // TODO: show errors below each query editor
     getDataStreams(query) {
@@ -206,9 +198,10 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
 
     showJsonQuery() {
+        // TODO: check if this.isOmObservationType(this.target.selectedDatastreamObservationType) here instead of disabling in query editor
         return (this.target.selectedDatastreamId !== 0) &&
-                (this.target.type === 'Sensors' || this.target.type === 'Things') &&
-                (this.target.panelType !== this.mapPanelName);
+                (this.target.type === 'Sensors' || 
+                this.target.type === 'Things' && this.target.selectedThingOption === 'Datastreams');
     }
 
     isOmObservationType(type) {
@@ -234,7 +227,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     //thing starts
     showThings(){
-        return this.target.type === 'Things' || this.target.type === 'Historical Locations' || (this.target.panelType === this.mapPanelName);
+        return this.target.type === 'Things' || this.target.type === 'Historical Locations';
     }
 
     getThings(query) {
@@ -257,6 +250,10 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
             this.alertSrv.set('Thing Not Found', this.target.selectedThingId + ' is not a valid thing name', 'error', this.notificationShowTime);
         }
         this.resetDataSource();
+    }
+
+    onThingOptionChange(query){
+        this.panelCtrl.refresh();
     }
     //thing ends
 

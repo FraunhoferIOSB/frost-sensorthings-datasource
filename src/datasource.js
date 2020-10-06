@@ -85,19 +85,24 @@ export class GenericDatasource {
               return thisTargetResult;
           }
 
-          if (_.isEqual(target.type,"Locations")) {
+          if (target.type=="Locations") {
               if (target.selectedLocationId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"time");
               suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things($select=name)&$select=time';
-          } else if(_.isEqual(target.type,"Historical Locations")){
+          } else if(target.type=="Things" && target.selectedThingOption=="Historical Locations") {
               if (target.selectedThingId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"time");
               suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations($select=name)&$select=time';
+          } else if(target.type=="Things" && target.selectedThingOption=="Last Location Coordinates") {
+              if (target.selectedThingId == 0) return thisTargetResult;
+              let timeFilter = this.getTimeFilter(options,"time");
+              suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name,location)&$top=1&$select=time';
           } else {
               if (target.selectedDatastreamId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"phenomenonTime");
               suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+ `$filter=${timeFilter}&$select=phenomenonTime,result&$orderby=phenomenonTime desc`;
           }
+          console.log("suburl:", suburl);
 
           let transformedResults = [];
           let hasNextLink = true;
@@ -118,20 +123,23 @@ export class GenericDatasource {
             //    return thisTargetResult;
             }
 
-            if (_.isEqual(target.type, 'Locations')) {
+            if (target.type=='Locations') {
               transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
                 /*if (target.selectedLocationId === 0) {
                     return thisTargetResult;
                 }
                 let timeFilter = this.getTimeFilter(options, 'time');
                 suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';*/
-            } else if (_.isEqual(target.type, 'Historical Locations')) {
+            } else if (target.type=="Things" && target.selectedThingOption=="Historical Locations") {
               transformedResults = transformedResults.concat(self.transformLocations(target,response.data.value));
               /*  if (target.selectedThingId === 0) {
                     return thisTargetResult;
                 }
                 let timeFilter = this.getTimeFilter(options, 'time');
                 suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name)&$select=time';*/
+            } else if (target.type=="Things" && target.selectedThingOption=="Last Location Coordinates"){
+                // stop here, as we only need 1 value
+                return self.transformLocationsCoordinates(target, response.data.value);
             } else {
               transformedResults = transformedResults.concat(self.transformDataSource(target,response.data.value));
               /*  if (target.selectedDatastreamId === 0) {
