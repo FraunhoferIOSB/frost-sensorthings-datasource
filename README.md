@@ -15,24 +15,30 @@ A live dashboard showing SensorThings data in Grafana panels: [SensorThings Dash
 
 ## Installation
 
-### Install the latest release via grafana-cli
+### Install the latest release
+Using grafana-cli:
 ```
 sudo grafana-cli plugins install linksmart-sensorthings-datasource
 ```
+If using [Grafana Docker Image](https://hub.docker.com/r/grafana/grafana/), set container environment variable instead:
+```
+GF_INSTALL_PLUGINS=linksmart-sensorthings-datasource
+```
+
+Restart Grafana server.
 
 ### Install the latest build from source
-
-* Clone the repository into Grafana's [plugin directory](http://docs.grafana.org/plugins/installation/#grafana-plugin-directory):
+Clone the repository into Grafana's [plugin directory](http://docs.grafana.org/plugins/installation/#grafana-plugin-directory):
 ```
 git clone https://github.com/linksmart/grafana-sensorthings-datasource.git linksmart-sensorthings-datasource
 ```
-* Restart Grafana server to see the newly added datasource.
-
-#### Docker
-Set environment variable:
+If using [Grafana Docker Image](https://hub.docker.com/r/grafana/grafana/), set container environment variable instead:
 ```
 GF_INSTALL_PLUGINS=https://github.com/linksmart/grafana-sensorthings-datasource/archive/master.zip;linksmart-sensorthings-datasource
 ```
+
+Restart Grafana server.
+
 
 ## Setup
 
