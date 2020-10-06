@@ -77,7 +77,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
 
                     _this.target.type = _this.target.type || 'Sensors';
 
-                    _this.mapPanelName = 'grafana-map-panel';
+                    _this.mapPanelName = 'grafana-worldmap-panel';
 
                     // datastream init
                     _this.target.selectedDatastreamId = _this.target.selectedDatastreamId || 0;
