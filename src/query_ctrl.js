@@ -198,10 +198,10 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
 
     showJsonQuery() {
-        // TODO: check if this.isOmObservationType(this.target.selectedDatastreamObservationType) here instead of disabling in query editor
         return (this.target.selectedDatastreamId !== 0) &&
                 (this.target.type === 'Sensors' || 
-                this.target.type === 'Things' && this.target.selectedThingOption === 'Datastreams');
+                this.target.type === 'Things' && this.target.selectedThingOption === 'Datastreams') &&
+                this.isOmObservationType(this.target.selectedDatastreamObservationType);
     }
 
     isOmObservationType(type) {
