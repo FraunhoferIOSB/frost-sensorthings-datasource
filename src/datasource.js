@@ -44,7 +44,7 @@ export class GenericDatasource {
         let testPromises = options.targets.map(async target => {
 
           let self = this;
-          let suburl = '';
+          let subUrl = '';
           let thisTargetResult = {
             'target' : target.selectedDatastreamName.toString(),
             'datapoints' : [],
@@ -57,25 +57,25 @@ export class GenericDatasource {
           if (target.type=="Locations") {
               if (target.selectedLocationId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"time");
-              suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Things($select=name)&$select=time';
+              subUrl = `/Locations(${this.getFormatedId(target.selectedLocationId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Things($select=name)&$select=time&$top=${this.topCount}`;
           } else if(target.type=="Things" && target.selectedThingOption=="Historical Locations") {
               if (target.selectedThingId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"time");
-              suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?'+'$filter='+timeFilter+'&$expand=Locations($select=name)&$select=time';
+              subUrl = `/Things(${this.getFormatedId(target.selectedThingId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Locations($select=name)&$select=time&$top=${this.topCount}`;
           } else if(target.type=="Things" && target.selectedThingOption=="Last Location Coordinates") {
               if (target.selectedThingId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"time");
-              suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name,location)&$top=1&$select=time';
+              subUrl = `/Things(${this.getFormatedId(target.selectedThingId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Locations($select=name,location)&$select=time&$top=1`;
           } else {
               if (target.selectedDatastreamId == 0) return thisTargetResult;
               let timeFilter = this.getTimeFilter(options,"phenomenonTime");
-              suburl = '/Datastreams('+this.getFormatedId(target.selectedDatastreamId)+')/Observations?'+ `$filter=${timeFilter}&$select=phenomenonTime,result&$orderby=phenomenonTime desc`;
+              subUrl = `/Datastreams(${this.getFormatedId(target.selectedDatastreamId)})/Observations?$filter=${timeFilter}&$select=phenomenonTime,result&$orderby=phenomenonTime desc&$top=${this.topCount}`;
           }
-          console.log("suburl:", suburl);
+          console.log("subUrl:", subUrl);
 
           let transformedResults = [];
           let hasNextLink = true;
-          let fullUrl = this.url + suburl + `&$top=${this.topCount}`;
+          let fullUrl = this.url + subUrl;
 
           while(hasNextLink) {
             let response = await this.doRequest({
@@ -85,8 +85,8 @@ export class GenericDatasource {
 
             hasNextLink = _.has(response.data, "@iot.nextLink");
             if (hasNextLink) {
-              suburl = suburl.split('?')[0];
-              fullUrl = this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
+              subUrl = subUrl.split('?')[0];
+              fullUrl = this.url + subUrl + "?" + response.data["@iot.nextLink"].split('?')[1];
             }
 
             if (target.type=='Locations') {
@@ -239,7 +239,7 @@ export class GenericDatasource {
         });
     }
 
-    async metricFindQuery(query, suburl, type) {
+    async metricFindQuery(query, subUrl, type) {
 
         let placeholder = 'select a sensor';
 
@@ -260,7 +260,7 @@ export class GenericDatasource {
 
         let hasNextLink = true;
         let selectParam = (type === 'datastream') ? '$select=name,id,observationType' : '$select=name,id';
-        let fullUrl = this.url + suburl + `?$top=${this.topCount}&${selectParam}`;
+        let fullUrl = this.url + subUrl + `?$top=${this.topCount}&${selectParam}`;
 
         while (hasNextLink) {
             let result = await this.doRequest({
@@ -269,7 +269,7 @@ export class GenericDatasource {
             });
             hasNextLink = _.has(result.data, '@iot.nextLink');
             if (hasNextLink) {
-                fullUrl = this.url + suburl + '?' + result.data['@iot.nextLink'].split('?')[1];
+                fullUrl = this.url + subUrl + '?' + result.data['@iot.nextLink'].split('?')[1];
             }
             transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
         }
