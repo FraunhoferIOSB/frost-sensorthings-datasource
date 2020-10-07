@@ -3,116 +3,129 @@ import moment from 'moment';
 
 import {JSONPath} from './external/jsonpath.js'; // copied with grunt
 export class GenericDatasource {
+  constructor(instanceSettings, $q, backendSrv, templateSrv, alertSrv, contextSrv, dashboardSrv) {
+    this.type = instanceSettings.type;
+    this.url = instanceSettings.url;
+    this.name = instanceSettings.name;
+    this.q = $q;
+    this.backendSrv = backendSrv;
+    this.templateSrv = templateSrv;
+    this.withCredentials = instanceSettings.withCredentials;
+    this.headers = { 'Content-Type': 'application/json' };
+    this.alertSrv = alertSrv;
+    this.contextSrv = contextSrv;
+    this.dashboardSrv = dashboardSrv;
+    this.notificationShowTime = 5000;
+    this.topCount = 1000;
 
-    constructor(instanceSettings, $q, backendSrv, templateSrv, alertSrv, contextSrv, dashboardSrv) {
+    if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
+      this.headers['Authorization'] = instanceSettings.basicAuth;
+    }
+  }
 
-        this.type = instanceSettings.type;
-        this.url = instanceSettings.url;
-        this.name = instanceSettings.name;
-        this.q = $q;
-        this.backendSrv = backendSrv;
-        this.templateSrv = templateSrv;
-        this.withCredentials = instanceSettings.withCredentials;
-        this.headers = { 'Content-Type': 'application/json' };
-        this.alertSrv = alertSrv;
-        this.contextSrv = contextSrv;
-        this.dashboardSrv = dashboardSrv;
-        this.notificationShowTime = 5000;
-        this.topCount = 1000;
+  getTimeFilter(options, key) {
+    let from = options.range.from.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+    let to = options.range.to.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+    return key + ' gt ' + from + ' and ' + key + ' lt ' + to;
+  }
 
-        if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
-            this.headers['Authorization'] = instanceSettings.basicAuth;
+  getFormatedId(id) {
+    return (Number.isInteger(id) || !isNaN(id)) ? id : '"' + id + '"';
+  }
+
+  async query(options) {
+    options.targets = _.filter(options.targets, target => target.hide !== true);
+
+    let allTargetResults = { data: [] };
+
+    let testPromises = options.targets.map(async target => {
+      let self = this;
+      let subUrl = '';
+      let thisTargetResult = {
+        'target' : target.selectedDatastreamName.toString(),
+        'datapoints' : [],
+      };
+
+      if (target.selectedDatastreamDirty) {
+        return thisTargetResult;
+      }
+
+      if(typeof(target.selectedLimit) == "undefined") {
+        target.selectedLimit = 1;
+      }
+      let limit = 0;
+
+      if (target.type === "Locations") {
+        if (target.selectedLocationId == 0) {
+          return thisTargetResult;
         }
-    }
+        let timeFilter = this.getTimeFilter(options,"time");
+        subUrl = `/Locations(${this.getFormatedId(target.selectedLocationId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Things($select=name)&$select=time&$top=${this.topCount}`;
+      } else if(target.type === "Things" && target.selectedThingOption === "Historical Locations") {
+        if (target.selectedThingId == 0) {
+          return thisTargetResult;
+        }
+        let timeFilter = this.getTimeFilter(options,"time");
+        subUrl = `/Things(${this.getFormatedId(target.selectedThingId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Locations($select=name)&$select=time&$top=${target.selectedLimit === 0 ? this.topCount : target.selectedLimit}`;
+        limit = target.selectedLimit;
+      } else if(target.type === "Things" && target.selectedThingOption === "Historical Locations with Coordinates") {
+        if (target.selectedThingId == 0) {
+          return thisTargetResult;
+        }
+        let timeFilter = this.getTimeFilter(options,"time");
+        subUrl = `/Things(${this.getFormatedId(target.selectedThingId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Locations($select=name,location)&$select=time&$top=${target.selectedLimit === 0 ? this.topCount : target.selectedLimit}`;
+        limit = target.selectedLimit;
+      } else {
+        if (target.selectedDatastreamId == 0) {
+          return thisTargetResult;
+        }
+        let timeFilter = this.getTimeFilter(options,"phenomenonTime");
+        subUrl = `/Datastreams(${this.getFormatedId(target.selectedDatastreamId)})/Observations?$filter=${timeFilter}&$select=phenomenonTime,result&$orderby=phenomenonTime desc&$top=${this.topCount}`;
+      }
+      console.log("subUrl:", subUrl);
 
-    getTimeFilter(options, key) {
-        let from = options.range.from.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
-        let to = options.range.to.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
-        return key + ' gt ' + from + ' and ' + key + ' lt ' + to;
-    }
+      let transformedResults = [];
+      let hasNextLink = true;
+      let fullUrl = this.url + subUrl;
 
-    getFormatedId(id) {
-        return (Number.isInteger(id) || !isNaN(id)) ? id : '"' + id + '"';
-    }
+      while(hasNextLink) {
+        if(transformedResults.length >= limit && limit !== 0) {
+          break;
+        }
 
-    query(options) {
-
-        options.targets = _.filter(options.targets, target => target.hide !== true);
-
-        let allTargetResults = { data: [] };
-
-        let testPromises = options.targets.map(async target => {
-
-          let self = this;
-          let subUrl = '';
-          let thisTargetResult = {
-            'target' : target.selectedDatastreamName.toString(),
-            'datapoints' : [],
-          };
-
-          if (target.selectedDatastreamDirty) {
-              return thisTargetResult;
-          }
-
-          if (target.type=="Locations") {
-              if (target.selectedLocationId == 0) return thisTargetResult;
-              let timeFilter = this.getTimeFilter(options,"time");
-              subUrl = `/Locations(${this.getFormatedId(target.selectedLocationId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Things($select=name)&$select=time&$top=${this.topCount}`;
-          } else if(target.type=="Things" && target.selectedThingOption=="Historical Locations") {
-              if (target.selectedThingId == 0) return thisTargetResult;
-              let timeFilter = this.getTimeFilter(options,"time");
-              subUrl = `/Things(${this.getFormatedId(target.selectedThingId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Locations($select=name)&$select=time&$top=${this.topCount}`;
-          } else if(target.type=="Things" && target.selectedThingOption=="Last Location Coordinates") {
-              if (target.selectedThingId == 0) return thisTargetResult;
-              let timeFilter = this.getTimeFilter(options,"time");
-              subUrl = `/Things(${this.getFormatedId(target.selectedThingId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Locations($select=name,location)&$select=time&$top=1`;
-          } else {
-              if (target.selectedDatastreamId == 0) return thisTargetResult;
-              let timeFilter = this.getTimeFilter(options,"phenomenonTime");
-              subUrl = `/Datastreams(${this.getFormatedId(target.selectedDatastreamId)})/Observations?$filter=${timeFilter}&$select=phenomenonTime,result&$orderby=phenomenonTime desc&$top=${this.topCount}`;
-          }
-          console.log("subUrl:", subUrl);
-
-          let transformedResults = [];
-          let hasNextLink = true;
-          let fullUrl = this.url + subUrl;
-
-          while(hasNextLink) {
-            let response = await this.doRequest({
-              url: fullUrl,
-              method: 'GET'
-            });
-
-            hasNextLink = _.has(response.data, "@iot.nextLink");
-            if (hasNextLink) {
-              subUrl = subUrl.split('?')[0];
-              fullUrl = this.url + subUrl + "?" + response.data["@iot.nextLink"].split('?')[1];
-            }
-
-            if (target.type=='Locations') {
-              transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-            } else if (target.type=="Things" && target.selectedThingOption=="Historical Locations") {
-              transformedResults = transformedResults.concat(self.transformLocations(target,response.data.value));
-            } else if (target.type=="Things" && target.selectedThingOption=="Last Location Coordinates"){
-                // stop here, as we only need 1 value
-                return self.transformLocationsCoordinates(target, response.data.value);
-            } else {
-              transformedResults = transformedResults.concat(self.transformDataSource(target,response.data.value));
-            }
-          }
-
-            thisTargetResult.datapoints = transformedResults;
-
-            return thisTargetResult;
-
+        let response = await this.doRequest({
+          url: fullUrl,
+          method: 'GET'
         });
 
-        return Promise.all(testPromises).then(function (values) {
-            allTargetResults.data = values;
-            return allTargetResults;
-        });
+        hasNextLink = _.has(response.data, "@iot.nextLink");
+        if (hasNextLink) {
+          subUrl = subUrl.split('?')[0];
+          fullUrl = this.url + subUrl + "?" + response.data["@iot.nextLink"].split('?')[1];
+        }
 
-    }
+        if (target.type === "Locations") {
+          transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
+        } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations") {
+          transformedResults = transformedResults.concat(self.transformLocations(target,response.data.value));
+        } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations with Coordinates"){
+          // stop here, as we only need 1 value
+          return self.transformLocationsCoordinates(target, response.data.value);
+        } else {
+          transformedResults = transformedResults.concat(self.transformDataSource(target,response.data.value));
+        }
+      }
+
+      thisTargetResult.datapoints = transformedResults;
+
+      return thisTargetResult;
+    });
+
+    return Promise.all(testPromises).then(function (values) {
+      allTargetResults.data = values;
+      return allTargetResults;
+    });
+  }
 
     transformLocationsCoordinates(target, value) {
         if (!value) {

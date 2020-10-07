@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'], function (_export, _context) {
+System.register(['lodash', 'moment', './external/jsonpath.js'], function (_export, _context) {
     "use strict";
 
-    var _, moment, FieldType, JSONPath, _typeof, _createClass, GenericDatasource;
+    var _, moment, JSONPath, _typeof, _createClass, GenericDatasource;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -16,8 +16,6 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
             _ = _lodash.default;
         }, function (_moment) {
             moment = _moment.default;
-        }, function (_grafanaData) {
-            FieldType = _grafanaData.default;
         }, function (_externalJsonpathJs) {
             JSONPath = _externalJsonpathJs.JSONPath;
         }],
@@ -63,7 +61,7 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
                     this.dashboardSrv = dashboardSrv;
                     this.notificationShowTime = 5000;
                     this.topCount = 1000;
-                    this.mapPanelName = 'grafana-worldmap-panel';
+
                     if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
                         this.headers['Authorization'] = instanceSettings.basicAuth;
                     }
@@ -83,50 +81,18 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
                     }
                 }, {
                     key: 'query',
-                    value: function query(options) {
+                    value: async function query(options) {
                         var _this = this;
 
                         options.targets = _.filter(options.targets, function (target) {
                             return target.hide !== true;
                         });
 
-                        var allPromises = [];
-
-                        if (_.find(options.targets, { 'panelType': this.mapPanelName })) {
-                            _.forEach(options.targets, function (target, targetIndex) {
-                                var self = this;
-                                var suburl = '';
-
-                                if (target.selectedThingId === 0) {
-                                    return;
-                                }
-                                var timeFilter = this.getTimeFilter(options, 'time');
-                                suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name,location)&$top=1&$select=time';
-
-                                allPromises.push(this.doRequest({
-                                    url: this.url + suburl,
-                                    method: 'GET'
-                                }).then(function (response) {
-                                    return self.transformLocationsCoordinates(target, response.data.value);
-                                }));
-                            }.bind(this));
-
-                            return Promise.all(allPromises).then(function (values) {
-                                var allCoordinates = [];
-                                _.forEach(values, function (value) {
-                                    allCoordinates = allCoordinates.concat(value);
-                                });
-                                return { data: allCoordinates };
-                            });
-                        }
-
-                        var self = this;
                         var allTargetResults = { data: [] };
 
                         var testPromises = options.targets.map(async function (target) {
-
                             var self = _this;
-                            var suburl = '';
+                            var subUrl = '';
                             var thisTargetResult = {
                                 'target': target.selectedDatastreamName.toString(),
                                 'datapoints': []
@@ -136,25 +102,49 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
                                 return thisTargetResult;
                             }
 
-                            if (_.isEqual(target.type, "Locations")) {
-                                if (target.selectedLocationId == 0) return thisTargetResult;
-                                var timeFilter = _this.getTimeFilter(options, "time");
-                                suburl = '/Locations(' + _this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';
-                            } else if (_.isEqual(target.type, "Historical Locations")) {
-                                if (target.selectedThingId == 0) return thisTargetResult;
-                                var _timeFilter = _this.getTimeFilter(options, "time");
-                                suburl = '/Things(' + _this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + _timeFilter + '&$expand=Locations($select=name)&$select=time';
-                            } else {
-                                if (target.selectedDatastreamId == 0) return thisTargetResult;
-                                var _timeFilter2 = _this.getTimeFilter(options, "phenomenonTime");
-                                suburl = '/Datastreams(' + _this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + ('$filter=' + _timeFilter2 + '&$select=phenomenonTime,result&$orderby=phenomenonTime desc');
+                            if (typeof target.selectedLimit == "undefined") {
+                                target.selectedLimit = 1;
                             }
+                            var limit = 0;
+
+                            if (target.type === "Locations") {
+                                if (target.selectedLocationId == 0) {
+                                    return thisTargetResult;
+                                }
+                                var timeFilter = _this.getTimeFilter(options, "time");
+                                subUrl = '/Locations(' + _this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time&$top=' + _this.topCount;
+                            } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations") {
+                                if (target.selectedThingId == 0) {
+                                    return thisTargetResult;
+                                }
+                                var _timeFilter = _this.getTimeFilter(options, "time");
+                                subUrl = '/Things(' + _this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?$filter=' + _timeFilter + '&$expand=Locations($select=name)&$select=time&$top=' + (target.selectedLimit === 0 ? _this.topCount : target.selectedLimit);
+                                limit = target.selectedLimit;
+                            } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations with Coordinates") {
+                                if (target.selectedThingId == 0) {
+                                    return thisTargetResult;
+                                }
+                                var _timeFilter2 = _this.getTimeFilter(options, "time");
+                                subUrl = '/Things(' + _this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?$filter=' + _timeFilter2 + '&$expand=Locations($select=name,location)&$select=time&$top=' + (target.selectedLimit === 0 ? _this.topCount : target.selectedLimit);
+                                limit = target.selectedLimit;
+                            } else {
+                                if (target.selectedDatastreamId == 0) {
+                                    return thisTargetResult;
+                                }
+                                var _timeFilter3 = _this.getTimeFilter(options, "phenomenonTime");
+                                subUrl = '/Datastreams(' + _this.getFormatedId(target.selectedDatastreamId) + ')/Observations?$filter=' + _timeFilter3 + '&$select=phenomenonTime,result&$orderby=phenomenonTime desc&$top=' + _this.topCount;
+                            }
+                            console.log("subUrl:", subUrl);
 
                             var transformedResults = [];
                             var hasNextLink = true;
-                            var fullUrl = _this.url + suburl + ('&$top=' + _this.topCount);
+                            var fullUrl = _this.url + subUrl;
 
                             while (hasNextLink) {
+                                if (transformedResults.length >= limit && limit !== 0) {
+                                    break;
+                                }
+
                                 var response = await _this.doRequest({
                                     url: fullUrl,
                                     method: 'GET'
@@ -162,58 +152,21 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
 
                                 hasNextLink = _.has(response.data, "@iot.nextLink");
                                 if (hasNextLink) {
-                                    suburl = suburl.split('?')[0];
-                                    fullUrl = _this.url + suburl + "?" + response.data["@iot.nextLink"].split('?')[1];
-
-                                    //if (target.selectedDatastreamDirty) {
-                                    //    return thisTargetResult;
+                                    subUrl = subUrl.split('?')[0];
+                                    fullUrl = _this.url + subUrl + "?" + response.data["@iot.nextLink"].split('?')[1];
                                 }
 
-                                if (_.isEqual(target.type, 'Locations')) {
+                                if (target.type === "Locations") {
                                     transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-                                    /*if (target.selectedLocationId === 0) {
-                                        return thisTargetResult;
-                                    }
-                                    let timeFilter = this.getTimeFilter(options, 'time');
-                                    suburl = '/Locations(' + this.getFormatedId(target.selectedLocationId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Things($select=name)&$select=time';*/
-                                } else if (_.isEqual(target.type, 'Historical Locations')) {
+                                } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations") {
                                     transformedResults = transformedResults.concat(self.transformLocations(target, response.data.value));
-                                    /*  if (target.selectedThingId === 0) {
-                                          return thisTargetResult;
-                                      }
-                                      let timeFilter = this.getTimeFilter(options, 'time');
-                                      suburl = '/Things(' + this.getFormatedId(target.selectedThingId) + ')/HistoricalLocations?' + '$filter=' + timeFilter + '&$expand=Locations($select=name)&$select=time';*/
+                                } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations with Coordinates") {
+                                    // stop here, as we only need 1 value
+                                    return self.transformLocationsCoordinates(target, response.data.value);
                                 } else {
                                     transformedResults = transformedResults.concat(self.transformDataSource(target, response.data.value));
-                                    /*  if (target.selectedDatastreamId === 0) {
-                                          return thisTargetResult;
-                                      }
-                                      let timeFilter = this.getTimeFilter(options, 'phenomenonTime');
-                                      suburl = '/Datastreams(' + this.getFormatedId(target.selectedDatastreamId) + ')/Observations?' + `$filter=${timeFilter}&$select=phenomenonTime,result`;*/
                                 }
                             }
-
-                            /*let transformedResults = [];
-                            let hasNextLink = true;
-                            let fullUrl = this.url + suburl + `&$top=${this.topCount}`;
-                             while (hasNextLink) {
-                                let response = await this.doRequest({
-                                    url: fullUrl,
-                                    method: 'GET'
-                                });
-                                 hasNextLink = _.has(response.data, '@iot.nextLink');
-                                 if (hasNextLink) {
-                                    suburl = suburl.split('?')[0];
-                                    fullUrl = this.url + suburl + '?' + response.data['@iot.nextLink'].split('?')[1];
-                                }
-                                 if (_.isEqual(target.type, 'Locations')) {
-                                    transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-                                } else if (_.isEqual(target.type, 'Historical Locations')) {
-                                    transformedResults = transformedResults.concat(self.transformLocations(target, response.data.value));
-                                } else {
-                                    transformedResults = transformedResults.concat(self.transformDataSource(target, response.data.value));
-                                }
-                            }*/
 
                             thisTargetResult.datapoints = transformedResults;
 
@@ -254,24 +207,14 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
                             return [];
                         }
 
+                        var metricColumn = 1; // this determines the size and color of the circle
                         return {
                             columnMap: {},
                             columns: [{ text: "Time", type: "time" }, { text: "longitude" }, { text: "latitude" }, { text: "metric" }, { text: "name" }],
                             meta: {},
                             refId: target.refId,
-                            rows: [[value.time, coordinates[0], coordinates[1], target.selectedThingId, target.selectedThingName]],
+                            rows: [[value.time, coordinates[0], coordinates[1], metricColumn, target.selectedThingName]],
                             type: "table"
-
-                            /*return {
-                                'target': target.selectedDatastreamName.toString(),
-                                'type': 'docs',
-                                'datapoints': [{
-                                    'key': locationName,
-                                    'longitude': coordinates[0], // longitude is the first element
-                                    'latitude': coordinates[1],
-                                    'name': locationName + ' | ' + target.selectedThingName + ' | ' + moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('YYYY-MM-DD HH:mm:ss.SSS')
-                                }],
-                            };*/
                         };
                     }
                 }, {
@@ -357,7 +300,7 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
                     }
                 }, {
                     key: 'metricFindQuery',
-                    value: async function metricFindQuery(query, suburl, type) {
+                    value: async function metricFindQuery(query, subUrl, type) {
 
                         var placeholder = 'select a sensor';
 
@@ -377,7 +320,7 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
 
                         var hasNextLink = true;
                         var selectParam = type === 'datastream' ? '$select=name,id,observationType' : '$select=name,id';
-                        var fullUrl = this.url + suburl + ('?$top=' + this.topCount + '&' + selectParam);
+                        var fullUrl = this.url + subUrl + ('?$top=' + this.topCount + '&' + selectParam);
 
                         while (hasNextLink) {
                             var result = await this.doRequest({
@@ -386,7 +329,7 @@ System.register(['lodash', 'moment', '@grafana/data', './external/jsonpath.js'],
                             });
                             hasNextLink = _.has(result.data, '@iot.nextLink');
                             if (hasNextLink) {
-                                fullUrl = this.url + suburl + '?' + result.data['@iot.nextLink'].split('?')[1];
+                                fullUrl = this.url + subUrl + '?' + result.data['@iot.nextLink'].split('?')[1];
                             }
                             transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
                         }

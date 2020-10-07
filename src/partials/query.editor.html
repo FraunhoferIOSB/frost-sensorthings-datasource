@@ -35,10 +35,20 @@
 
           <div class="gf-form">
             <select class="gf-form-input"
-                    ng-if="ctrl.showThingOptions()"
-                    ng-model="ctrl.target.selectedThingOption"
-                    ng-options="f as f for f in ctrl.queryThingOptions"
-                    ng-change="ctrl.onThingOptionChange($query)"></select>
+              ng-if="ctrl.showThingOptions()"
+              ng-model="ctrl.target.selectedThingOption"
+              ng-options="f as f for f in ctrl.queryThingOptions"
+              ng-change="ctrl.onThingOptionChange($query)"></select>
+          </div>
+
+          <div class="gf-form" ng-if="ctrl.showThingLimit()">
+            <label class="gf-form-label query-keyword">Limit</label>
+            <input class="gf-form-input" type="number" min="0"
+              ng-model="ctrl.target.selectedLimit"
+              placeholder="1"
+              allow-custom="true"
+              ng-blur="ctrl.onThingsLimitChange($query)">
+            </gf-form-dropdown>
           </div>
 
           <div class="gf-form">

@@ -75,9 +75,15 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
 
                     _this.target.panelType = _this.scope.ctrl.panel.type;
 
-                    _this.target.type = _this.target.type || 'Sensors';
+                    _this.queryTypes = ['Sensors', 'Things', 'Locations'];
+                    _this.queryThingOptions = ['Datastreams', "Historical Locations", "Historical Locations with Coordinates"];
 
-                    _this.mapPanelName = 'grafana-worldmap-panel';
+                    _this.target.type = _this.target.type || _this.queryTypes[0]; // rename to selectedType?
+                    _this.target.selectedThingOption = _this.target.selectedThingOption || _this.queryThingOptions[0];
+
+                    if (typeof _this.target.selectedLimit == "undefined") {
+                        _this.target.selectedLimit = 1;
+                    }
 
                     // datastream init
                     _this.target.selectedDatastreamId = _this.target.selectedDatastreamId || 0;
@@ -156,20 +162,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                         }
                     }
                 }, {
-                    key: 'getTargetTypes',
-                    value: function getTargetTypes() {
-                        var targetTypes = ['Sensors', 'Things'];
-                        if (this.target.panelType === 'table') {
-                            targetTypes.push('Locations', 'Historical Locations');
-                        }
-                        return targetTypes;
-                    }
-                }, {
-                    key: 'showControlTypes',
-                    value: function showControlTypes() {
-                        return this.target.panelType !== this.mapPanelName;
-                    }
-                }, {
                     key: 'toggleEditorMode',
                     value: function toggleEditorMode() {
                         this.target.rawQuery = !this.target.rawQuery;
@@ -177,7 +169,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showSensors',
                     value: function showSensors() {
-                        return this.target.type === 'Sensors' && this.target.panelType !== this.mapPanelName;
+                        return this.target.type === 'Sensors';
                     }
                 }, {
                     key: 'jsonQueryClick',
@@ -212,9 +204,21 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                         this.resetDataSource();
                     }
                 }, {
+                    key: 'showThingOptions',
+                    value: function showThingOptions() {
+                        return this.target.selectedThingId !== 0 && this.target.type === 'Things';
+                    }
+                }, {
+                    key: 'showThingLimit',
+                    value: function showThingLimit() {
+                        //type = Target
+                        //selectedThingOption = [Historical Locations|Historical Locations with Coordinates]
+                        return this.target.type === this.queryTypes[1] && this.target.selectedThingId !== 0 && (this.target.selectedThingOption === this.queryThingOptions[1] || this.target.selectedThingOption === this.queryThingOptions[2]);
+                    }
+                }, {
                     key: 'showDatastreams',
                     value: function showDatastreams() {
-                        return (this.target.selectedSensorId !== 0 || this.target.selectedThingId !== 0) && (this.target.type === 'Sensors' || this.target.type === 'Things') && this.target.panelType !== this.mapPanelName;
+                        return this.target.type === 'Sensors' && this.target.selectedSensorId !== 0 || this.target.type === 'Things' && this.target.selectedThingId !== 0 && this.target.selectedThingOption === 'Datastreams';
                     }
                 }, {
                     key: 'getDataStreams',
@@ -274,7 +278,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showJsonQuery',
                     value: function showJsonQuery() {
-                        return this.target.selectedDatastreamId !== 0 && (this.target.type === 'Sensors' || this.target.type === 'Things') && this.target.panelType !== this.mapPanelName;
+                        return this.target.selectedDatastreamId !== 0 && (this.target.type === 'Sensors' || this.target.type === 'Things' && this.target.selectedThingOption === 'Datastreams') && this.isOmObservationType(this.target.selectedDatastreamObservationType);
                     }
                 }, {
                     key: 'isOmObservationType',
@@ -302,7 +306,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                 }, {
                     key: 'showThings',
                     value: function showThings() {
-                        return this.target.type === 'Things' || this.target.type === 'Historical Locations' || this.target.panelType === this.mapPanelName;
+                        return this.target.type === 'Things' || this.target.type === 'Historical Locations';
                     }
                 }, {
                     key: 'getThings',
@@ -327,6 +331,16 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
                             this.alertSrv.set('Thing Not Found', this.target.selectedThingId + ' is not a valid thing name', 'error', this.notificationShowTime);
                         }
                         this.resetDataSource();
+                    }
+                }, {
+                    key: 'onThingsLimitChange',
+                    value: function onThingsLimitChange(query) {
+                        this.panelCtrl.refresh();
+                    }
+                }, {
+                    key: 'onThingOptionChange',
+                    value: function onThingOptionChange(query) {
+                        this.panelCtrl.refresh();
                     }
                 }, {
                     key: 'showLocations',

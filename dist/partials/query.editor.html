@@ -1,10 +1,10 @@
 <query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
   <div class="gf-form-inline">
 
-    <div class="gf-form max-width-8" ng-if="ctrl.showControlTypes()">
+    <div class="gf-form">
       <select  class="gf-form-input"
               ng-model="ctrl.target.type"
-              ng-options="f as f for f in ctrl.getTargetTypes()"
+              ng-options="f as f for f in ctrl.queryTypes"
               ng-change="ctrl.typeChanged(ctrl.target.type)"></select>
     </div>
 
@@ -34,6 +34,24 @@
           </div>
 
           <div class="gf-form">
+            <select class="gf-form-input"
+              ng-if="ctrl.showThingOptions()"
+              ng-model="ctrl.target.selectedThingOption"
+              ng-options="f as f for f in ctrl.queryThingOptions"
+              ng-change="ctrl.onThingOptionChange($query)"></select>
+          </div>
+
+          <div class="gf-form" ng-if="ctrl.showThingLimit()">
+            <label class="gf-form-label query-keyword">Limit</label>
+            <input class="gf-form-input" type="number" min="0"
+              ng-model="ctrl.target.selectedLimit"
+              placeholder="1"
+              allow-custom="true"
+              ng-blur="ctrl.onThingsLimitChange($query)">
+            </gf-form-dropdown>
+          </div>
+
+          <div class="gf-form">
               <gf-form-dropdown
               ng-if="ctrl.showDatastreams()"
               model="ctrl.target.selectedDatastreamId"
@@ -43,6 +61,7 @@
               on-change="ctrl.onDataStreamChange($query)">
           </gf-form-dropdown>
           </div>
+
           <div class="gf-form">
               <gf-form-dropdown
               ng-if="ctrl.showLocations()"
@@ -53,8 +72,9 @@
               on-change="ctrl.onLocationChange($query)">
             </gf-form-dropdown>
           </div>
+
           <div class="gf-form" ng-click="ctrl.jsonQueryClick(ctrl.target.selectedDatastreamObservationType)">
-              <input ng-if="ctrl.showJsonQuery()" ng-disabled="!ctrl.isOmObservationType(ctrl.target.selectedDatastreamObservationType)" class="gf-form-input" rows="5" ng-model-options='{ debounce: 300 }' ng-model="ctrl.target.jsonQuery" spellcheck="false" ng-change="ctrl.onJsonQueryChange()" placeholder="JSONPath Expression" />
+              <input ng-if="ctrl.showJsonQuery()" class="gf-form-input" rows="5" ng-model-options='{ debounce: 300 }' ng-model="ctrl.target.jsonQuery" spellcheck="false" ng-change="ctrl.onJsonQueryChange()" placeholder="JSONPath Expression" />
           </div>
       </div>
     </div>

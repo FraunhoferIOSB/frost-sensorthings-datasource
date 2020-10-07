@@ -17,10 +17,14 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         this.target.panelType = this.scope.ctrl.panel.type;
 
         this.queryTypes = ['Sensors', 'Things','Locations'];
-        this.queryThingOptions = ['Datastreams', 'Historical Locations','Last Location Coordinates'];
+        this.queryThingOptions = ['Datastreams', "Historical Locations", "Historical Locations with Coordinates"];
 
         this.target.type = this.target.type || this.queryTypes[0]; // rename to selectedType?
         this.target.selectedThingOption = this.target.selectedThingOption || this.queryThingOptions[0];
+
+        if(typeof(this.target.selectedLimit) == "undefined") {
+          this.target.selectedLimit = 1;
+        }
 
         // datastream init
         this.target.selectedDatastreamId = this.target.selectedDatastreamId || 0;
@@ -138,6 +142,14 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
         return this.target.selectedThingId !== 0 && this.target.type === 'Things';
     }
 
+    showThingLimit() {
+      //type = Target
+      //selectedThingOption = [Historical Locations|Historical Locations with Coordinates]
+      return this.target.type === this.queryTypes[1] && 
+        this.target.selectedThingId !== 0 && 
+        (this.target.selectedThingOption === this.queryThingOptions[1] || this.target.selectedThingOption === this.queryThingOptions[2])
+    }
+
     //datastream starts
     showDatastreams(){
         return (this.target.type === 'Sensors' && this.target.selectedSensorId !== 0) ||
@@ -250,6 +262,10 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
             this.alertSrv.set('Thing Not Found', this.target.selectedThingId + ' is not a valid thing name', 'error', this.notificationShowTime);
         }
         this.resetDataSource();
+    }
+
+    onThingsLimitChange(query) {
+      this.panelCtrl.refresh();
     }
 
     onThingOptionChange(query){
