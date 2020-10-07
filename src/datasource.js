@@ -141,6 +141,7 @@ export class GenericDatasource {
             return [];
         }
 
+        const metricColumn = 1; // this determines the size and color of the circle
         return {
           columnMap: {},
           columns: [
@@ -153,7 +154,7 @@ export class GenericDatasource {
           meta: {},
           refId: target.refId,
           rows: [
-            [value.time, coordinates[0], coordinates[1], target.selectedThingId, target.selectedThingName]
+            [value.time, coordinates[0], coordinates[1], metricColumn, target.selectedThingName]
           ],
           type: "table"
         }
