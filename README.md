@@ -87,32 +87,28 @@ See the demo below for better understanding:
 ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/table_demo.gif)
 
 ### Map view
-Using the Grafana Map Panel view, one can see the current Location of a Thing on the map.
+Using the [Grafana Worldmap Panel](https://grafana.com/grafana/plugins/grafana-worldmap-panel), one can see the last Location of a Thing on the map.
 
-1. Download the Grafana map panel from here (https://github.com/panodata/grafana-map-panel) and copy it to your grafana/plugins directory
+1. Install world map panel from grafana plugin store.
 2. Add the map panel in dashboard
-3. In "Panel" tab in the "Worldmap" section:
-    * Under `Location source`
-        * Set `Data format and mapping` -> `JSON from data source`
-        * Set `Aggregation` -> `current` 
-       ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap-tab-1.png)
-       
-    * Under `Visual options`
-        * Select `Center`->`Last GeoHash`
-        * Set `Zoom level` to 12
-        ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap-tab-2.png)
+3. Under `Worldmap` tab of the panel configuration:
+    * `Map Visual Options`:
+        * Set `Center` to `Last GeoHash`
+        * Set `Max Circle Size` to 5
+               
+    * `Map Data Options`:
+        * Set `Location Data` to `Table`
         
-        * Under `Circle parameters` set `Minimum size` and `Maximum size` to 5
-        ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap-tab-3.png)
-
+    * `Field Mapping`:
+        * Set `Table Query Format` to `coordinates`
+        * Set `Location Name Field` to `name`
 
 4. In "Query" tab:
     * Select the LinkSmart SensorThings Datasource.
-    * Select a "Thing" from dropdown list.
-    ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/query-tab.png)
+    * Select `Things` and pick a Thing from from the dropdown list.
+    * Select `Last Location Coordinates`
 
-
-
+![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap_config.jpg)
 
 ### Dev setup
 ```
