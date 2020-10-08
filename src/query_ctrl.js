@@ -102,7 +102,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.target.rawQuery = !this.target.rawQuery;
   }
 
-  //Sensor Starts
+  //#region Sensor Starts
   showSensors(){
     return this.target.type === 'Sensors';
   }
@@ -135,7 +135,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     }
     this.resetDataSource();
   }
-  //Sensor end
+  //#endregion Sensor end
 
   showThingOptions(){
     return this.target.selectedThingId !== 0 && this.target.type === 'Things';
@@ -149,7 +149,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
       (this.target.selectedThingOption === this.queryThingOptions[1] || this.target.selectedThingOption === this.queryThingOptions[2])
   }
 
-  //datastream starts
+  //#region datastream starts
   showDatastreams(){
     return (this.target.type === 'Sensors' && this.target.selectedSensorId !== 0) ||
       (this.target.type === 'Things' && this.target.selectedThingId !== 0 && this.target.selectedThingOption === 'Datastreams');
@@ -228,7 +228,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.target.selectedDatastreamName = 'select a datastream';
     this.panelCtrl.refresh();
   }
-  //datastream ends
+  //#endregion datastream ends
 
   typeChanged(type) {
     this.target.selectedSensorId = 0;
@@ -236,7 +236,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.resetDataSource();
   }
 
-  //thing starts
+  //#region thing starts
   showThings(){
     return this.target.type === 'Things' || this.target.type === 'Historical Locations';
   }
@@ -269,9 +269,9 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   onThingOptionChange(query){
     this.panelCtrl.refresh();
   }
-  //thing ends
+  //#endregion thing ends
 
-  //location starts
+  //#region location starts
   showLocations(){
     return this.target.type === 'Locations';
   }
@@ -298,7 +298,7 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     this.panelCtrl.refresh();
   }
-  //location ends
+  //#endregion location ends
 }
 
 GenericDatasourceQueryCtrl.templateUrl = 'partials/query.editor.html';
