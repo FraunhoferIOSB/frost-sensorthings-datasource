@@ -106,14 +106,15 @@ export class GenericDatasource {
 
         if (target.type === "Locations") {
           transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-        } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations") {
-          transformedResults = transformedResults.concat(self.transformLocations(target,response.data.value));
-        } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations with Coordinates"){
-          // stop here, as we only need 1 value
-          return self.transformLocationsCoordinates(target, response.data.value);
+        } else if (target.type === "Things" && (target.selectedThingOption === "Historical Locations" || target.selectedThingOption === "Historical Locations with Coordinates")) {
+          transformedResults = transformedResults.concat(response.data.value);
         } else {
           transformedResults = transformedResults.concat(self.transformDataSource(target,response.data.value));
         }
+      }
+
+      if(target.type === "Things" && (target.selectedThingOption === "Historical Locations" || target.selectedThingOption === "Historical Locations with Coordinates")) {
+        return self.transformLocations(target, transformedResults, limit);
       }
 
       thisTargetResult.datapoints = transformedResults;
@@ -127,7 +128,8 @@ export class GenericDatasource {
     });
   }
 
-  transformLocationsCoordinates(target, value) {
+  //#region Transforn results
+  transformLocations(target, value, limit) {
     if (!value) {
       console.error('Invalid location data for Thing ' + target.selectedThingId);
       return [];
@@ -137,41 +139,57 @@ export class GenericDatasource {
       if (value.length === 0) {
         console.log('No location for Thing ' + target.selectedThingId);
         return [];
-      } else {
-        value = value[0];
       }
     }
 
-    let locationName = value.Locations[0].name;
-    let location = value.Locations[0].location;
-    let coordinates;
-    if (location.type === 'Feature' && location.geometry.type === 'Point') {
-      coordinates = location.geometry.coordinates;
-    } else if (location.type === 'Point') {
-      coordinates = location.coordinates;
-    } else {
-      console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
-      return [];
+    if(limit == 0) {
+      limit = value.length;
     }
 
-    const metricColumn = 1; // this determines the size and color of the circle
-    return {
+    limit = Math.min(limit, value.length);
+
+    let table = {
       columnMap: {},
       columns: [
-        {text: "Time", type: "time"},
-        {text: "longitude"},
-        {text: "latitude"},
-        {text: "metric"},
-        {text: "name"}
+        {text: "Time", type: "time"}
       ],
       meta: {},
       refId: target.refId,
-      rows: [
-        [value.time, coordinates[0], coordinates[1], metricColumn, target.selectedThingName]
-      ],
+      rows: [],
       type: "table"
+    };
+
+    if(target.selectedThingOption === "Historical Locations") {
+      table.columns.push({text: "Location"});
+    } else if(target.selectedThingOption === "Historical Locations with Coordinates") {
+      table.columns.push({text: "longitude"});
+      table.columns.push({text: "latitude"});
+      table.columns.push({text: "metric"});
+      table.columns.push({text: "Location"});
     }
+
+    for(let i = 0; i < limit; i++) {
+      let time = value[i].time;
+      if(target.selectedThingOption === "Historical Locations") {
+        table.rows.push([time, value[i].Locations[0].name]);
+      } else if(target.selectedThingOption === "Historical Locations with Coordinates") {
+        let location = value[i].Locations[0].location;
+        let coordinates;
+        if (location.type === 'Feature' && location.geometry.type === 'Point') {
+          coordinates = location.geometry.coordinates;
+        } else if (location.type === 'Point') {
+          coordinates = location.coordinates;
+        } else {
+          console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
+          return [];
+        }
+        table.rows.push([time, coordinates[0], coordinates[1], target.selectedThingId, value[i].Locations[0].name]);
+      }
+    }
+
+    return table;
   }
+  //#endregion
 
   transformDataSource(target, values) {
     let self = this;
@@ -222,16 +240,6 @@ export class GenericDatasource {
     return _.map(values, value => {
       return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
     });
-  }
-
-  transformLocations(target, values) {
-    let result = [];
-    _.forEach(values, function (value) {
-      _.forEach(value.Locations, function (location) {
-        result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))]);
-      });
-    });
-    return result;
   }
 
   testDatasource() {
