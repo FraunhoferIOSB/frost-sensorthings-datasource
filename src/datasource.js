@@ -127,189 +127,177 @@ export class GenericDatasource {
     });
   }
 
-    transformLocationsCoordinates(target, value) {
-        if (!value) {
-            console.error('Invalid location data for Thing ' + target.selectedThingId);
-            return [];
-        }
+  transformLocationsCoordinates(target, value) {
+    if (!value) {
+      console.error('Invalid location data for Thing ' + target.selectedThingId);
+      return [];
+    }
 
-        if (Array.isArray(value)) {
-            if (value.length === 0) {
-                console.log('No location for Thing ' + target.selectedThingId);
-                return [];
-            } else {
-                value = value[0];
-            }
-        }
+    if (Array.isArray(value)) {
+      if (value.length === 0) {
+        console.log('No location for Thing ' + target.selectedThingId);
+        return [];
+      } else {
+        value = value[0];
+      }
+    }
 
-        let locationName = value.Locations[0].name;
-        let location = value.Locations[0].location;
-        let coordinates;
-        if (location.type === 'Feature' && location.geometry.type === 'Point') {
-            coordinates = location.geometry.coordinates;
-        } else if (location.type === 'Point') {
-            coordinates = location.coordinates;
+    let locationName = value.Locations[0].name;
+    let location = value.Locations[0].location;
+    let coordinates;
+    if (location.type === 'Feature' && location.geometry.type === 'Point') {
+      coordinates = location.geometry.coordinates;
+    } else if (location.type === 'Point') {
+      coordinates = location.coordinates;
+    } else {
+      console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
+      return [];
+    }
+
+    const metricColumn = 1; // this determines the size and color of the circle
+    return {
+      columnMap: {},
+      columns: [
+        {text: "Time", type: "time"},
+        {text: "longitude"},
+        {text: "latitude"},
+        {text: "metric"},
+        {text: "name"}
+      ],
+      meta: {},
+      refId: target.refId,
+      rows: [
+        [value.time, coordinates[0], coordinates[1], metricColumn, target.selectedThingName]
+      ],
+      type: "table"
+    }
+  }
+
+  transformDataSource(target, values) {
+    let self = this;
+
+    if (self.isOmObservationType(target.selectedDatastreamObservationType) && _.isEmpty(target.jsonQuery)) {
+      return [];
+    }
+
+    let datapoints = _.map(values, function (value, index) {
+      if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
+        var result = new JSONPath({ json: value.result, path: target.jsonQuery });
+
+        if (target.panelType === 'table' || target.panelType === 'singlestat') {
+          result = (typeof result[0] === 'object') ? JSON.stringify(result[0]) : result[0];
+          return [result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
         } else {
-            console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
-            return [];
+          return [result[0], parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
         }
-
-        const metricColumn = 1; // this determines the size and color of the circle
-        return {
-          columnMap: {},
-          columns: [
-            {text: "Time", type: "time"},
-            {text: "longitude"},
-            {text: "latitude"},
-            {text: "metric"},
-            {text: "name"}
-          ],
-          meta: {},
-          refId: target.refId,
-          rows: [
-            [value.time, coordinates[0], coordinates[1], metricColumn, target.selectedThingName]
-          ],
-          type: "table"
+      } else {
+        if (target.panelType === 'table') {
+          return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
+        } else {
+          return [value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
         }
+      }
+    });
+
+    datapoints = _.filter(datapoints, function (datapoint) {
+      return (typeof datapoint[0] === 'string' || typeof datapoint[0] === 'number' || (Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0));
+    });
+
+    return datapoints;
+  }
+
+  isOmObservationType(type) {
+    if (_.isEmpty(type)) {
+      return false;
     }
 
-    transformDataSource(target, values) {
-        let self = this;
-
-        if (self.isOmObservationType(target.selectedDatastreamObservationType) && _.isEmpty(target.jsonQuery)) {
-            return [];
-        }
-
-        let datapoints = _.map(values, function (value, index) {
-
-            if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-
-                var result = new JSONPath({ json: value.result, path: target.jsonQuery });
-
-                if (target.panelType === 'table' || target.panelType === 'singlestat') {
-                    result = (typeof result[0] === 'object') ? JSON.stringify(result[0]) : result[0];
-                    return [result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-                } else {
-                    return [result[0], parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-                }
-
-            } else {
-
-                if (target.panelType === 'table') {
-                    return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-                } else {
-                    return [value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-                }
-
-            }
-        });
-
-        datapoints = _.filter(datapoints, function (datapoint) {
-            return (typeof datapoint[0] === 'string' || typeof datapoint[0] === 'number' || (Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0));
-        });
-
-        return datapoints;
+    if (!type.includes('om_observation')) {
+      return false;
     }
 
-    isOmObservationType(type) {
-        if (_.isEmpty(type)) {
-            return false;
-        }
+    return true;
+  }
 
-        if (!type.includes('om_observation')) {
-            return false;
-        }
+  transformThings(target, values) {
+    return _.map(values, value => {
+      return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
+    });
+  }
 
-        return true;
+  transformLocations(target, values) {
+    let result = [];
+    _.forEach(values, function (value) {
+      _.forEach(value.Locations, function (location) {
+        result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))]);
+      });
+    });
+    return result;
+  }
+
+  testDatasource() {
+    return this.doRequest({
+      url: this.url,
+      method: 'GET',
+    }).then(response => {
+      if (response.status === 200) {
+        return { status: 'success', message: 'Data source is working', title: 'Success' };
+      }
+    });
+  }
+
+  async metricFindQuery(query, subUrl, type) {
+    let placeholder = 'select a sensor';
+
+    if (type === 'thing') {
+      placeholder = 'select a thing';
+    } else if (type === 'datastream') {
+      placeholder = 'select a datastream';
+    } else if (type === 'location') {
+      placeholder = 'select a location';
     }
 
-    transformThings(target, values) {
+    let transformedMetrics = [{
+      text: placeholder,
+      value: 0,
+      type: ''
+    }];
 
-        return _.map(values, value => {
-            return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-        });
+    let hasNextLink = true;
+    let selectParam = (type === 'datastream') ? '$select=name,id,observationType' : '$select=name,id';
+    let fullUrl = this.url + subUrl + `?$top=${this.topCount}&${selectParam}`;
 
+    while (hasNextLink) {
+      let result = await this.doRequest({
+        url: fullUrl,
+        method: 'GET',
+      });
+      hasNextLink = _.has(result.data, '@iot.nextLink');
+      if (hasNextLink) {
+        fullUrl = this.url + subUrl + '?' + result.data['@iot.nextLink'].split('?')[1];
+      }
+      transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
     }
 
-    transformLocations(target, values) {
-        let result = [];
-        _.forEach(values, function (value) {
-            _.forEach(value.Locations, function (location) {
-                result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))]);
-            });
-        });
-        return result;
-    }
+    return transformedMetrics;
+  }
 
-    testDatasource() {
-        return this.doRequest({
-            url: this.url,
-            method: 'GET',
-        }).then(response => {
-            if (response.status === 200) {
-                return { status: 'success', message: 'Data source is working', title: 'Success' };
-            }
-        });
-    }
+  transformMetrics(metrics, type) {
+    let transformedMetrics = [];
 
-    async metricFindQuery(query, subUrl, type) {
+    _.forEach(metrics, (metric, index) => {
+      transformedMetrics.push({
+        text: metric.name + ' ( ' + metric['@iot.id'] + ' )',
+        value: metric['@iot.id'],
+        type: metric['observationType']
+      });
+    });
 
-        let placeholder = 'select a sensor';
+    return transformedMetrics;
+  }
 
-        if (type === 'thing') {
-            placeholder = 'select a thing';
-        } else if (type === 'datastream') {
-            placeholder = 'select a datastream';
-        } else if (type === 'location') {
-            placeholder = 'select a location';
-        }
-
-        let transformedMetrics = [{
-            text: placeholder,
-            value: 0,
-            type: ''
-        }];
-
-
-        let hasNextLink = true;
-        let selectParam = (type === 'datastream') ? '$select=name,id,observationType' : '$select=name,id';
-        let fullUrl = this.url + subUrl + `?$top=${this.topCount}&${selectParam}`;
-
-        while (hasNextLink) {
-            let result = await this.doRequest({
-                url: fullUrl,
-                method: 'GET',
-            });
-            hasNextLink = _.has(result.data, '@iot.nextLink');
-            if (hasNextLink) {
-                fullUrl = this.url + subUrl + '?' + result.data['@iot.nextLink'].split('?')[1];
-            }
-            transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
-        }
-
-        return transformedMetrics;
-    }
-
-    transformMetrics(metrics, type) {
-
-        let transformedMetrics = [];
-
-        _.forEach(metrics, (metric, index) => {
-            transformedMetrics.push({
-                text: metric.name + ' ( ' + metric['@iot.id'] + ' )',
-                value: metric['@iot.id'],
-                type: metric['observationType']
-            });
-        });
-
-        return transformedMetrics;
-    }
-
-    doRequest(options) {
-        options.withCredentials = this.withCredentials;
-        options.headers = this.headers;
-
-        return this.backendSrv.datasourceRequest(options);
-
-    }
+  doRequest(options) {
+    options.withCredentials = this.withCredentials;
+    options.headers = this.headers;
+    return this.backendSrv.datasourceRequest(options);
+  }
 }
