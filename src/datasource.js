@@ -216,7 +216,7 @@ export class GenericDatasource {
     let table = {
       columnMap: {},
       columns: [
-        {text: "Time", type: "time"}
+        {text: "time", type: "time"}
       ],
       meta: {},
       refId: target.refId,
@@ -225,12 +225,12 @@ export class GenericDatasource {
     };
 
     if(target.selectedThingOption === "Historical Locations") {
-      table.columns.push({text: "Location"});
+      table.columns.push({text: "name"});
     } else if(target.selectedThingOption === "Historical Locations with Coordinates") {
       table.columns.push({text: "longitude"});
       table.columns.push({text: "latitude"});
       table.columns.push({text: "metric"});
-      table.columns.push({text: "Location"});
+      table.columns.push({text: "name"});
     }
 
     for(let i = 0; i < limit; i++) {

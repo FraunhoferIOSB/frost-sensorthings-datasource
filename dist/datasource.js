@@ -271,7 +271,7 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
 
             var table = {
               columnMap: {},
-              columns: [{ text: "Time", type: "time" }],
+              columns: [{ text: "time", type: "time" }],
               meta: {},
               refId: target.refId,
               rows: [],
@@ -279,12 +279,12 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
             };
 
             if (target.selectedThingOption === "Historical Locations") {
-              table.columns.push({ text: "Location" });
+              table.columns.push({ text: "name" });
             } else if (target.selectedThingOption === "Historical Locations with Coordinates") {
               table.columns.push({ text: "longitude" });
               table.columns.push({ text: "latitude" });
               table.columns.push({ text: "metric" });
-              table.columns.push({ text: "Location" });
+              table.columns.push({ text: "name" });
             }
 
             for (var i = 0; i < limit; i++) {
