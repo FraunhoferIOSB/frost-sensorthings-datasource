@@ -128,6 +128,71 @@ export class GenericDatasource {
     });
   }
 
+  isOmObservationType(type) {
+    if (_.isEmpty(type)) {
+      return false;
+    }
+
+    if (!type.includes('om_observation')) {
+      return false;
+    }
+
+    return true;
+  }
+
+  testDatasource() {
+    return this.doRequest({
+      url: this.url,
+      method: 'GET',
+    }).then(response => {
+      if (response.status === 200) {
+        return { status: 'success', message: 'Data source is working', title: 'Success' };
+      }
+    });
+  }
+
+  async metricFindQuery(query, subUrl, type) {
+    let placeholder = 'select a sensor';
+
+    if (type === 'thing') {
+      placeholder = 'select a thing';
+    } else if (type === 'datastream') {
+      placeholder = 'select a datastream';
+    } else if (type === 'location') {
+      placeholder = 'select a location';
+    }
+
+    let transformedMetrics = [{
+      text: placeholder,
+      value: 0,
+      type: ''
+    }];
+
+    let hasNextLink = true;
+    let selectParam = (type === 'datastream') ? '$select=name,id,observationType' : '$select=name,id';
+    let fullUrl = this.url + subUrl + `?$top=${this.topCount}&${selectParam}`;
+
+    while (hasNextLink) {
+      let result = await this.doRequest({
+        url: fullUrl,
+        method: 'GET',
+      });
+      hasNextLink = _.has(result.data, '@iot.nextLink');
+      if (hasNextLink) {
+        fullUrl = this.url + subUrl + '?' + result.data['@iot.nextLink'].split('?')[1];
+      }
+      transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
+    }
+
+    return transformedMetrics;
+  }
+
+  doRequest(options) {
+    options.withCredentials = this.withCredentials;
+    options.headers = this.headers;
+    return this.backendSrv.datasourceRequest(options);
+  }
+
   //#region Transforn results
   transformLocations(target, value, limit) {
     if (!value) {
@@ -189,7 +254,6 @@ export class GenericDatasource {
 
     return table;
   }
-  //#endregion
 
   transformDataSource(target, values) {
     let self = this;
@@ -224,69 +288,10 @@ export class GenericDatasource {
     return datapoints;
   }
 
-  isOmObservationType(type) {
-    if (_.isEmpty(type)) {
-      return false;
-    }
-
-    if (!type.includes('om_observation')) {
-      return false;
-    }
-
-    return true;
-  }
-
   transformThings(target, values) {
     return _.map(values, value => {
       return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
     });
-  }
-
-  testDatasource() {
-    return this.doRequest({
-      url: this.url,
-      method: 'GET',
-    }).then(response => {
-      if (response.status === 200) {
-        return { status: 'success', message: 'Data source is working', title: 'Success' };
-      }
-    });
-  }
-
-  async metricFindQuery(query, subUrl, type) {
-    let placeholder = 'select a sensor';
-
-    if (type === 'thing') {
-      placeholder = 'select a thing';
-    } else if (type === 'datastream') {
-      placeholder = 'select a datastream';
-    } else if (type === 'location') {
-      placeholder = 'select a location';
-    }
-
-    let transformedMetrics = [{
-      text: placeholder,
-      value: 0,
-      type: ''
-    }];
-
-    let hasNextLink = true;
-    let selectParam = (type === 'datastream') ? '$select=name,id,observationType' : '$select=name,id';
-    let fullUrl = this.url + subUrl + `?$top=${this.topCount}&${selectParam}`;
-
-    while (hasNextLink) {
-      let result = await this.doRequest({
-        url: fullUrl,
-        method: 'GET',
-      });
-      hasNextLink = _.has(result.data, '@iot.nextLink');
-      if (hasNextLink) {
-        fullUrl = this.url + subUrl + '?' + result.data['@iot.nextLink'].split('?')[1];
-      }
-      transformedMetrics = transformedMetrics.concat(this.transformMetrics(result.data.value, type));
-    }
-
-    return transformedMetrics;
   }
 
   transformMetrics(metrics, type) {
@@ -302,10 +307,5 @@ export class GenericDatasource {
 
     return transformedMetrics;
   }
-
-  doRequest(options) {
-    options.withCredentials = this.withCredentials;
-    options.headers = this.headers;
-    return this.backendSrv.datasourceRequest(options);
-  }
+  //#endregion
 }

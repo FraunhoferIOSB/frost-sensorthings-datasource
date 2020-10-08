@@ -158,14 +158,15 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
 
                 if (target.type === "Locations") {
                   transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-                } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations") {
-                  transformedResults = transformedResults.concat(self.transformLocations(target, response.data.value));
-                } else if (target.type === "Things" && target.selectedThingOption === "Historical Locations with Coordinates") {
-                  // stop here, as we only need 1 value
-                  return self.transformLocationsCoordinates(target, response.data.value);
+                } else if (target.type === "Things" && (target.selectedThingOption === "Historical Locations" || target.selectedThingOption === "Historical Locations with Coordinates")) {
+                  transformedResults = transformedResults.concat(response.data.value);
                 } else {
                   transformedResults = transformedResults.concat(self.transformDataSource(target, response.data.value));
                 }
+              }
+
+              if (target.type === "Things" && (target.selectedThingOption === "Historical Locations" || target.selectedThingOption === "Historical Locations with Coordinates")) {
+                return self.transformLocations(target, transformedResults, limit);
               }
 
               thisTargetResult.datapoints = transformedResults;
@@ -179,79 +180,6 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
             });
           }
         }, {
-          key: 'transformLocationsCoordinates',
-          value: function transformLocationsCoordinates(target, value) {
-            if (!value) {
-              console.error('Invalid location data for Thing ' + target.selectedThingId);
-              return [];
-            }
-
-            if (Array.isArray(value)) {
-              if (value.length === 0) {
-                console.log('No location for Thing ' + target.selectedThingId);
-                return [];
-              } else {
-                value = value[0];
-              }
-            }
-
-            var locationName = value.Locations[0].name;
-            var location = value.Locations[0].location;
-            var coordinates = void 0;
-            if (location.type === 'Feature' && location.geometry.type === 'Point') {
-              coordinates = location.geometry.coordinates;
-            } else if (location.type === 'Point') {
-              coordinates = location.coordinates;
-            } else {
-              console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
-              return [];
-            }
-
-            var metricColumn = 1; // this determines the size and color of the circle
-            return {
-              columnMap: {},
-              columns: [{ text: "Time", type: "time" }, { text: "longitude" }, { text: "latitude" }, { text: "metric" }, { text: "name" }],
-              meta: {},
-              refId: target.refId,
-              rows: [[value.time, coordinates[0], coordinates[1], metricColumn, target.selectedThingName]],
-              type: "table"
-            };
-          }
-        }, {
-          key: 'transformDataSource',
-          value: function transformDataSource(target, values) {
-            var self = this;
-
-            if (self.isOmObservationType(target.selectedDatastreamObservationType) && _.isEmpty(target.jsonQuery)) {
-              return [];
-            }
-
-            var datapoints = _.map(values, function (value, index) {
-              if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
-                var result = new JSONPath({ json: value.result, path: target.jsonQuery });
-
-                if (target.panelType === 'table' || target.panelType === 'singlestat') {
-                  result = _typeof(result[0]) === 'object' ? JSON.stringify(result[0]) : result[0];
-                  return [result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-                } else {
-                  return [result[0], parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-                }
-              } else {
-                if (target.panelType === 'table') {
-                  return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-                } else {
-                  return [value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-                }
-              }
-            });
-
-            datapoints = _.filter(datapoints, function (datapoint) {
-              return typeof datapoint[0] === 'string' || typeof datapoint[0] === 'number' || Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0;
-            });
-
-            return datapoints;
-          }
-        }, {
           key: 'isOmObservationType',
           value: function isOmObservationType(type) {
             if (_.isEmpty(type)) {
@@ -263,24 +191,6 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
             }
 
             return true;
-          }
-        }, {
-          key: 'transformThings',
-          value: function transformThings(target, values) {
-            return _.map(values, function (value) {
-              return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
-            });
-          }
-        }, {
-          key: 'transformLocations',
-          value: function transformLocations(target, values) {
-            var result = [];
-            _.forEach(values, function (value) {
-              _.forEach(value.Locations, function (location) {
-                result.push([_.isEmpty(location.name) ? '-' : location.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))]);
-              });
-            });
-            return result;
           }
         }, {
           key: 'testDatasource',
@@ -332,6 +242,114 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
             return transformedMetrics;
           }
         }, {
+          key: 'doRequest',
+          value: function doRequest(options) {
+            options.withCredentials = this.withCredentials;
+            options.headers = this.headers;
+            return this.backendSrv.datasourceRequest(options);
+          }
+        }, {
+          key: 'transformLocations',
+          value: function transformLocations(target, value, limit) {
+            if (!value) {
+              console.error('Invalid location data for Thing ' + target.selectedThingId);
+              return [];
+            }
+
+            if (Array.isArray(value)) {
+              if (value.length === 0) {
+                console.log('No location for Thing ' + target.selectedThingId);
+                return [];
+              }
+            }
+
+            if (limit == 0) {
+              limit = value.length;
+            }
+
+            limit = Math.min(limit, value.length);
+
+            var table = {
+              columnMap: {},
+              columns: [{ text: "Time", type: "time" }],
+              meta: {},
+              refId: target.refId,
+              rows: [],
+              type: "table"
+            };
+
+            if (target.selectedThingOption === "Historical Locations") {
+              table.columns.push({ text: "Location" });
+            } else if (target.selectedThingOption === "Historical Locations with Coordinates") {
+              table.columns.push({ text: "longitude" });
+              table.columns.push({ text: "latitude" });
+              table.columns.push({ text: "metric" });
+              table.columns.push({ text: "Location" });
+            }
+
+            for (var i = 0; i < limit; i++) {
+              var time = value[i].time;
+              if (target.selectedThingOption === "Historical Locations") {
+                table.rows.push([time, value[i].Locations[0].name]);
+              } else if (target.selectedThingOption === "Historical Locations with Coordinates") {
+                var location = value[i].Locations[0].location;
+                var coordinates = void 0;
+                if (location.type === 'Feature' && location.geometry.type === 'Point') {
+                  coordinates = location.geometry.coordinates;
+                } else if (location.type === 'Point') {
+                  coordinates = location.coordinates;
+                } else {
+                  console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
+                  return [];
+                }
+                table.rows.push([time, coordinates[0], coordinates[1], target.selectedThingId, value[i].Locations[0].name]);
+              }
+            }
+
+            return table;
+          }
+        }, {
+          key: 'transformDataSource',
+          value: function transformDataSource(target, values) {
+            var self = this;
+
+            if (self.isOmObservationType(target.selectedDatastreamObservationType) && _.isEmpty(target.jsonQuery)) {
+              return [];
+            }
+
+            var datapoints = _.map(values, function (value, index) {
+              if (self.isOmObservationType(target.selectedDatastreamObservationType)) {
+                var result = new JSONPath({ json: value.result, path: target.jsonQuery });
+
+                if (target.panelType === 'table' || target.panelType === 'singlestat') {
+                  result = _typeof(result[0]) === 'object' ? JSON.stringify(result[0]) : result[0];
+                  return [result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
+                } else {
+                  return [result[0], parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
+                }
+              } else {
+                if (target.panelType === 'table') {
+                  return [_.isEmpty(value.result.toString()) ? '-' : value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
+                } else {
+                  return [value.result, parseInt(moment(value.phenomenonTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
+                }
+              }
+            });
+
+            datapoints = _.filter(datapoints, function (datapoint) {
+              return typeof datapoint[0] === 'string' || typeof datapoint[0] === 'number' || Number(datapoint[0]) === datapoint[0] && datapoint[0] % 1 !== 0;
+            });
+
+            return datapoints;
+          }
+        }, {
+          key: 'transformThings',
+          value: function transformThings(target, values) {
+            return _.map(values, function (value) {
+              return [_.isEmpty(value.Thing.name) ? '-' : value.Thing.name, parseInt(moment(value.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('x'))];
+            });
+          }
+        }, {
           key: 'transformMetrics',
           value: function transformMetrics(metrics, type) {
             var transformedMetrics = [];
@@ -345,13 +363,6 @@ System.register(['lodash', 'moment', './external/jsonpath.js'], function (_expor
             });
 
             return transformedMetrics;
-          }
-        }, {
-          key: 'doRequest',
-          value: function doRequest(options) {
-            options.withCredentials = this.withCredentials;
-            options.headers = this.headers;
-            return this.backendSrv.datasourceRequest(options);
           }
         }]);
 
