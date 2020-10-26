@@ -39,6 +39,7 @@ export class GenericDatasource {
     let allTargetResults = { data: [] };
 
     let testPromises = options.targets.map(async target => {
+      console.log(target.query);
       let self = this;
       let subUrl = '';
       let thisTargetResult = {
@@ -65,16 +66,58 @@ export class GenericDatasource {
         if (target.selectedThingId == 0) {
           return thisTargetResult;
         }
+
         let timeFilter = this.getTimeFilter(options,"time");
         subUrl = `/Things(${this.getFormatedId(target.selectedThingId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Locations($select=name)&$select=time&$top=${target.selectedLimit === 0 ? this.topCount : target.selectedLimit}`;
-        limit = target.selectedLimit;
+        
+        let data = await this.fetchData(this.url + subUrl, target.selectedLimit);
+        return this.transformToTable(
+          data, 
+          target.selectedLimit, 
+          {
+            columns: [
+              "name"
+            ], 
+            values: [
+              function(v) { return v.Locations[0].name; }
+            ]
+          }, 
+          target);
       } else if(target.type === "Things" && target.selectedThingOption === "Historical Locations with Coordinates") {
         if (target.selectedThingId == 0) {
           return thisTargetResult;
         }
+
         let timeFilter = this.getTimeFilter(options,"time");
+        let timeFilterSub = this.getTimeFilter(options,"phenomenonTime");
         subUrl = `/Things(${this.getFormatedId(target.selectedThingId)})/HistoricalLocations?$filter=${timeFilter}&$expand=Locations($select=name,location)&$select=time&$top=${target.selectedLimit === 0 ? this.topCount : target.selectedLimit}`;
-        limit = target.selectedLimit;
+        
+        let data = await this.fetchData(this.url + subUrl, target.selectedLimit);
+        if(target.selectedDatastreamId !== 0) {
+          let subsuburl = `/Datastreams(${target.selectedDatastreamId})/Observations?$select=result,phenomenonTime&$top=${target.selectedLimit === 0 ? this.topCount : target.selectedLimit}&$filter=${timeFilterSub}`;
+          let subdata = await this.fetchData(this.url + subsuburl, target.selectedLimit);
+          data = this.dataMerge(data, subdata);
+          console.log(subdata);
+          console.log(data);
+        }
+        return this.transformToTable(
+          data, 
+          target.selectedLimit, 
+          {
+            columns: [
+              "name", 
+              "longitude", 
+              "latitude", 
+              "metric"
+            ], 
+            values: [
+              function(v) { return v.Locations[0].name; }, 
+              function(v) { return self.transformParseLoc(v.Locations[0].location)[0]; }, 
+              function(v) { return self.transformParseLoc(v.Locations[0].location)[1]; }, 
+              function(v) { return 1; }
+            ]
+          }, 
+          target);
       } else {
         if (target.selectedDatastreamId == 0) {
           return thisTargetResult;
@@ -106,15 +149,9 @@ export class GenericDatasource {
 
         if (target.type === "Locations") {
           transformedResults = transformedResults.concat(self.transformThings(target, response.data.value));
-        } else if (target.type === "Things" && (target.selectedThingOption === "Historical Locations" || target.selectedThingOption === "Historical Locations with Coordinates")) {
-          transformedResults = transformedResults.concat(response.data.value);
         } else {
           transformedResults = transformedResults.concat(self.transformDataSource(target,response.data.value));
         }
-      }
-
-      if(target.type === "Things" && (target.selectedThingOption === "Historical Locations" || target.selectedThingOption === "Historical Locations with Coordinates")) {
-        return self.transformLocations(target, transformedResults, limit);
       }
 
       thisTargetResult.datapoints = transformedResults;
@@ -126,6 +163,34 @@ export class GenericDatasource {
       allTargetResults.data = values;
       return allTargetResults;
     });
+  }
+
+  dataMerge(data) {
+    return data;
+  }
+
+  async fetchData(url, limit) {
+    let result = [];
+    let hasNextLink = true;
+    let fullUrl = url;
+    while(hasNextLink) {
+      if(result.length >= limit && limit !== 0) {
+        break;
+      }
+
+      let response = await this.doRequest({
+        url: fullUrl,
+        method: 'GET'
+      });
+
+      hasNextLink = _.has(response.data, "@iot.nextLink");
+      if (hasNextLink) {
+        fullUrl = fullUrl.split('?')[0]; + "?" + response.data["@iot.nextLink"].split('?')[1];
+      }
+
+      result = result.concat(response.data.value);
+    }
+    return result;
   }
 
   isOmObservationType(type) {
@@ -194,24 +259,34 @@ export class GenericDatasource {
   }
 
   //#region Transforn results
-  transformLocations(target, value, limit) {
-    if (!value) {
-      console.error('Invalid location data for Thing ' + target.selectedThingId);
+  transformParseLoc(location) {
+    if (location.type === 'Feature' && location.geometry.type === 'Point') {
+      return location.geometry.coordinates;
+    } else if (location.type === 'Point') {
+      return location.coordinates;
+    } else {
+      console.error('Unsupported location type for Thing. Expected GeoJSON Feature.Point or Point.');
+      return [0,0];
+    }
+  }
+
+  transformToTable(data, limit, options, target) {
+    if (!data) {
+      console.error('Could not convert data to Tableformat, data is not valid.');
       return [];
     }
 
-    if (Array.isArray(value)) {
-      if (value.length === 0) {
-        console.log('No location for Thing ' + target.selectedThingId);
+    if (Array.isArray(data)) {
+      if (data.length === 0) {
+        console.log('Could not convert data to Tableformat, data is empty.');
         return [];
       }
     }
 
     if(limit == 0) {
-      limit = value.length;
+      limit = data.length;
     }
-
-    limit = Math.min(limit, value.length);
+    limit = Math.min(limit, data.length);
 
     let table = {
       columnMap: {},
@@ -224,34 +299,21 @@ export class GenericDatasource {
       type: "table"
     };
 
-    if(target.selectedThingOption === "Historical Locations") {
-      table.columns.push({text: "name"});
-    } else if(target.selectedThingOption === "Historical Locations with Coordinates") {
-      table.columns.push({text: "longitude"});
-      table.columns.push({text: "latitude"});
-      table.columns.push({text: "metric"});
-      table.columns.push({text: "name"});
-    }
-
-    for(let i = 0; i < limit; i++) {
-      let time = value[i].time;
-      if(target.selectedThingOption === "Historical Locations") {
-        table.rows.push([time, value[i].Locations[0].name]);
-      } else if(target.selectedThingOption === "Historical Locations with Coordinates") {
-        let location = value[i].Locations[0].location;
-        let coordinates;
-        if (location.type === 'Feature' && location.geometry.type === 'Point') {
-          coordinates = location.geometry.coordinates;
-        } else if (location.type === 'Point') {
-          coordinates = location.coordinates;
-        } else {
-          console.error('Unsupported location type for Thing ' + target.selectedThingId + '. Expected GeoJSON Feature.Point or Point.');
-          return [];
-        }
-        table.rows.push([time, coordinates[0], coordinates[1], target.selectedThingId, value[i].Locations[0].name]);
+    if(options.hasOwnProperty("columns")) {
+      for(let i = 0; i < options.columns.length; i++) {
+        table.columns.push({text: options.columns[i]});
       }
     }
-
+    
+    if(options.hasOwnProperty("values")) {
+      for(let i = 0; i < limit; i++) {
+        let row = [data[i].time];
+        for(let j = 0; j < options.values.length; j++) {
+          row.push(options.values[j](data[i]));
+        }
+        table.rows.push(row);
+      }
+    }
     return table;
   }
 
