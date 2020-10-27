@@ -39,7 +39,6 @@ export class GenericDatasource {
     let allTargetResults = { data: [] };
 
     let testPromises = options.targets.map(async target => {
-      console.log(target.query);
       let self = this;
       let subUrl = '';
       let thisTargetResult = {
@@ -97,8 +96,6 @@ export class GenericDatasource {
           let subsuburl = `/Datastreams(${target.selectedDatastreamId})/Observations?$select=result,phenomenonTime&$top=${target.selectedLimit === 0 ? this.topCount : target.selectedLimit}&$filter=${timeFilterSub}`;
           let subdata = await this.fetchData(this.url + subsuburl, target.selectedLimit);
           data = this.dataMerge(data, subdata);
-          console.log(subdata);
-          console.log(data);
         }
         return this.transformToTable(
           data, 
@@ -114,7 +111,7 @@ export class GenericDatasource {
               function(v) { return v.Locations[0].name; }, 
               function(v) { return self.transformParseLoc(v.Locations[0].location)[0]; }, 
               function(v) { return self.transformParseLoc(v.Locations[0].location)[1]; }, 
-              function(v) { return 1; }
+              function(v) { return self.findDataResult(v, target); }
             ]
           }, 
           target);
@@ -165,7 +162,31 @@ export class GenericDatasource {
     });
   }
 
-  dataMerge(data) {
+  findDataResult(data, target) {
+    if(typeof(data.result) === "undefined" || data.result === null) {
+      return null;
+    }
+    if(this.isOmObservationType(target.selectedDatastreamObservationType)) {
+      let result = new JSONPath({ json: data.result, path: target.jsonQuery });
+      return (typeof result[0] === 'object') ? JSON.stringify(result[0]) : result[0];
+    } else {
+      return typeof data.result === 'object' ? JSON.stringify(data.result) : data.result;
+    }
+  }
+
+  dataMerge(data, subdata) {
+    let subdata_search = {};
+    for(let i=0; i<subdata.length; i++) {
+      subdata_search[Math.round(new Date(subdata[i]['phenomenonTime']).valueOf()/1000)] = subdata[i]['result'];
+    }
+    for(let i=0; i<data.length; i++) {
+      let t = Math.round(new Date(data[i]['time']).valueOf()/1000);
+      if(subdata_search.hasOwnProperty(t)) {
+        data[i]['result'] = subdata_search[t];
+      } else {
+        data[i]['result'] = null;
+      }
+    }
     return data;
   }
 
