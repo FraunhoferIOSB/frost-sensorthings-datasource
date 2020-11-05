@@ -78,12 +78,12 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
           _this.queryTypes = ['Sensors', 'Things', 'Locations'];
           _this.queryThingOptions = ['Datastreams', "Historical Locations", "Historical Locations with Coordinates"];
 
-          _this.target.type = _this.target.type || _this.queryTypes[0]; // rename to selectedType?
-          _this.target.selectedThingOption = _this.target.selectedThingOption || _this.queryThingOptions[0];
-
           if (typeof _this.target.selectedLimit == "undefined") {
             _this.target.selectedLimit = 1;
           }
+
+          // type init
+          _this.target.type = _this.target.type || _this.queryTypes[0]; // rename to selectedType?
 
           // datastream init
           _this.target.selectedDatastreamId = _this.target.selectedDatastreamId || 0;
@@ -110,6 +110,9 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
           _this.target.selectedLocationDirty = _this.target.selectedLocationDirty || false;
           _this.allLocations = {};
 
+          // thing options init
+          _this.target.selectedThingOption = _this.target.selectedThingOption || _this.queryThingOptions[0];
+
           _this.panelCtrl.events.on('data-received', _this.onDataReceived.bind(_this), $scope);
           _this.panelCtrl.events.on('data-error', _this.onDataError.bind(_this), $scope);
 
@@ -135,6 +138,76 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
         }
 
         _createClass(GenericDatasourceQueryCtrl, [{
+          key: 'buildQueryString',
+          value: function buildQueryString() {
+            var query = "";
+            var queryparams = {};
+            if (this.target.type === "Sensors") {
+              query += "/Sensors";
+              if (this.target.selectedSensorId !== 0) {
+                query += '(' + this.target.selectedSensorId + ')';
+                if (this.target.selectedDatastreamId !== 0) {
+                  query = "/Datastreams";
+                  query += '(' + this.target.selectedDatastreamId + ')';
+                  query += "/Observations";
+                  queryparams["$select"] = "phenomenonTime,result";
+                  queryparams["$orderby"] = "phenomenonTime desc";
+                  if (this.isOmObservationType(this.target.selectedDatastreamObservationType)) {
+                    queryparams["$jsonPath"] = this.target.jsonQuery;
+                  }
+                }
+              }
+            } else if (this.target.type === "Things") {
+              query += "/Things";
+              if (this.target.selectedThingId !== 0) {
+                query += '(' + this.target.selectedThingId + ')';
+                if (this.target.selectedThingOption === "Datastreams") {
+                  query += "/Datastreams";
+                  if (this.target.selectedDatastreamId !== 0) {
+                    query = "/Datastreams";
+                    query += '(' + this.target.selectedDatastreamId + ')';
+                    query += "/Observations";
+                    queryparams["$select"] = "phenomenonTime,result";
+                    queryparams["$orderby"] = "phenomenonTime desc";
+                    if (this.isOmObservationType(this.target.selectedDatastreamObservationType)) {
+                      queryparams["$jsonPath"] = this.target.jsonQuery;
+                    }
+                  }
+                } else if (this.target.selectedThingOption === "Historical Locations") {
+                  query += "/HistoricalLocations";
+                  queryparams["$expand"] = "Locations($select=name)";
+                  queryparams["$select"] = "time";
+                  queryparams["$top"] = this.target.selectedLimit;
+                } else if (this.target.selectedThingOption === "Historical Locations with Coordinates") {
+                  query += "/HistoricalLocations";
+                  queryparams["$expand"] = "Locations($select=name,Location)";
+                  queryparams["$select"] = "time";
+                  queryparams["$top"] = this.target.selectedLimit;
+                  if (this.target.selectedDatastreamId !== 0) {
+                    queryparams["$combine"] = encodeURIComponent("/Datastreams" + ('(' + this.target.selectedDatastreamId + ')') + "/Observations" + "?" + "$select=result,phenomenonTime" + "&" + ('$top=' + this.target.selectedLimit));
+                    if (this.isOmObservationType(this.target.selectedDatastreamObservationType)) {
+                      queryparams["$jsonPath"] = this.target.jsonQuery;
+                    }
+                  }
+                }
+              }
+            } else if (this.target.type === "Locations") {
+              query += "/Locations";
+              if (this.target.selectedLocationId !== 0) {
+                query += '(' + this.target.selectedLocationId + ')';
+                query += "/HistoricalLocations";
+                queryparams["$expand"] = "Things($select=name)";
+                queryparams["$select"] = "time";
+              }
+            }
+            queryparams['$filter'] = "$timeFilter";
+            var queryparam = [];
+            for (var index in queryparams) {
+              queryparam.push(index + '=' + queryparams[index]);
+            }
+            return query + "?" + queryparam.join('&');
+          }
+        }, {
           key: 'onDataReceived',
           value: function onDataReceived(dataList) {
             this.lastQueryError = null;
@@ -166,6 +239,11 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
         }, {
           key: 'toggleEditorMode',
           value: function toggleEditorMode() {
+            try {
+              this.target.query = this.buildQueryString();
+            } catch (err) {
+              console.error('query render error');
+            }
             this.target.rawQuery = !this.target.rawQuery;
           }
         }, {
@@ -220,7 +298,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
         }, {
           key: 'showDatastreams',
           value: function showDatastreams() {
-            return this.target.type === 'Sensors' && this.target.selectedSensorId !== 0 || this.target.type === 'Things' && this.target.selectedThingId !== 0 && this.target.selectedThingOption === 'Datastreams';
+            return this.target.type === 'Sensors' && this.target.selectedSensorId !== 0 || this.target.type === 'Things' && this.target.selectedThingId !== 0 && (this.target.selectedThingOption === 'Datastreams' || this.target.selectedThingOption === 'Historical Locations with Coordinates');
           }
         }, {
           key: 'getDataStreams',
@@ -280,7 +358,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', 'app/core/core'],
         }, {
           key: 'showJsonQuery',
           value: function showJsonQuery() {
-            return this.target.selectedDatastreamId !== 0 && (this.target.type === 'Sensors' || this.target.type === 'Things' && this.target.selectedThingOption === 'Datastreams') && this.isOmObservationType(this.target.selectedDatastreamObservationType);
+            return this.target.selectedDatastreamId !== 0 && (this.target.type === 'Sensors' || this.target.type === 'Things' && (this.target.selectedThingOption === 'Datastreams' || this.target.selectedThingOption === 'Historical Locations with Coordinates')) && this.isOmObservationType(this.target.selectedDatastreamObservationType);
           }
         }, {
           key: 'isOmObservationType',
