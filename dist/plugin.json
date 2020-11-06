@@ -24,8 +24,8 @@
       {"name": "OGC SensorThings API", "url": "https://github.com/opengeospatial/sensorthings"},
       {"name": "LinkSmart", "url": "https://linksmart.eu"}
     ],
-    "version": "1.4.0-alpha",
-    "updated": "2020-11-02"
+    "version": "1.4.0",
+    "updated": "2020-11-06"
   },
   "dependencies": {
     "grafanaVersion": "5.x.x",
