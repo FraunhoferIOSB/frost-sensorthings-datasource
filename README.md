@@ -1,12 +1,10 @@
 # Grafana OGC SensorThings Plugin
-This plugin enables the visualization of sensor and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) server on [Grafana](http://grafana.org/).
+This plugin enables the visualization of observation and location data from an [OGC SensorThings](https://github.com/opengeospatial/sensorthings) server on [Grafana](http://grafana.org/) panels.
 
 It provides:
-* Time-series visualization on [Graph](https://grafana.com/plugins/graph)
-* Time-series and location history in [Table](https://grafana.com/plugins/table)
-* Sensor data in [Singlestat](https://grafana.com/plugins/singlestat)
-* Location of things on [Worldmap Panel](https://grafana.com/plugins/grafana-worldmap-panel)
-* [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2) support for extracting values from [OM_Observation](http://docs.opengeospatial.org/is/15-078r6/15-078r6.html#table_12) observations (See [examples](https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/JSONPath.md))
+* Observations for panels such as [Graph](https://grafana.com/plugins/graph), [Table](https://grafana.com/plugins/table), [Singlestat](https://grafana.com/plugins/singlestat)
+* Historical Locations (along with coordinated and Observations) for panels such as [Table](https://grafana.com/plugins/table), [Worldmap Panel](https://grafana.com/plugins/grafana-worldmap-panel)
+* JSONPath expression support for selection of values from result objects
 
 ## Demo
 A live dashboard showing SensorThings data in Grafana panels: [SensorThings Dashboard](https://demo.linksmart.eu/grafana/d/OUQUMYDmz/ogc-sensorthings)
@@ -44,50 +42,27 @@ Restart Grafana server.
 
 1. Go to Grafana Configuration.
 2. Select `Add data source`.
-3. Provide the necessary details to connect with OGC SensorThings server.
-
-Name | Description
------------- | -------------
-Name | The data source name.
-Default | Set this as the default plugin for new panels.
-Type | Choose SensorThings Datasource.
-Url | OGC SensorThings API root URL (e.g. `http://localhost:8080/v1.0`). Note the URL has no trailing slash ("/").
-Access | Proxy: Let Grafana server proxy the requests to OGC SensorThings API server.
-Basic Auth | Authenticate to OGC SensorThings API server (if required, provide User and Password)
-
-![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/datasource_setup.png)
-
+3. Provide the necessary details to connect to the OGC SensorThings server. Note that the URL field must be set to OGC SensorThings API root endpoint (e.g. `http://localhost:8080/v1.0`), without trailing slash.
 4. Save & Test, you should see this confirmation:  
 ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/datasource_setup_confirmation.png)
 
 ## Query Configuration
+There are several ways to query Observations and Locations. The Observations are sorted descendingly by phenomenonTime. 
 
-### Graph view
-To visualize the observations from OGC SensorThings server,
+![Query Options](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/query_options.jpg)
 
-1. Add a graph panel.
-2. Select the SensorThings Datasource.
-3. Select `Sensor` or `Things` to get the list of sensors or things which are available in your SensorThings server.
-4. Select a specific sensor or thing from the list, to get the list of datastreams.
-5. Select a datastream to visualize the observations in the graph.
+The queries options are:
+* (A) Things->Datastreams->Observations
+* (B) Things->Historical Locations
+* (C) Things->Historical Locations with Coordinates and optional Datastreams->Observations
+* (D) Sensors->Datastreams->Observations
 
-See the demo below for better understanding:
+If the Datastream has [OM_Observation](http://docs.opengeospatial.org/is/15-078r6/15-078r6.html#table_12) for observationType, the particular values can be selected from the result object inside each Observation. The selection can be done using [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2) expressions. Few examples are available [here](https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/JSONPath.md).
 
-![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/graph_demo.gif)
+![JSONPath Queries](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/query_jsonpath.jpg)
 
-### Table view
-Using table view, one can see list of observation recorded based on Sensors/Things, and also list of Locations visited by a Thing or list of Things that has been in a specific Location.
-
-1. Add a table panel.
-2. Select the SensorThings Datasource.
-3. Select `Sensors`, `Things`, `Locations`, or `Historical Locations` from the initial dropdown list.
-
-See the demo below for better understanding:
-
-![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/table_demo.gif)
-
-### Map view
-Using the [Grafana Worldmap Panel](https://grafana.com/grafana/plugins/grafana-worldmap-panel), one can see the last Location of a Thing on the map.
+## Map view
+Using the [Grafana Worldmap Panel](https://grafana.com/grafana/plugins/grafana-worldmap-panel), one can see latest Locations of Things on the map. Currently, only a single Thing can be visualized.
 
 1. Install world map panel from grafana plugin store.
 2. Add the map panel in dashboard
@@ -110,7 +85,7 @@ Using the [Grafana Worldmap Panel](https://grafana.com/grafana/plugins/grafana-w
     * Select a Datastream if you want to query the latest observation (per Historical Location) and use that value as metric field. This metric value will determine the size and color of each circle and can be viewed by hovering on the circle.
     * Select a Limit value to set how many locations should be retrieved from the history.
 
-![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap_config.jpg)
+![Worldmap Configuration](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap_config.jpg)
 
 ### Dev setup
 ```
