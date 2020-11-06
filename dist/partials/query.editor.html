@@ -1,89 +1,137 @@
-<query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
-  <div class="gf-form-inline">
-
+<query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" can-collapse="true" has-text-edit-mode="true">
+  <div ng-if="ctrl.target.rawQuery">
     <div class="gf-form">
-      <select  class="gf-form-input"
-        ng-model="ctrl.target.type"
-        ng-options="f as f for f in ctrl.queryTypes"
-        ng-change="ctrl.typeChanged(ctrl.target.type)">
-      </select>
+      <textarea rows="3" class="gf-form-input" ng-model="ctrl.target.query" spellcheck="false" placeholder="OData Query" ng-model-onblur ng-change="ctrl.refresh()"></textarea>
     </div>
-
-    <div ng-if="!ctrl.target.rawQuery">
+    <!-- <div class="gf-form-inline">
       <div class="gf-form">
-        <div class="gf-form">
-          <gf-form-dropdown
-            ng-if="ctrl.showSensors()"
-            model="ctrl.target.selectedSensorId"
-            allow-custom="true"
-            lookup-text="true"
-            get-options="ctrl.getSensors($query)"
-            on-change="ctrl.onSensorChange($query)">
-          </gf-form-dropdown>
+        <label class="gf-form-label query-keyword">FORMAT AS</label>
+        <div class="gf-form-select-wrapper">
+          <select class="gf-form-input gf-size-auto" ng-model="ctrl.target.resultFormat" ng-options="f.value as f.text for f in ctrl.resultFormats" ng-change="ctrl.refresh()"></select>
         </div>
+      </div>
+      <div class="gf-form max-width-25" ng-hide="ctrl.target.resultFormat === 'table'">
+        <label class="gf-form-label query-keyword">ALIAS BY</label>
+        <input type="text" class="gf-form-input" ng-model="ctrl.target.alias" spellcheck="false" placeholder="Naming pattern" ng-blur="ctrl.refresh()"/>
+      </div>
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
+      </div>
+    </div> -->
+  </div>
 
-        <div class="gf-form">
-          <gf-form-dropdown
-            model="ctrl.target.selectedThingId"
-            ng-if="ctrl.showThings()"
-            allow-custom="true"
-            lookup-text="true"
-            get-options="ctrl.getThings($query)"
-            on-change="ctrl.onThingChange($query)">
-          </gf-form-dropdown>
-        </div>
+  <div ng-if="!ctrl.target.rawQuery">
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-7"> <span>ENTITY</span>&nbsp; </label>
+      </div>
 
-        <div class="gf-form">
-          <select class="gf-form-input"
-            ng-if="ctrl.showThingOptions()"
-            ng-model="ctrl.target.selectedThingOption"
-            ng-options="f as f for f in ctrl.queryThingOptions"
-            ng-change="ctrl.onThingOptionChange($query)">
-          </select>
-        </div>
+      <div class="gf-form">
+        <select  class="gf-form-input"
+          ng-model="ctrl.target.type"
+          ng-options="f as f for f in ctrl.queryTypes"
+          ng-change="ctrl.typeChanged(ctrl.target.type)">
+        </select>
+      </div>
 
-        <div class="gf-form" ng-if="ctrl.showThingLimit()">
-          <label class="gf-form-label query-keyword">Limit</label>
-          <input class="gf-form-input" type="number" min="0"
-            ng-model="ctrl.target.selectedLimit"
-            placeholder="1"
-            allow-custom="true"
-            ng-blur="ctrl.onThingsLimitChange($query)" />
-        </div>
+      <div class="gf-form">
+        <gf-form-dropdown
+          ng-if="ctrl.showSensors()"
+          model="ctrl.target.selectedSensorId"
+          allow-custom="true"
+          lookup-text="true"
+          get-options="ctrl.getSensors($query)"
+          on-change="ctrl.onSensorChange($query)">
+        </gf-form-dropdown>
+      </div>
 
-        <div class="gf-form">
-          <gf-form-dropdown
-            ng-if="ctrl.showDatastreams()"
-            model="ctrl.target.selectedDatastreamId"
-            allow-custom="true"
-            lookup-text="true"
-            get-options="ctrl.getDataStreams($query)"
-            on-change="ctrl.onDataStreamChange($query)">
-          </gf-form-dropdown>
-        </div>
+      <div class="gf-form">
+        <gf-form-dropdown
+          model="ctrl.target.selectedThingId"
+          ng-if="ctrl.showThings()"
+          allow-custom="true"
+          lookup-text="true"
+          get-options="ctrl.getThings($query)"
+          on-change="ctrl.onThingChange($query)">
+        </gf-form-dropdown>
+      </div>
 
-        <div class="gf-form">
-          <gf-form-dropdown
-            ng-if="ctrl.showLocations()"
-            model="ctrl.target.selectedLocationId"
-            allow-custom="true"
-            lookup-text="true"
-            get-options="ctrl.getLocations($query)"
-            on-change="ctrl.onLocationChange($query)">
-          </gf-form-dropdown>
-        </div>
+      <div class="gf-form">
+        <select class="gf-form-input"
+          ng-if="ctrl.showThingOptions()"
+          ng-model="ctrl.target.selectedThingOption"
+          ng-options="f as f for f in ctrl.queryThingOptions"
+          ng-change="ctrl.onThingOptionChange($query)">
+        </select>
+      </div>
 
-        <div class="gf-form" ng-click="ctrl.jsonQueryClick(ctrl.target.selectedDatastreamObservationType)">
-          <input ng-if="ctrl.showJsonQuery()" class="gf-form-input" rows="5" ng-model-options='{ debounce: 300 }' ng-model="ctrl.target.jsonQuery" spellcheck="false" ng-change="ctrl.onJsonQueryChange()" placeholder="JSONPath Expression" />
-        </div>
+      <div class="gf-form">
+        <gf-form-dropdown
+          ng-if="ctrl.showLocations()"
+          model="ctrl.target.selectedLocationId"
+          allow-custom="true"
+          lookup-text="true"
+          get-options="ctrl.getLocations($query)"
+          on-change="ctrl.onLocationChange($query)">
+        </gf-form-dropdown>
+      </div>
+
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
       </div>
     </div>
 
-    <div class="gf-form gf-form--grow">
-      <div class="gf-form-label gf-form-label--grow"></div>
+    <div class="gf-form-inline" ng-hide="!ctrl.showDatastreams()">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-7"> <span>DATASTREAM</span>&nbsp; </label>
+      </div>
+
+      <div class="gf-form">
+        <gf-form-dropdown
+          ng-if="ctrl.showDatastreams()"
+          model="ctrl.target.selectedDatastreamId"
+          allow-custom="true"
+          lookup-text="true"
+          get-options="ctrl.getDataStreams($query)"
+          on-change="ctrl.onDataStreamChange($query)">
+        </gf-form-dropdown>
+      </div>
+
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
+      </div>
+    </div>
+
+    <div class="gf-form-inline" ng-hide="!ctrl.showThingLimit()">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-7"> <span>LIMIT</span>&nbsp; </label>
+      </div>
+
+      <div class="gf-form" ng-if="ctrl.showThingLimit()">
+        <input class="gf-form-input" type="number" min="0"
+          ng-model="ctrl.target.selectedLimit"
+          placeholder="1"
+          allow-custom="true"
+          ng-blur="ctrl.onThingsLimitChange($query)" />
+      </div>
+
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
+      </div>
+    </div>
+
+    <div class="gf-form-inline" ng-hide="!ctrl.showJsonQuery()">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-7"> <span>JSONPath</span>&nbsp; </label>
+      </div>
+
+      <div class="gf-form" ng-click="ctrl.jsonQueryClick(ctrl.target.selectedDatastreamObservationType)">
+        <input ng-if="ctrl.showJsonQuery()" class="gf-form-input" rows="5" ng-model-options='{ debounce: 300 }' ng-model="ctrl.target.jsonQuery" spellcheck="false" ng-change="ctrl.onJsonQueryChange()" placeholder="JSONPath Expression" />
+      </div>
+
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
+      </div>
     </div>
   </div>
-  <!-- <div class="gf-form" ng-show="ctrl.lastQueryError">
-      <pre class="gf-form-pre alert alert-error">{{ctrl.lastQueryError}}</pre>
-  </div> -->
 </query-editor-row>

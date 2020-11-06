@@ -14,15 +14,15 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     this.target.panelType = this.scope.ctrl.panel.type;
 
-    this.queryTypes = ['Sensors', 'Things','Locations'];
+    this.queryTypes = ['Sensors', 'Things', 'Locations'];
     this.queryThingOptions = ['Datastreams', "Historical Locations", "Historical Locations with Coordinates"];
-
-    this.target.type = this.target.type || this.queryTypes[0]; // rename to selectedType?
-    this.target.selectedThingOption = this.target.selectedThingOption || this.queryThingOptions[0];
 
     if(typeof(this.target.selectedLimit) == "undefined") {
       this.target.selectedLimit = 1;
     }
+
+    // type init
+    this.target.type = this.target.type || this.queryTypes[0]; // rename to selectedType?
 
     // datastream init
     this.target.selectedDatastreamId = this.target.selectedDatastreamId || 0;
@@ -49,6 +49,9 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     this.target.selectedLocationDirty = this.target.selectedLocationDirty || false;
     this.allLocations = {};
 
+    // thing options init
+    this.target.selectedThingOption = this.target.selectedThingOption || this.queryThingOptions[0];
+
     this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
     this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
 
@@ -70,6 +73,75 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
     if (this.target.selectedLocationDirty) {
       this.alertSrv.set('Location Not Found', this.target.selectedLocationId + ' is not a valid location name', 'error', this.notificationShowTime);
     }
+  }
+
+  buildQueryString() {
+    let query = "";
+    let queryparams = {};
+    if(this.target.type === "Sensors") {
+      query += "/Sensors";
+      if(this.target.selectedSensorId !== 0) {
+        query += `(${this.target.selectedSensorId})`;
+        if(this.target.selectedDatastreamId !== 0) {
+          query = "/Datastreams"
+          query += `(${this.target.selectedDatastreamId})`;
+          query += "/Observations";
+          queryparams["$select"] = "phenomenonTime,result";
+          queryparams["$orderby"] = "phenomenonTime desc";
+          if(this.isOmObservationType(this.target.selectedDatastreamObservationType)) {
+            queryparams["$jsonPath"] = this.target.jsonQuery;
+          }
+        }
+      }
+    } else if(this.target.type === "Things") {
+      query += "/Things";
+      if(this.target.selectedThingId !== 0) {
+        query += `(${this.target.selectedThingId})`;
+        if(this.target.selectedThingOption === "Datastreams") {
+          query += "/Datastreams"
+          if(this.target.selectedDatastreamId !== 0) {
+            query = "/Datastreams"
+            query += `(${this.target.selectedDatastreamId})`;
+            query += "/Observations";
+            queryparams["$select"] = "phenomenonTime,result";
+            queryparams["$orderby"] = "phenomenonTime desc";
+            if(this.isOmObservationType(this.target.selectedDatastreamObservationType)) {
+              queryparams["$jsonPath"] = this.target.jsonQuery;
+            }
+          }
+        } else if(this.target.selectedThingOption === "Historical Locations") {
+          query += "/HistoricalLocations";
+          queryparams["$expand"] = "Locations($select=name)";
+          queryparams["$select"] = "time";
+          queryparams["$top"] = this.target.selectedLimit;
+        } else if(this.target.selectedThingOption === "Historical Locations with Coordinates") {
+          query += "/HistoricalLocations";
+          queryparams["$expand"] = "Locations($select=name,Location)";
+          queryparams["$select"] = "time";
+          queryparams["$top"] = this.target.selectedLimit;
+          if(this.target.selectedDatastreamId !== 0) {
+            queryparams["$combine"] = encodeURIComponent("/Datastreams" + `(${this.target.selectedDatastreamId})` + "/Observations" + "?" + "$select=result,phenomenonTime" + "&" + `$top=${this.target.selectedLimit}`);
+            if(this.isOmObservationType(this.target.selectedDatastreamObservationType)) {
+              queryparams["$jsonPath"] = this.target.jsonQuery;
+            }
+          }
+        }
+      }
+    } else if(this.target.type === "Locations") {
+      query += "/Locations";
+      if(this.target.selectedLocationId !== 0) {
+        query += `(${this.target.selectedLocationId})`;
+        query += "/HistoricalLocations"
+        queryparams["$expand"] = "Things($select=name)";
+        queryparams["$select"] = "time";
+      }
+    }
+    queryparams['$filter'] = "$timeFilter";
+    let queryparam = [];
+    for(var index in queryparams) {
+      queryparam.push(`${index}=${queryparams[index]}`);
+    }
+    return query + "?" + queryparam.join('&');
   }
 
   onDataReceived(dataList) {
@@ -99,6 +171,11 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   }
 
   toggleEditorMode() {
+    try {
+      this.target.query = this.buildQueryString();
+    } catch (err) {
+      console.error('query render error');
+    }
     this.target.rawQuery = !this.target.rawQuery;
   }
 
@@ -152,7 +229,8 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   //#region datastream starts
   showDatastreams(){
     return (this.target.type === 'Sensors' && this.target.selectedSensorId !== 0) ||
-      (this.target.type === 'Things' && this.target.selectedThingId !== 0 && this.target.selectedThingOption === 'Datastreams');
+      (this.target.type === 'Things' && this.target.selectedThingId !== 0 && 
+        (this.target.selectedThingOption === 'Datastreams' || this.target.selectedThingOption === 'Historical Locations with Coordinates'));
   }
 
   // TODO: show errors below each query editor
@@ -211,8 +289,9 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   showJsonQuery() {
     return (this.target.selectedDatastreamId !== 0) &&
       (this.target.type === 'Sensors' || 
-      this.target.type === 'Things' && this.target.selectedThingOption === 'Datastreams') &&
-      this.isOmObservationType(this.target.selectedDatastreamObservationType);
+      this.target.type === 'Things' && 
+      (this.target.selectedThingOption === 'Datastreams' || this.target.selectedThingOption === 'Historical Locations with Coordinates')) && 
+      this.isOmObservationType(this.target.selectedDatastreamObservationType)
   }
 
   isOmObservationType(type) {
