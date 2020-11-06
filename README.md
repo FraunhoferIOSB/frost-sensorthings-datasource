@@ -106,7 +106,9 @@ Using the [Grafana Worldmap Panel](https://grafana.com/grafana/plugins/grafana-w
 4. In "Query" tab:
     * Select the LinkSmart SensorThings Datasource.
     * Select `Things` and pick a Thing from from the dropdown list.
-    * Select `Last Location Coordinates`
+    * Select `Historical Locations with Coordinates`
+    * Select a Datastream if you want to query the latest observation (per Historical Location) and use that value as metric field. This metric value will determine the size and color of each circle and can be viewed by hovering on the circle.
+    * Select a Limit value to set how many locations should be retrieved from the history.
 
 ![](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/worldmap_config.jpg)
 
