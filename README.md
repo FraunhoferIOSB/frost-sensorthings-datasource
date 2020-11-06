@@ -83,7 +83,7 @@ git clone https://github.com/linksmart/grafana-sensorthings-datasource.git links
 ```
 If using [Grafana Docker Image](https://hub.docker.com/r/grafana/grafana/), set container environment variable instead:
 ```
-GF_INSTALL_PLUGINS=https://github.com/linksmart/grafana-sensorthings-datasource/archive/master.zip;linksmart-sensorthings-datasource
+GF_INSTALL_PLUGINS="https://github.com/linksmart/grafana-sensorthings-datasource/archive/master.zip;linksmart-sensorthings-datasource"
 ```
 
 Restart Grafana server.
