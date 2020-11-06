@@ -23,13 +23,14 @@ A live dashboard showing SensorThings data in Grafana panels: [SensorThings Dash
 ## Query Configuration
 There are several ways to query Observations and Locations. The Observations are sorted descendingly by phenomenonTime. 
 
-![Query Options](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/query_options.jpg)
-
 The queries options are:
-* (A) Things->Datastreams->Observations
-* (B) Things->Historical Locations
-* (C) Things->Historical Locations with Coordinates and optional Datastreams->Observations
-* (D) Sensors->Datastreams->Observations
+* (A) Get Observations by Thing/Datastream
+* (B) Get Historical Locations by Things
+* (C) Get Historical Locations, coordinates, and Observations by Thing
+* (D) Get Observations by Sensor
+* (E) Get Things by Location
+
+![Query Options](https://raw.githubusercontent.com/linksmart/grafana-sensorthings-datasource/master/img/query_options.jpg)
 
 If the Datastream has [OM_Observation](http://docs.opengeospatial.org/is/15-078r6/15-078r6.html#table_12) for observationType, the particular values can be selected from the result object inside each Observation. The selection can be done using [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2) expressions. Few examples are available [here](https://github.com/linksmart/grafana-sensorthings-datasource/blob/master/JSONPath.md).
 
