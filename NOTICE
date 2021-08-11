@@ -1,11 +1,13 @@
 Grafana SensorThings Datasource
-Copyright 2018 Fraunhofer Institute for Applied Information Technology FIT
+Copyright 2018 Fraunhofer-Gesellschaft
 
 This product includes software developed at
-Fraunhofer Institute for Applied Information Technology FIT (http://fit.fraunhofer.de/).
+Fraunhofer Institute of Optronics, System Technologies and Image Exploitation (https://www.iosb.fraunhofer.de),
+a division of Fraunhofer Gesellschaft e. V.
 
-This software is a fork of the simple-json-datasource (https://github.com/grafana/simple-json-datasource)
-developed by Grafana under MIT License.
+This software is a fork of the linksmart-sensorthings-datasource (https://github.com/linksmart/grafana-sensorthings-datasource)
+developed by the Fraunhofer Institute for Applied Information Technology (https://fit.fraunhofer.de),
+a division of Fraunhofer Gesellschaft e. V.
 
 Grafana SensorThings Datasource includes the following dependencies 
 developed by the corresponding developers and organisations:
