@@ -1,0 +1,47 @@
+{
+  "$schema": "https://github.com/grafana/grafana/raw/main/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "FROST SensorThings API Plugin",
+  "id": "frost-sensorthings-datasource",
+  "metrics": true,
+  "logs": true,
+  "annotations": true,
+  "info": {
+    "description": "A data source plugin for loading data from OGC SensorThings APIs into Grafana.",
+    "keywords": [
+      "SensorThings API",
+      "FROST",
+      "grafana",
+      "OGC"
+    ],
+    "author": {
+      "name": "Fraunhofer IOSB",
+      "email": "frost@iosb.fraunhofer.de",
+      "url": "https://www.iosb.fraunhofer.de/ILT"
+    },
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "Documentation",
+        "url": "https://github.com/FraunhoferIOSB/grafana-frost-sensorthings-datasource"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/FraunhoferIOSB/grafana-frost-sensorthings-datasource/blob/main/LICENSE"
+      }
+    ],
+    "screenshots": [
+      { "name": "Displaying NO2 values in Karlsruhe.", "path": "img/screenshot-no2-karlsruhe.png" }
+    ],
+    "version": "0.0.1",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=7.3.0",
+    "grafanaVersion": "7.3.0",
+    "plugins": []
+  }
+}
