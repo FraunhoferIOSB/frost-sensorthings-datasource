@@ -33,19 +33,19 @@
   },
   "devDependencies": {
     "@emotion/core": "10.0.27",
-    "@grafana/data": "8.0.7",
+    "@grafana/data": "^8.4.5",
     "@grafana/runtime": "8.4.5",
-    "@grafana/toolkit": "8.0.7",
+    "@grafana/toolkit": "^8.4.5",
     "@grafana/ui": "8.4.5",
     "@testing-library/jest-dom": "5.4.0",
     "@testing-library/react": "^10.0.2",
     "@types/lodash": "^4.14.168",
     "@types/memory-cache": "^0.2.2",
     "@types/react-virtualized-auto-sizer": "^1.0.0",
-    "emotion": "^11.0.0",
+    "emotion": "10.0.27",
     "react-virtualized-auto-sizer": "^1.0.4"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   }
 }

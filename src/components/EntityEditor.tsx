@@ -1,8 +1,8 @@
-import {} from '@emotion/core';
 import { TimeRange } from '@grafana/data';
 import { Select } from '@grafana/ui';
 //import { getPropertiesForVariant } from '@grafana/ui/components/Button';
-import React, { useState, useEffect } from 'react';
+//import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { JsonDataSource } from 'datasource';
 //import { lastIndexOf } from 'lodash';
 import { cloneDeep } from 'lodash';
@@ -18,9 +18,10 @@ interface Props {
 }
 
 export const EntityEditor = ({ entity, specifics, onEntityChange, onSpecificsChange, datasource }: Props) => {
-  const [data, setData] = useState<any[]>([[{ name: 'noData', url: 'noURL' }]]);
+  //const [data, setData] = useState<any[]>([[{ name: 'noData', url: 'noURL' }]]);
+  const [data] = useState<any[]>([[{ name: 'noData', url: 'noURL' }]]);
   const [selections, updateSelection] = useState<String[]>(['noData']);
-  const fetchData = async (path: string, override: boolean) => {
+  /*const fetchData = async (path: string, override: boolean) => {
     try {
       //setData(await datasource.sensorThingsQuery("/"));
       if (override) {
@@ -41,7 +42,7 @@ export const EntityEditor = ({ entity, specifics, onEntityChange, onSpecificsCha
       console.log('failed getting data from OGC Server', error);
     }
   };
-  useEffect(() => {
+  /*useEffect(() => {
     //Fetch Data on first Render
     fetchData('/', true);
     //console.log('Fetched data' + JSON.stringify(data));
@@ -62,7 +63,7 @@ export const EntityEditor = ({ entity, specifics, onEntityChange, onSpecificsCha
   /* const updateFieldChanged = async (index: number, queryString: string, datasource: JsonDataSource) => {
     //console.log('index:' + index);
     let newArray = cloneDeep(data); //copying old data
-    newArray[0] = 
+    newArray[0] =
     console.log(newArray);
     setData(await Promise.all(newArray));
     console.log(await Promise.all(data));
