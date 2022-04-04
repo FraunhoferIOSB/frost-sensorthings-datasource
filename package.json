@@ -39,7 +39,7 @@
     "@grafana/ui": "8.4.5",
     "@testing-library/jest-dom": "5.4.0",
     "@testing-library/react": "^10.0.2",
-    "@types/lodash": "^4.14.168",
+    "@types/lodash": "^4.14.181",
     "@types/memory-cache": "^0.2.2",
     "@types/react-virtualized-auto-sizer": "^1.0.0",
     "emotion": "10.0.27",
