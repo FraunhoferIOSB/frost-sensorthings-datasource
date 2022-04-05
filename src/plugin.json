@@ -2,7 +2,7 @@
   "$schema": "https://github.com/grafana/grafana/raw/main/docs/sources/developers/plugins/plugin.schema.json",
   "type": "datasource",
   "name": "FROST SensorThings API Plugin",
-  "id": "frost-sensorthings-datasource",
+  "id": "iosb-sensorthings-datasource",
   "metrics": true,
   "logs": true,
   "annotations": true,
