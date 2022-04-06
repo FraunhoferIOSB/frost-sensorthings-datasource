@@ -7,7 +7,7 @@
 
 A data source plugin for loading OGC SensorThings API data into [Grafana](https://grafana.com).
 
-![NO2 Values in Karlsruhe](https://raw.githubusercontent.com/FraunhoferIOSB/frost-sensorthings-datasource/master/src/img/sensorthings-demo.png)
+![NO2 Values in Karlsruhe](https://raw.githubusercontent.com/FraunhoferIOSB/frost-sensorthings-datasource/master/src/img/sensorthings-demo.gif)
 
 ## Using the Plugin
 1. Click the _Gear_ icon in Grafana to enter the configuration menu, select Plugins, and add _FROST SensorThings Plugin_
