@@ -2,11 +2,11 @@
 
 1. Make sure you have a working Docker setup.
 2. (Optional) Start a local FROST Server, e.g. using Docker
-3. start Grafana with Docker:
+3. start Grafana with Docker (on Windows you may need to replace `$pwd` with the actual path using the right syntax, like `'c:\Grafana\plugings'` or `c:\\Grafana\\plugings`):
 ```bash
 docker run -d --rm \
     -v $(pwd):/var/lib/grafana/plugins \
-    -e GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=frost-sensorthings-datasource \
+    -e GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=iosb-sensorthings-datasource \
     -p 3000:3000 \
     --name grafana-sensorthings \
     grafana/grafana:latest
