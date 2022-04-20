@@ -911,6 +911,11 @@
   resolved "https://registry.yarnpkg.com/@braintree/sanitize-url/-/sanitize-url-5.0.2.tgz#b23080fa35520e993a8a37a0f5bca26aa4650a48"
   integrity sha512-NBEJlHWrhQucLhZGHtSxM2loSaNUMajC7KOYJLyfcdW/6goVoff2HoYI3bz8YCDN0wKGbxtUL0gx2dvHpvnWlw==
 
+"@braintree/sanitize-url@6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@braintree/sanitize-url/-/sanitize-url-6.0.0.tgz#fe364f025ba74f6de6c837a84ef44bdb1d61e68f"
+  integrity sha512-mgmE7XBYY/21erpzhexk4Cj1cyTQ9LzvnTxtzM17BJ7ERMNE6W72mQRo0I1Ud8eFJ+RVVIcBNhLFZ3GX4XFz5w==
+
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.4.tgz#f864ae85004d0fcab6f50be9141c4da368d1656a"
@@ -1132,7 +1137,7 @@
   resolved "https://registry.yarnpkg.com/@grafana/aws-sdk/-/aws-sdk-0.0.31.tgz#ddc7f5e3f2f35e4ad5c43fdf3e8efe64c5a5303a"
   integrity sha512-AUgw19cAnwkg2QTwghlMk7cmLkjph4oQtH5S57hjX6XywlbUF3SXCoMwTXlqfM6oeBPVelCJ4zM9imtmBQFAVQ==
 
-"@grafana/data@8.4.6", "@grafana/data@^8.4.6":
+"@grafana/data@8.4.6":
   version "8.4.6"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-8.4.6.tgz#af2ce7c202a654d0fb8eb80a09dfbb39de9c168b"
   integrity sha512-BCOBhhxLpdQIYHHTdXy/YSqE08/lxxRNTwke5cQ9D5a+TlStXqWB/dT4Umt2n7TDkB01QP9+/t2DQGwoH1iKzw==
@@ -1157,10 +1162,44 @@
     uplot "1.6.19"
     xss "1.0.10"
 
+"@grafana/data@8.4.7", "@grafana/data@^8.4.6":
+  version "8.4.7"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-8.4.7.tgz#50ec81d8ce93ecff04b13fbc4f358f28b302cb97"
+  integrity sha512-NS2sLY7J5GruE2UOQX+BX5r4YnrtGP/9fpWnUBWZeZ0fPDH5TNwVaunu/EbP5wqEyPJFL+qn1fZutZR2hhaN2Q==
+  dependencies:
+    "@braintree/sanitize-url" "6.0.0"
+    "@grafana/schema" "8.4.7"
+    "@types/d3-interpolate" "^1.4.0"
+    d3-interpolate "1.4.0"
+    date-fns "2.28.0"
+    eventemitter3 "4.0.7"
+    lodash "4.17.21"
+    marked "4.0.10"
+    moment "2.29.2"
+    moment-timezone "0.5.34"
+    ol "6.12.0"
+    papaparse "5.3.1"
+    react "17.0.2"
+    react-dom "17.0.2"
+    regenerator-runtime "0.13.9"
+    rxjs "7.5.1"
+    tslib "2.3.1"
+    uplot "1.6.19"
+    xss "1.0.10"
+
 "@grafana/e2e-selectors@8.4.6":
   version "8.4.6"
   resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-8.4.6.tgz#4794d61ac736663b20119c04484e63458ce10b5d"
   integrity sha512-EIxeQ09+4v+l++vjiSbMTIR3tX+N4fs/jj6TYzpfEdvOdVyzZRmKQP2zgaiV8JvQ45ILEPXkUpYw61CjEnI3Zw==
+  dependencies:
+    "@grafana/tsconfig" "^1.0.0-rc1"
+    tslib "2.3.1"
+    typescript "4.4.4"
+
+"@grafana/e2e-selectors@8.4.7":
+  version "8.4.7"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-8.4.7.tgz#4f62386090c1cc6b1c8d5a5e4953d774cec9fdd2"
+  integrity sha512-UTazbKgOS0cxTCFstk51zc3TguM3J6lJrXpL62qs4x59y8hzB4tcz3EnxP/yx9tFPA60TteLGlevksG7XH0PtA==
   dependencies:
     "@grafana/tsconfig" "^1.0.0-rc1"
     tslib "2.3.1"
@@ -1203,6 +1242,13 @@
   version "8.4.6"
   resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-8.4.6.tgz#a80371e10ddad4410d67c453674cb52cb26beb03"
   integrity sha512-slFMwC9140Fo24tWqQi6k8ngzGUNPaY8lMxS42XTLMDF6H3nxNCSREZKjJ0HAqMDx3TvHIXL7BMkLBMmrF+jGg==
+  dependencies:
+    tslib "2.3.1"
+
+"@grafana/schema@8.4.7":
+  version "8.4.7"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-8.4.7.tgz#ec2f937959c893cf7a2626b4ce5d4deaa3cfbc87"
+  integrity sha512-Ba01SX8hmOXLg8hYAWL8KKnFB8L/ToyDL6e1lit6PB6EuPEklqW6yhAUrA74zu9CZ4+nwR5HGh90OLdMi24lhw==
   dependencies:
     tslib "2.3.1"
 
@@ -1316,7 +1362,7 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.0.0-rc1.tgz#d07ea16755a50cae21000113f30546b61647a200"
   integrity sha512-nucKPGyzlSKYSiJk5RA8GzMdVWhdYNdF+Hh65AXxjD9PlY69JKr5wANj8bVdQboag6dgg0BFKqgKPyY+YtV4Iw==
 
-"@grafana/ui@8.4.6", "@grafana/ui@^8.4.6":
+"@grafana/ui@8.4.6":
   version "8.4.6"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-8.4.6.tgz#cac2c72939058a850e076cb0f14413e04bb9c0f5"
   integrity sha512-ncjK+LPiXuyRskOOWoT9k5VPmjCTco3S93pb50IbMwQP1oa2cBM+APSiIXa5o9svpGH9rnyloBaFrN+4CFeRxg==
@@ -1350,6 +1396,73 @@
     lodash "4.17.21"
     memoize-one "6.0.0"
     moment "2.29.1"
+    monaco-editor "^0.31.1"
+    ol "6.12.0"
+    prismjs "1.26.0"
+    rc-cascader "3.2.1"
+    rc-drawer "4.4.3"
+    rc-slider "9.7.5"
+    rc-time-picker "^3.7.3"
+    react "17.0.2"
+    react-beautiful-dnd "13.1.0"
+    react-calendar "3.6.0"
+    react-colorful "5.5.1"
+    react-custom-scrollbars-2 "4.4.0"
+    react-dom "17.0.2"
+    react-dropzone "11.5.1"
+    react-highlight-words "0.17.0"
+    react-hook-form "7.5.3"
+    react-inlinesvg "2.3.0"
+    react-popper "2.2.5"
+    react-router-dom "^5.2.0"
+    react-select "5.2.1"
+    react-select-event "^5.1.0"
+    react-table "7.7.0"
+    react-transition-group "4.4.2"
+    react-use "17.3.2"
+    react-window "1.8.6"
+    rxjs "7.5.1"
+    slate "0.47.8"
+    slate-plain-serializer "0.7.10"
+    tinycolor2 "1.4.2"
+    tslib "2.3.1"
+    uplot "1.6.19"
+    uuid "8.3.2"
+
+"@grafana/ui@^8.4.7":
+  version "8.4.7"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-8.4.7.tgz#42619052c32cbf453802ad6d2bd466cbb8627e85"
+  integrity sha512-AlcCj6fyQ7GS3CPsd8gwj1ABOvTDw1mpR/lag7sUd6YO8/3KkEkSYq4g7xiX6PdrlSzFAnttc/yKHS/Mu7BT1w==
+  dependencies:
+    "@emotion/css" "11.7.1"
+    "@emotion/react" "11.7.1"
+    "@grafana/aws-sdk" "0.0.31"
+    "@grafana/data" "8.4.7"
+    "@grafana/e2e-selectors" "8.4.7"
+    "@grafana/schema" "8.4.7"
+    "@grafana/slate-react" "0.22.10-grafana"
+    "@monaco-editor/react" "4.3.1"
+    "@popperjs/core" "2.11.2"
+    "@react-aria/button" "3.3.4"
+    "@react-aria/dialog" "3.1.4"
+    "@react-aria/focus" "3.5.0"
+    "@react-aria/menu" "3.3.0"
+    "@react-aria/overlays" "3.7.3"
+    "@react-stately/menu" "3.2.3"
+    "@sentry/browser" "6.17.2"
+    ansicolor "1.1.95"
+    calculate-size "1.1.1"
+    classnames "2.3.1"
+    core-js "3.20.2"
+    d3 "5.15.0"
+    date-fns "2.28.0"
+    hoist-non-react-statics "3.3.2"
+    immutable "4.0.0"
+    is-hotkey "0.2.0"
+    jquery "3.6.0"
+    lodash "4.17.21"
+    memoize-one "6.0.0"
+    moment "2.29.2"
     monaco-editor "^0.31.1"
     ol "6.12.0"
     prismjs "1.26.0"
@@ -8593,10 +8706,15 @@ moment-timezone@0.5.34:
   dependencies:
     moment ">= 2.9.0"
 
-moment@2.29.1, moment@2.x, "moment@>= 2.9.0":
+moment@2.29.1:
   version "2.29.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
   integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
+
+moment@2.29.2, moment@2.x, "moment@>= 2.9.0":
+  version "2.29.2"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.2.tgz#00910c60b20843bcba52d37d58c628b47b1f20e4"
+  integrity sha512-UgzG4rvxYpN15jgCmVJwac49h9ly9NurikMWGPdVxm8GZD6XjkKPxDTjQQ43gtGgnV3X0cAyWDdP2Wexoquifg==
 
 monaco-editor@^0.31.1:
   version "0.31.1"
