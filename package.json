@@ -34,7 +34,7 @@
   "devDependencies": {
     "@emotion/core": "11.0.0",
     "@grafana/data": "^8.5.1",
-    "@grafana/runtime": "^8.5.1",
+    "@grafana/runtime": "^8.5.2",
     "@grafana/toolkit": "^8.5.1",
     "@grafana/ui": "^8.4.6",
     "@testing-library/jest-dom": "5.16.4",
