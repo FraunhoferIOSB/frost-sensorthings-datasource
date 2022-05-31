@@ -1,6 +1,6 @@
 {
   "name": "frost-sensorthings-datasource",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A data source plugin for loading data from OGC SensorThings APIs into Grafana.",
   "keywords": [
     "SensorThings API",

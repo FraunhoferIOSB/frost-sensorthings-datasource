@@ -36,7 +36,7 @@
     "screenshots": [
       { "name": "Displaying NO2 values in Karlsruhe.", "path": "img/screenshot-no2-karlsruhe.png" }
     ],
-    "version": "0.0.2",
+    "version": "0.0.3",
     "updated": "%TODAY%"
   },
   "dependencies": {
