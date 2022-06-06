@@ -25,7 +25,7 @@
     "url": "https://www.iosb.fraunhofer.de/ILT"
   },
   "dependencies": {
-    "dayjs": "^1.11.2",
+    "dayjs": "^1.11.3",
     "jsonata": "^1.8.6",
     "jsonpath-plus": "^6.0.1",
     "memory-cache": "^0.2.0",
