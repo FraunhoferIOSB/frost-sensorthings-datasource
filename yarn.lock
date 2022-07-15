@@ -1621,7 +1621,7 @@
   resolved "https://registry.yarnpkg.com/@grafana/aws-sdk/-/aws-sdk-0.0.36.tgz#60fa54e98c29c2f94db844966824aec4f8a77549"
   integrity sha512-Vtj8WXKI52R4wLfbDASbHWTfgnG7XG1cgKsibAl5hT1BWKqs5chW3zRzpjo4xOqaBDCsweMwLlF/wWzlg1vrFQ==
 
-"@grafana/data@9.0.2", "@grafana/data@^9.0.2":
+"@grafana/data@9.0.2":
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.0.2.tgz#53f2a8578615083bf1d2d0eafb9d3f0a090d8262"
   integrity sha512-/LT4S7q63t9Owhm0Ytpo5fdH82zP/ExUB8T2LTaIVaumRon35Zd3afuEACJay58xaEQ5TMCnSvFWSs+5Ge1SJw==
@@ -1646,10 +1646,44 @@
     uplot "1.6.21"
     xss "1.0.11"
 
+"@grafana/data@9.0.3", "@grafana/data@^9.0.2":
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.0.3.tgz#e706878cbb884bbed15093c73efadd38b7fe21b6"
+  integrity sha512-xaOJ8GeKA7o/HUMl6RngsZgMJyFwg/HNcAEybBLH6nkXxo7zYO6MzF3VAPuWerusUR+iFRoMmGGg7Qpmp9/0sg==
+  dependencies:
+    "@braintree/sanitize-url" "6.0.0"
+    "@grafana/schema" "9.0.3"
+    "@types/d3-interpolate" "^1.4.0"
+    d3-interpolate "1.4.0"
+    date-fns "2.28.0"
+    eventemitter3 "4.0.7"
+    lodash "4.17.21"
+    marked "4.0.16"
+    moment "2.29.3"
+    moment-timezone "0.5.34"
+    ol "6.14.1"
+    papaparse "5.3.2"
+    react "17.0.2"
+    react-dom "17.0.2"
+    regenerator-runtime "0.13.9"
+    rxjs "7.5.5"
+    tslib "2.4.0"
+    uplot "1.6.22"
+    xss "1.0.11"
+
 "@grafana/e2e-selectors@9.0.2":
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.0.2.tgz#14d43b4314a52e1d8083bbeacd8fb99e6cd8fb0f"
   integrity sha512-3Q4fVk16hsSYy5Dcw8dACbJBdRfmH8sPOkKxePDbmCOnixLKtEj5JTxASFSYppeJz/zIFWb92UMFR6je7DMd2A==
+  dependencies:
+    "@grafana/tsconfig" "^1.2.0-rc1"
+    tslib "2.4.0"
+    typescript "4.6.4"
+
+"@grafana/e2e-selectors@9.0.3":
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.0.3.tgz#dd923f6104852a2fa27c15bde87dc37777f431c7"
+  integrity sha512-PBGgrIoS5WCBiUrGSSyOq3uBf4WXX8bMSNX0qYZdAtkn73DLSH/zgrcfO8VkQgelwYzaPaUEs3yes4/eh73XAQ==
   dependencies:
     "@grafana/tsconfig" "^1.2.0-rc1"
     tslib "2.4.0"
@@ -1690,6 +1724,13 @@
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.0.2.tgz#658fe561e76a8fa9f2041fd6ff1a4365a1e4109e"
   integrity sha512-kGkcth6E9VCLOqEUDnjunh30KIcC2MYto1NX4DDyNZz2uZX/EqgmtCt1Uhvo2+LhjzLHwitqov4dYuAP0nNKcw==
+  dependencies:
+    tslib "2.4.0"
+
+"@grafana/schema@9.0.3":
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.0.3.tgz#48e4806cce814b18b633709fb84c7b13a6f4a09a"
+  integrity sha512-FOY+4L+7tsxrdWPR3YOUTcJQje3no7JM5n6TBJAeSswYQ2p2eOKZojoR33N6+N+2433DgxMRIdjh9P6oMUjuSg==
   dependencies:
     tslib "2.4.0"
 
@@ -1813,7 +1854,7 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.2.0-rc1.tgz#10973c978ec95b0ea637511254b5f478bce04de7"
   integrity sha512-+SgQeBQ1pT6D/E3/dEdADqTrlgdIGuexUZ8EU+8KxQFKUeFeU7/3z/ayI2q/wpJ/Kr6WxBBNlrST6aOKia19Ag==
 
-"@grafana/ui@9.0.2", "@grafana/ui@^9.0.2":
+"@grafana/ui@9.0.2":
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.0.2.tgz#ec06eea0f5d82e7e5f58cd3f882d522f2facf2bd"
   integrity sha512-c7/NqUnYwZjU+k1vGUiA1+elOoJK3DTV9Z9FwanvrOXhAGz3M7x6gohAcOXbKb3BYvSi3jACE1Tqmc+9L1q1ag==
@@ -1879,6 +1920,74 @@
     tinycolor2 "1.4.2"
     tslib "2.4.0"
     uplot "1.6.21"
+    uuid "8.3.2"
+
+"@grafana/ui@^9.0.3":
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.0.3.tgz#ca75f2de2c33738ddc7f5603187c582c58371505"
+  integrity sha512-yDHvp3gCyvPBudHOqRf0CtCd7r3Fmi+76f2qgUPxD5BZcndYwo0xIEafklLm+inwcT/bETaZJgQDlGbT5URfdw==
+  dependencies:
+    "@emotion/css" "11.9.0"
+    "@emotion/react" "11.9.0"
+    "@grafana/aws-sdk" "0.0.36"
+    "@grafana/data" "9.0.3"
+    "@grafana/e2e-selectors" "9.0.3"
+    "@grafana/schema" "9.0.3"
+    "@grafana/slate-react" "0.22.10-grafana"
+    "@monaco-editor/react" "4.3.1"
+    "@popperjs/core" "2.11.5"
+    "@react-aria/button" "3.4.4"
+    "@react-aria/dialog" "3.1.9"
+    "@react-aria/focus" "3.5.5"
+    "@react-aria/menu" "3.4.4"
+    "@react-aria/overlays" "3.8.2"
+    "@react-stately/menu" "3.2.7"
+    "@sentry/browser" "6.19.7"
+    ansicolor "1.1.100"
+    calculate-size "1.1.1"
+    classnames "2.3.1"
+    core-js "3.22.5"
+    d3 "5.15.0"
+    date-fns "2.28.0"
+    hoist-non-react-statics "3.3.2"
+    immutable "4.0.0"
+    is-hotkey "0.2.0"
+    jquery "3.6.0"
+    lodash "4.17.21"
+    memoize-one "6.0.0"
+    moment "2.29.3"
+    monaco-editor "^0.31.1"
+    ol "6.14.1"
+    prismjs "1.28.0"
+    rc-cascader "3.5.0"
+    rc-drawer "4.4.3"
+    rc-slider "9.7.5"
+    rc-time-picker "^3.7.3"
+    react "17.0.2"
+    react-beautiful-dnd "13.1.0"
+    react-calendar "3.7.0"
+    react-colorful "5.5.1"
+    react-custom-scrollbars-2 "4.4.0"
+    react-dom "17.0.2"
+    react-dropzone "12.0.4"
+    react-highlight-words "0.18.0"
+    react-hook-form "7.5.3"
+    react-inlinesvg "2.3.0"
+    react-popper "2.3.0"
+    react-popper-tooltip "^4.3.1"
+    react-router-dom "^5.2.0"
+    react-select "5.3.2"
+    react-select-event "^5.1.0"
+    react-table "7.8.0"
+    react-transition-group "4.4.2"
+    react-use "17.3.2"
+    react-window "1.8.7"
+    rxjs "7.5.5"
+    slate "0.47.8"
+    slate-plain-serializer "0.7.10"
+    tinycolor2 "1.4.2"
+    tslib "2.4.0"
+    uplot "1.6.22"
     uuid "8.3.2"
 
 "@humanwhocodes/config-array@^0.9.2":
@@ -7285,15 +7394,10 @@ moment-timezone@0.5.34:
   dependencies:
     moment ">= 2.9.0"
 
-moment@2.29.3:
+moment@2.29.3, moment@2.x, "moment@>= 2.9.0":
   version "2.29.3"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.3.tgz#edd47411c322413999f7a5940d526de183c031f3"
   integrity sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==
-
-moment@2.x, "moment@>= 2.9.0":
-  version "2.29.2"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.2.tgz#00910c60b20843bcba52d37d58c628b47b1f20e4"
-  integrity sha512-UgzG4rvxYpN15jgCmVJwac49h9ly9NurikMWGPdVxm8GZD6XjkKPxDTjQQ43gtGgnV3X0cAyWDdP2Wexoquifg==
 
 monaco-editor@^0.31.1:
   version "0.31.1"
@@ -8785,18 +8889,10 @@ react-popper-tooltip@^4.3.1:
     "@popperjs/core" "^2.10.2"
     react-popper "^2.2.5"
 
-react-popper@2.3.0:
+react-popper@2.3.0, react-popper@^2.2.5:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-2.3.0.tgz#17891c620e1320dce318bad9fede46a5f71c70ba"
   integrity sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==
-  dependencies:
-    react-fast-compare "^3.0.1"
-    warning "^4.0.2"
-
-react-popper@^2.2.5:
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-2.2.5.tgz#1214ef3cec86330a171671a4fbcbeeb65ee58e96"
-  integrity sha512-kxGkS80eQGtLl18+uig1UIf9MKixFSyPxglsgLBxlYnyDf65BiY9B3nZSc6C9XUNDgStROB0fMQlTEz1KxGddw==
   dependencies:
     react-fast-compare "^3.0.1"
     warning "^4.0.2"
@@ -10069,6 +10165,11 @@ uplot@1.6.21:
   version "1.6.21"
   resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.21.tgz#39030f64dccf3c777ce2cc04742d46111ceec7f8"
   integrity sha512-Xd7m2GSHyzhz+mP9CzYTalzp9WDlHzTorNY1yDvg6E+wiCwMIIY+MLfNveObyp3qVMH4kP8mOhRX4k4S9YLHRQ==
+
+uplot@1.6.22:
+  version "1.6.22"
+  resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.22.tgz#28a136c7c5fce92ce5e25f38f19314a029bec390"
+  integrity sha512-2jtSb/YHUgtmIUn0+QJjf7ggcJicb5PKe7ijBiRDTPsG/f8F/MFayZ+g6/0kATNkDyF/qQsHJDmCp6cxncg1EQ==
 
 uri-js@^4.2.2:
   version "4.4.1"
