@@ -1551,31 +1551,6 @@
   resolved "https://registry.yarnpkg.com/@grafana/aws-sdk/-/aws-sdk-0.0.36.tgz#60fa54e98c29c2f94db844966824aec4f8a77549"
   integrity sha512-Vtj8WXKI52R4wLfbDASbHWTfgnG7XG1cgKsibAl5hT1BWKqs5chW3zRzpjo4xOqaBDCsweMwLlF/wWzlg1vrFQ==
 
-"@grafana/data@9.0.6":
-  version "9.0.6"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.0.6.tgz#a734a4e1ea29db12111b5956bd9b6321df631b5e"
-  integrity sha512-ry8DIf8+oT/kG4NuWs/mRx/L96BDHEWnN/5x9zvTUJpXhPvDqARP57aTybW9/EF5YmJUBjV8LJvAhnL2lA0Uhw==
-  dependencies:
-    "@braintree/sanitize-url" "6.0.0"
-    "@grafana/schema" "9.0.6"
-    "@types/d3-interpolate" "^1.4.0"
-    d3-interpolate "1.4.0"
-    date-fns "2.28.0"
-    eventemitter3 "4.0.7"
-    lodash "4.17.21"
-    marked "4.0.16"
-    moment "2.29.4"
-    moment-timezone "0.5.34"
-    ol "6.14.1"
-    papaparse "5.3.2"
-    react "17.0.2"
-    react-dom "17.0.2"
-    regenerator-runtime "0.13.9"
-    rxjs "7.5.5"
-    tslib "2.4.0"
-    uplot "1.6.22"
-    xss "1.0.11"
-
 "@grafana/data@9.0.7", "@grafana/data@^9.0.7":
   version "9.0.7"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.0.7.tgz#bc08918d0d9dc508445f807cea1b628f537393c1"
@@ -1600,15 +1575,6 @@
     tslib "2.4.0"
     uplot "1.6.22"
     xss "1.0.11"
-
-"@grafana/e2e-selectors@9.0.6":
-  version "9.0.6"
-  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.0.6.tgz#e06f17e80a6c23f98c70737da8924d72a6a2898c"
-  integrity sha512-8letZlrcVyLvACmG65eXExyb9odB2Md9gcSJ7I5t5QCvwv1pkkMHyloMqagikcfNB4U2VDwduOuCJOcT19AfuQ==
-  dependencies:
-    "@grafana/tsconfig" "^1.2.0-rc1"
-    tslib "2.4.0"
-    typescript "4.6.4"
 
 "@grafana/e2e-selectors@9.0.7":
   version "9.0.7"
@@ -1650,13 +1616,6 @@
     systemjs "0.20.19"
     tslib "2.4.0"
 
-"@grafana/schema@9.0.6":
-  version "9.0.6"
-  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.0.6.tgz#01b0d9f1ebd5fb09de364bad27b71802ddf874e7"
-  integrity sha512-gTI5E9Ez9ZsUOcM3kgjIX2NVfseEEr0UHFLb2VHm3xhEuWSnICnKwC0f+glckF1y9LsBc6sTuzPCTuvIB7qpaA==
-  dependencies:
-    tslib "2.4.0"
-
 "@grafana/schema@9.0.7":
   version "9.0.7"
   resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.0.7.tgz#653ca143600714de784509ab0a955d084f56737c"
@@ -1686,10 +1645,10 @@
     tiny-invariant "^1.0.1"
     tiny-warning "^0.0.3"
 
-"@grafana/toolkit@^9.0.6":
-  version "9.0.6"
-  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-9.0.6.tgz#9dd8a53ecc3a8135951ff05e226bed9647114b92"
-  integrity sha512-c4A/PbdNjkCXglcimwXAomZ+mwf61TvsPxw1uli1YQ/QgzBpM2WUejY4XA3nfcn2mye6PkTWMd9u07wD47sZgQ==
+"@grafana/toolkit@^9.0.7":
+  version "9.0.7"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-9.0.7.tgz#c72c147a0c6b190541caf09b001adaca391a074d"
+  integrity sha512-CEbFwUeRbvqTFz3QzYWMJ58ODgyxwYIpbv8A4080Rys9Z665VEirBpctZutqd8e70B0aH5h89k8hPC/p0OKC5Q==
   dependencies:
     "@babel/core" "^7.17.8"
     "@babel/plugin-proposal-class-properties" "7.16.7"
@@ -1703,10 +1662,10 @@
     "@babel/preset-env" "^7.16.11"
     "@babel/preset-react" "^7.16.7"
     "@babel/preset-typescript" "^7.16.7"
-    "@grafana/data" "9.0.6"
+    "@grafana/data" "9.0.7"
     "@grafana/eslint-config" "^4.0.0"
     "@grafana/tsconfig" "^1.2.0-rc1"
-    "@grafana/ui" "9.0.6"
+    "@grafana/ui" "9.0.7"
     "@jest/core" "27.5.1"
     "@types/command-exists" "^1.2.0"
     "@types/eslint" "8.4.1"
@@ -1783,74 +1742,6 @@
   version "1.2.0-rc1"
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.2.0-rc1.tgz#10973c978ec95b0ea637511254b5f478bce04de7"
   integrity sha512-+SgQeBQ1pT6D/E3/dEdADqTrlgdIGuexUZ8EU+8KxQFKUeFeU7/3z/ayI2q/wpJ/Kr6WxBBNlrST6aOKia19Ag==
-
-"@grafana/ui@9.0.6":
-  version "9.0.6"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.0.6.tgz#ae1a8fffc04d3854dcb5e64e789c0e9e120cde9f"
-  integrity sha512-WRt0PzvsLazKDh27imPgLwtVws7Lq27TRipzQCk4e9RY9O6MGyJ5RLUUsbDTDCAs5jYLFa8jmodwKwQxFA7sSw==
-  dependencies:
-    "@emotion/css" "11.9.0"
-    "@emotion/react" "11.9.0"
-    "@grafana/aws-sdk" "0.0.36"
-    "@grafana/data" "9.0.6"
-    "@grafana/e2e-selectors" "9.0.6"
-    "@grafana/schema" "9.0.6"
-    "@grafana/slate-react" "0.22.10-grafana"
-    "@monaco-editor/react" "4.3.1"
-    "@popperjs/core" "2.11.5"
-    "@react-aria/button" "3.4.4"
-    "@react-aria/dialog" "3.1.9"
-    "@react-aria/focus" "3.5.5"
-    "@react-aria/menu" "3.4.4"
-    "@react-aria/overlays" "3.8.2"
-    "@react-stately/menu" "3.2.7"
-    "@sentry/browser" "6.19.7"
-    ansicolor "1.1.100"
-    calculate-size "1.1.1"
-    classnames "2.3.1"
-    core-js "3.22.5"
-    d3 "5.15.0"
-    date-fns "2.28.0"
-    hoist-non-react-statics "3.3.2"
-    immutable "4.0.0"
-    is-hotkey "0.2.0"
-    jquery "3.6.0"
-    lodash "4.17.21"
-    memoize-one "6.0.0"
-    moment "2.29.4"
-    monaco-editor "^0.31.1"
-    ol "6.14.1"
-    prismjs "1.28.0"
-    rc-cascader "3.5.0"
-    rc-drawer "4.4.3"
-    rc-slider "9.7.5"
-    rc-time-picker "^3.7.3"
-    react "17.0.2"
-    react-beautiful-dnd "13.1.0"
-    react-calendar "3.7.0"
-    react-colorful "5.5.1"
-    react-custom-scrollbars-2 "4.4.0"
-    react-dom "17.0.2"
-    react-dropzone "12.0.4"
-    react-highlight-words "0.18.0"
-    react-hook-form "7.5.3"
-    react-inlinesvg "2.3.0"
-    react-popper "2.3.0"
-    react-popper-tooltip "^4.3.1"
-    react-router-dom "^5.2.0"
-    react-select "5.3.2"
-    react-select-event "^5.1.0"
-    react-table "7.8.0"
-    react-transition-group "4.4.2"
-    react-use "17.3.2"
-    react-window "1.8.7"
-    rxjs "7.5.5"
-    slate "0.47.8"
-    slate-plain-serializer "0.7.10"
-    tinycolor2 "1.4.2"
-    tslib "2.4.0"
-    uplot "1.6.22"
-    uuid "8.3.2"
 
 "@grafana/ui@9.0.7", "@grafana/ui@^9.0.2":
   version "9.0.7"
