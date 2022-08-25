@@ -27,7 +27,7 @@
   "dependencies": {
     "dayjs": "^1.11.5",
     "jsonata": "^1.8.6",
-    "jsonpath-plus": "^7.0.0",
+    "jsonpath-plus": "^7.1.0",
     "memory-cache": "^0.2.0",
     "tslib": "^2.4.0"
   },
