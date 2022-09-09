@@ -35,7 +35,7 @@
     "@emotion/core": "11.0.0",
     "@grafana/data": "^9.1.2",
     "@grafana/runtime": "^9.1.1",
-    "@grafana/toolkit": "^9.1.1",
+    "@grafana/toolkit": "^9.1.4",
     "@grafana/ui": "^9.0.2",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "^13.3.0",

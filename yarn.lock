@@ -1668,13 +1668,13 @@
     uplot "1.6.22"
     xss "1.0.13"
 
-"@grafana/data@^9.1.2":
-  version "9.1.2"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.1.2.tgz#cb3fda868c850323cf4a1cfba119d651a0bff550"
-  integrity sha512-R87C4+LFLaZeXTlcEMUBLFFOS1wd+adqBoBaO+LnUnM5rE2L+8lGz+fjke97iHPxGCUtLowwKkY8be2rgFDMbQ==
+"@grafana/data@9.1.4", "@grafana/data@^9.1.2":
+  version "9.1.4"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.1.4.tgz#5f8aafb08254e1f70c70c00e8091123781332f24"
+  integrity sha512-yn9x1SffJ5c1z2LARcJyP8oMug/EB0K77qrYmsMC/p9GVJjG6nLZbzuJrWbRxX3UdJpB+FqEKMxymvrDCZETlg==
   dependencies:
     "@braintree/sanitize-url" "6.0.0"
-    "@grafana/schema" "9.1.2"
+    "@grafana/schema" "9.1.4"
     "@types/d3-interpolate" "^1.4.0"
     d3-interpolate "1.4.0"
     date-fns "2.29.1"
@@ -1697,6 +1697,15 @@
   version "9.1.1"
   resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.1.1.tgz#acd53200f7c6f7f831266434cf9d61b2dc0580bd"
   integrity sha512-2y0Sb3sDYn/3iuYQmjI8Aae6vWY12vwDwZFMbgvWZW1/Bnn8YqEyYu0LyIV6QWdoLfAjre/7KPYzja2fjM8uZQ==
+  dependencies:
+    "@grafana/tsconfig" "^1.2.0-rc1"
+    tslib "2.4.0"
+    typescript "4.7.4"
+
+"@grafana/e2e-selectors@9.1.4":
+  version "9.1.4"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.1.4.tgz#10a07797961896a4f2506869d1403c0b93ffbf83"
+  integrity sha512-jp8ldmTJTxSHYcVYrWeZYuGy48OvDlz8n8AQxCgFM5UyRlfip23MbC5MO2QntIbFhyx+4t0pY1szjIDGcQ3rDA==
   dependencies:
     "@grafana/tsconfig" "^1.2.0-rc1"
     tslib "2.4.0"
@@ -1741,10 +1750,10 @@
   dependencies:
     tslib "2.4.0"
 
-"@grafana/schema@9.1.2":
-  version "9.1.2"
-  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.1.2.tgz#478a6180db67aa6d64fa6aa2985a1b993c9e166e"
-  integrity sha512-UTgAM3jV8K/0VrKBvuA2YAFkx33LEgYN+CyRBmIWkxIPnsjLgQxJ3xMFuAmj73AgYKr+dDGmYBgpFTDt3vJp9Q==
+"@grafana/schema@9.1.4":
+  version "9.1.4"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.1.4.tgz#4f499e34e800ecf09e24e1bd3468371eec2b215c"
+  integrity sha512-xUPuQf8DoHW0KN7PcslbbFCkwDFzHTCAn4DoQ5xh8Rbv9JBD5CFqyHeBV71VHDGR3ENXAqpQDCx86L93MOFG6w==
   dependencies:
     tslib "2.4.0"
 
@@ -1770,10 +1779,10 @@
     tiny-invariant "^1.0.1"
     tiny-warning "^0.0.3"
 
-"@grafana/toolkit@^9.1.1":
-  version "9.1.1"
-  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-9.1.1.tgz#0f75b8977a498e9f502ad3b5fd40c9d653b6b5f9"
-  integrity sha512-i7Dr9VcLFdXO8j6QnoZdropW1d7nh0TiKVs9FCdTgcwsSmxTJ7g3h1vvTCilnL0zOjU3UsZsvRThGaIMQixcBw==
+"@grafana/toolkit@^9.1.4":
+  version "9.1.4"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-9.1.4.tgz#82fb46ec3da71fe936786892b6fc2969dd5c92a1"
+  integrity sha512-v5Kq+PeqtOC762DY2t4DC1HDEwjidgvpHSbYFW6Bwwm64dfxEACMLhS8lJBv6lvaE/tKkTtucQWPbKCOOLNg4w==
   dependencies:
     "@babel/core" "^7.18.9"
     "@babel/plugin-proposal-class-properties" "7.18.6"
@@ -1787,10 +1796,10 @@
     "@babel/preset-env" "^7.18.9"
     "@babel/preset-react" "^7.18.6"
     "@babel/preset-typescript" "^7.18.6"
-    "@grafana/data" "9.1.1"
+    "@grafana/data" "9.1.4"
     "@grafana/eslint-config" "^4.0.0"
     "@grafana/tsconfig" "^1.2.0-rc1"
-    "@grafana/ui" "9.1.1"
+    "@grafana/ui" "9.1.4"
     "@jest/core" "27.5.1"
     "@types/command-exists" "^1.2.0"
     "@types/eslint" "8.4.1"
@@ -1867,7 +1876,7 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.2.0-rc1.tgz#10973c978ec95b0ea637511254b5f478bce04de7"
   integrity sha512-+SgQeBQ1pT6D/E3/dEdADqTrlgdIGuexUZ8EU+8KxQFKUeFeU7/3z/ayI2q/wpJ/Kr6WxBBNlrST6aOKia19Ag==
 
-"@grafana/ui@9.1.1", "@grafana/ui@^9.0.2":
+"@grafana/ui@9.1.1":
   version "9.1.1"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.1.1.tgz#b9778cb7db70ea4fe70836461f1e53873ae0e0b6"
   integrity sha512-jfZfke4THg35wPl8Y9vrssNwkv3q9a2gsJ2tVv0ZqFEnJl2RVnG2csw72hAtAyqTs/lykOyb8IM9kE6AlPxtKQ==
@@ -1930,6 +1939,75 @@
     rxjs "7.5.6"
     slate "0.47.8"
     slate-plain-serializer "0.7.10"
+    tinycolor2 "1.4.2"
+    tslib "2.4.0"
+    uplot "1.6.22"
+    uuid "8.3.2"
+
+"@grafana/ui@9.1.4", "@grafana/ui@^9.0.2":
+  version "9.1.4"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.1.4.tgz#393ff4bae63afca1ebd6742bc999476ff183c6ee"
+  integrity sha512-G6onE2pzjajRk1uOA4yz4cVUM2zk7AOyDFC1WX4IiF2zKrpRJ6hWLpxUI305bsjIL0BknTDch8q1LTQXNThMKQ==
+  dependencies:
+    "@emotion/css" "11.9.0"
+    "@emotion/react" "11.9.3"
+    "@grafana/data" "9.1.4"
+    "@grafana/e2e-selectors" "9.1.4"
+    "@grafana/schema" "9.1.4"
+    "@grafana/slate-react" "0.22.10-grafana"
+    "@monaco-editor/react" "4.3.1"
+    "@popperjs/core" "2.11.5"
+    "@react-aria/button" "3.5.1"
+    "@react-aria/dialog" "3.2.1"
+    "@react-aria/focus" "3.6.1"
+    "@react-aria/menu" "3.5.1"
+    "@react-aria/overlays" "3.9.1"
+    "@react-aria/utils" "3.13.1"
+    "@react-stately/menu" "3.3.1"
+    "@sentry/browser" "6.19.7"
+    ansicolor "1.1.100"
+    calculate-size "1.1.1"
+    classnames "2.3.1"
+    core-js "3.24.0"
+    d3 "5.15.0"
+    date-fns "2.29.1"
+    hoist-non-react-statics "3.3.2"
+    immutable "4.1.0"
+    is-hotkey "0.2.0"
+    jquery "3.6.0"
+    lodash "4.17.21"
+    memoize-one "6.0.0"
+    moment "2.29.4"
+    monaco-editor "^0.31.1"
+    ol "6.15.1"
+    prismjs "1.28.0"
+    rc-cascader "3.6.1"
+    rc-drawer "4.4.3"
+    rc-slider "9.7.5"
+    rc-time-picker "^3.7.3"
+    react "17.0.2"
+    react-beautiful-dnd "13.1.0"
+    react-calendar "3.7.0"
+    react-colorful "5.5.1"
+    react-custom-scrollbars-2 "4.5.0"
+    react-dom "17.0.2"
+    react-dropzone "14.2.2"
+    react-highlight-words "0.18.0"
+    react-hook-form "7.5.3"
+    react-inlinesvg "3.0.0"
+    react-popper "2.3.0"
+    react-popper-tooltip "^4.3.1"
+    react-router-dom "^5.2.0"
+    react-select "5.4.0"
+    react-select-event "^5.1.0"
+    react-table "7.8.0"
+    react-transition-group "4.4.2"
+    react-use "17.4.0"
+    react-window "1.8.7"
+    rxjs "7.5.6"
+    slate "0.47.9"
+    slate-plain-serializer "0.7.11"
+    slate-react "0.22.10"
     tinycolor2 "1.4.2"
     tslib "2.4.0"
     uplot "1.6.22"
@@ -9523,7 +9601,7 @@ slash@^3.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
-slate-base64-serializer@^0.2.111:
+slate-base64-serializer@^0.2.111, slate-base64-serializer@^0.2.112:
   version "0.2.115"
   resolved "https://registry.yarnpkg.com/slate-base64-serializer/-/slate-base64-serializer-0.2.115.tgz#438e051959bde013b50507f3144257e74039ff7f"
   integrity sha512-GnLV7bUW/UQ5j7rVIxCU5zdB6NOVsEU6YWsCp68dndIjSGTGLaQv2+WwV3NcnrGGZEYe5qgo33j2QWrPws2C1A==
@@ -9550,25 +9628,66 @@ slate-plain-serializer@0.7.10:
   resolved "https://registry.yarnpkg.com/slate-plain-serializer/-/slate-plain-serializer-0.7.10.tgz#bc4a6942cf52fde826019bb1095dffd0dac8cc08"
   integrity sha512-/QvMCQ0F3NzbnuoW+bxsLIChPdRgxBjQeGhYhpRGTVvlZCLOmfDvavhN6fHsuEwkvdwOmocNF30xT1WVlmibYg==
 
-slate-plain-serializer@^0.7.10:
+slate-plain-serializer@0.7.11:
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/slate-plain-serializer/-/slate-plain-serializer-0.7.11.tgz#74ff6eb949e9fbd92ad98ed833d74d5082f2688b"
+  integrity sha512-vzXQ68GiHHcTUcAB6ggf2qN/sX9BoLs77SMHacp5Gkg+oHAA/NxRzRH4efDAhpiJqfJZDrA3rQySK6+Y7KAuwg==
+
+slate-plain-serializer@^0.7.10, slate-plain-serializer@^0.7.11:
   version "0.7.13"
   resolved "https://registry.yarnpkg.com/slate-plain-serializer/-/slate-plain-serializer-0.7.13.tgz#6de8f5c645dd749f1b2e4426c20de74bfd213adf"
   integrity sha512-TtrlaslxQBEMV0LYdf3s7VAbTxRPe1xaW10WNNGAzGA855/0RhkaHjKkQiRjHv5rvbRleVf7Nxr9fH+4uErfxQ==
 
-slate-prop-types@^0.5.41:
+slate-prop-types@^0.5.41, slate-prop-types@^0.5.42:
   version "0.5.44"
   resolved "https://registry.yarnpkg.com/slate-prop-types/-/slate-prop-types-0.5.44.tgz#da60b69c3451c3bd6cdd60a45d308eeba7e83c76"
   integrity sha512-JS0iW7uaciE/W3ADuzeN1HOnSjncQhHPXJ65nZNQzB0DF7mXVmbwQKI6cmCo/xKni7XRJT0JbWSpXFhEdPiBUA==
 
-slate-react-placeholder@^0.2.8:
+slate-react-placeholder@^0.2.8, slate-react-placeholder@^0.2.9:
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/slate-react-placeholder/-/slate-react-placeholder-0.2.9.tgz#30f450a05d4871c7d1a27668ebe7907861e7ca74"
   integrity sha512-YSJ9Gb4tGpbzPje3eNKtu26hWM8ApxTk9RzjK+6zfD5V/RMTkuWONk24y6c9lZk0OAYNZNUmrnb/QZfU3j9nag==
+
+slate-react@0.22.10:
+  version "0.22.10"
+  resolved "https://registry.yarnpkg.com/slate-react/-/slate-react-0.22.10.tgz#01296dadb707869ace6cb21d336c90bedfb567bf"
+  integrity sha512-B2Ms1u/REbdd8yKkOItKgrw/tX8klgz5l5x6PP86+oh/yqmB6EHe0QyrYlQ9fc3WBlJUVTOL+nyAP1KmlKj2/w==
+  dependencies:
+    debug "^3.1.0"
+    get-window "^1.1.1"
+    is-window "^1.0.2"
+    lodash "^4.1.1"
+    memoize-one "^4.0.0"
+    prop-types "^15.5.8"
+    react-immutable-proptypes "^2.1.0"
+    selection-is-backward "^1.0.0"
+    slate-base64-serializer "^0.2.112"
+    slate-dev-environment "^0.2.2"
+    slate-hotkeys "^0.2.9"
+    slate-plain-serializer "^0.7.11"
+    slate-prop-types "^0.5.42"
+    slate-react-placeholder "^0.2.9"
+    tiny-invariant "^1.0.1"
+    tiny-warning "^0.0.3"
 
 slate@0.47.8:
   version "0.47.8"
   resolved "https://registry.yarnpkg.com/slate/-/slate-0.47.8.tgz#1e987b74d8216d44ec56154f0e6d3c722ce21e6e"
   integrity sha512-/Jt0eq4P40qZvtzeKIvNb+1N97zVICulGQgQoMDH0TI8h8B+5kqa1YeckRdRnuvfYJm3J/9lWn2V3J1PrF+hag==
+  dependencies:
+    debug "^3.1.0"
+    direction "^0.1.5"
+    esrever "^0.2.0"
+    is-plain-object "^2.0.4"
+    lodash "^4.17.4"
+    tiny-invariant "^1.0.1"
+    tiny-warning "^0.0.3"
+    type-of "^2.0.1"
+
+slate@0.47.9:
+  version "0.47.9"
+  resolved "https://registry.yarnpkg.com/slate/-/slate-0.47.9.tgz#090597dd790e79718f782994907d34a903739443"
+  integrity sha512-EK4O6b7lGt+g5H9PGw9O5KCM4RrOvOgE9mPi3rzQ0zDRlgAb2ga4TdpS6XNQbrsJWsc8I1fjaSsUeCqCUhhi9A==
   dependencies:
     debug "^3.1.0"
     direction "^0.1.5"
