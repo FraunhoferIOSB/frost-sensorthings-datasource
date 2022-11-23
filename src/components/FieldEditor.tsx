@@ -35,9 +35,11 @@ export const FieldEditor = ({ value = [], onChange, limit, onComplete }: Props) 
       onChange([...value.slice(0, i + 1), { name: '', jsonPath: '', ...defaults }, ...value.slice(i + 1)]);
     }
   };
+
   const removeField = (i: number) => () => {
     onChange([...value.slice(0, i), ...value.slice(i + 1)]);
   };
+
   return (
     <>
       {value.map((field, index) => (
@@ -91,7 +93,6 @@ export const FieldEditor = ({ value = [], onChange, limit, onComplete }: Props) 
           <InlineField label="Alias" tooltip="If left blank, the field uses the name of the queried element.">
             <Input width={12} value={field.name} onChange={onAliasChange(index)} />
           </InlineField>
-
           {(!limit || value.length < limit) && (
             <a className="gf-form-label" onClick={addField(index, { language: field.language ?? 'jsonpath' })}>
               <Icon name="plus" />

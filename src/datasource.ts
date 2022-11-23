@@ -12,6 +12,7 @@ import {
   toDataFrame,
 } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
+import { Filter } from '@material-table/core';
 import jsonata from 'jsonata';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
@@ -44,6 +45,52 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
   async metadataRequest(query: JsonApiQuery, range?: TimeRange) {
     return this.requestJson(query, replace({}, range));
   }
+
+  /**
+   * selectionRequest is used by the language provider to return the JSON
+   * document to generate suggestions for the QueryField.
+   *
+   * This is a custom method and is not part of the DataSourceApi, feel free to
+   * name it as you like.
+   */
+  async selectionRequest(query: JsonApiQuery, filters?: Array<Filter<any>>, skip?: number, top?: number) {
+    let urlWithFilters = query.urlPath;
+    let start = true;
+
+    (filters ?? []).forEach((filter) => {
+      if (start) {
+        urlWithFilters = urlWithFilters 
+          + '$filter=startswith(' 
+          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title): (filter.column.title)?.toString().replace('.', '/')) 
+          + ',\'' + filter.value + '\')';
+        start = false;
+      } else {
+        urlWithFilters = urlWithFilters 
+          + ' and startswith(' 
+          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title): (filter.column.title)?.toString().replace('.', '/')) + ',\'' 
+          + filter.value  + '\')';
+      }
+    })
+
+    if (urlWithFilters.endsWith('?')) {
+      urlWithFilters = urlWithFilters + '$count=true';
+    } else {
+      urlWithFilters = urlWithFilters + '&$count=true';
+    }
+
+    if (skip) {
+      urlWithFilters = urlWithFilters + '&$skip=' + skip;
+    }
+
+    if (top) {
+      urlWithFilters = urlWithFilters + '&$top=' + top;
+    }
+    query.urlPath = urlWithFilters;
+  
+    return this.requestJson(query,replace())
+  }
+
+
   /**
    * sensorThingsInitializer gets every SensorThings Enitiy to dertermine the URLs to query for data
    *
@@ -73,7 +120,10 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
       params: [],
       headers: [],
       body: '',
+      entrypointUrlPath: '',
       cacheDurationSeconds: 0,
+      selectedEntrypoint: '',
+      selectedDatastream: '',
     });
   }
   async query(request: DataQueryRequest<JsonApiQuery>): Promise<DataQueryResponse> {
@@ -158,7 +208,7 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
 
   async doRequest(query: JsonApiQuery, range?: TimeRange, scopedVars?: ScopedVars): Promise<DataFrame[]> {
     //Automatically add time filter
-    var format;
+    let format;
     if (query.urlPath.includes('__from')) {
       if (!(range?.from === null || range?.from === undefined)) {
         format = new RegExp('__from', 'gi'); //Match every occurence of __from
@@ -193,17 +243,17 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
     }
 
     const replaceWithVars = replace(scopedVars, range);
-    var json = await this.requestJson(query, replaceWithVars);
+    let json = await this.requestJson(query, replaceWithVars);
     if (!json) {
       throw new Error('Query returned empty data');
     }
     //Implements OGC Paging https://docs.opengeospatial.org/is/15-078r6/15-078r6.html#57
     while (json['@iot.nextLink'] !== undefined && json['@iot.nextLink'] !== null) {
-      var pagingURL = json['@iot.nextLink'].split(/[?]+/).slice(-1).toString();
-      var baseURL = query.urlPath.split(/[?]+/)[0];
-      var newURL = baseURL + '?' + pagingURL;
+      let pagingURL = json['@iot.nextLink'].split(/[?]+/).slice(-1).toString();
+      let baseURL = query.urlPath.split(/[?]+/)[0];
+      let newURL = baseURL + '?' + pagingURL;
       query.urlPath = newURL;
-      var json2 = null;
+      let json2 = null;
       json2 = await this.requestJson(query, replaceWithVars);
       json.value = json.value.concat(json2.value);
       if (json2['@iot.nextLink'] === undefined) {

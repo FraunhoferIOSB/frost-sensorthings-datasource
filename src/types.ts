@@ -29,6 +29,11 @@ export interface JsonApiQuery extends DataQuery {
   experimentalMetricField?: string;
   experimentalVariableTextField?: string;
   experimentalVariableValueField?: string;
+
+  //for Basic Tab
+  entrypointUrlPath: string;
+  selectedEntrypoint: any;
+  selectedDatastream: any;
 }
 
 export const defaultQuery: Partial<JsonApiQuery> = {
@@ -36,8 +41,15 @@ export const defaultQuery: Partial<JsonApiQuery> = {
   method: 'GET',
   queryParams: '',
   urlPath: '',
-  fields: [{ jsonPath: '' }],
+  entrypointUrlPath: '',
+  selectedEntrypoint: '',
+  selectedDatastream: '',
+  fields: [
+    /*{ name: 'Time', jsonPath: '$.value[*].phenomenonTime.start', language: 'jsonpath'}, 
+    { name: 'Result', jsonPath: '$.value[*].result', language: 'jsonpath' }*/
+  ],
 };
+
 
 export interface JsonApiDataSourceOptions extends DataSourceJsonData {
   queryParams?: string;

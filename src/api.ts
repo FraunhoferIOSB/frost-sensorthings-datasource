@@ -96,6 +96,52 @@ export default class Api {
     return result;
   }
 
+  async simpleGet(method: string,
+    path: string,
+    params?: Record<string, string>,
+    headers?: Array<Pair<string, string>>,
+    data?: string) {
+
+    let result = this.simpleRequest(method, path, params, headers, data);
+    return (await result.toPromise()).data;
+  }
+
+  /**
+   * Simplefied Fetch request to test.
+   * @param method 
+   * @param path 
+   * @param params 
+   * @param headers 
+   * @param data 
+   * @returns 
+   */
+  simpleRequest(
+    method: string,
+    path: string,
+    params?: Record<string, string>,
+    headers?: Array<Pair<string, string>>,
+    data?: string
+  ): Observable<any> {
+    const recordHeaders: Record<string, any> = {};
+
+    (headers ?? [])
+      .filter(([key, _]) => key)
+      .forEach(([key, value]) => {
+        recordHeaders[key] = value;
+      });
+
+      const req: BackendSrvRequest = {
+        url: this.baseUrl + path,
+        method,
+        headers: recordHeaders,
+      };
+  
+      if (req.method !== 'GET' && data) {
+        req.data = data;
+      }
+      return getBackendSrv().fetch(req);
+  }
+
   /**
    * Make an API request using the data source configuration as defaults.
    * Allows the user to append a path, or override query parameters.

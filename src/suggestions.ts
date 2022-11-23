@@ -81,11 +81,12 @@ export const onSuggest = async (input: TypeaheadInput, onData: () => Promise<any
     ? toCursor.slice(0, toCursor.lastIndexOf('[') + 1) + ':]'
     : currentLine.slice(0, currentLine.lastIndexOf('.'));
 
+  
   // Get the actual JSON for parsing.
   const response = await onData();
-
+  
   const values = JSONPath({ path, json: response });
-
+  
   // Don't attempt to suggest if this is a leaf node, e.g. strings, numbers, and booleans.
   if (typeof values[0] !== 'object') {
     return emptyResult;

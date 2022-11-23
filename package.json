@@ -1,6 +1,6 @@
 {
   "name": "frost-sensorthings-datasource",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "A data source plugin for loading data from OGC SensorThings APIs into Grafana.",
   "keywords": [
     "SensorThings API",
@@ -25,25 +25,27 @@
     "url": "https://www.iosb.fraunhofer.de/ILT"
   },
   "dependencies": {
-    "dayjs": "^1.11.6",
+    "@material-table/core": "^5.1.7",
+    "@material-ui/core": "^4.12.4",
+    "dayjs": "^1.11.4",
     "jsonata": "^1.8.6",
-    "jsonpath-plus": "^7.2.0",
+    "jsonpath-plus": "^7.0.0",
     "memory-cache": "^0.2.0",
-    "tslib": "^2.4.1"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@emotion/core": "11.0.0",
-    "@grafana/data": "^9.1.8",
-    "@grafana/runtime": "^9.1.8",
-    "@grafana/toolkit": "^9.1.6",
+    "@grafana/data": "^9.0.6",
+    "@grafana/runtime": "^9.0.6",
+    "@grafana/toolkit": "^9.0.6",
     "@grafana/ui": "^9.0.2",
-    "@testing-library/jest-dom": "5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@types/lodash": "^4.14.188",
+    "@testing-library/jest-dom": "5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@types/lodash": "^4.14.182",
     "@types/memory-cache": "^0.2.2",
     "@types/react-virtualized-auto-sizer": "^1.0.0",
     "emotion": "10.0.27",
-    "react-virtualized-auto-sizer": "^1.0.7"
+    "react-virtualized-auto-sizer": "^1.0.4"
   },
   "engines": {
     "node": ">=16"

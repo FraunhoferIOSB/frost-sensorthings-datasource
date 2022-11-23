@@ -12,12 +12,12 @@ export const parseValues = (values: any[], type: FieldType): any[] => {
 
       if (values.filter((_) => _).every((value) => typeof value === 'string')) {
         if (values.some((a) => a !== null && a.includes('/'))) {
-          var returnvalues: any[] = [];
+          let returnvalues: any[] = [];
           values.forEach((e) => {
             if (e !== null) {
-              var interval = dayjs(e.split(/[/]+/)[0].toString()).valueOf();
+              let interval = dayjs(e.split(/[/]+/)[0].toString()).valueOf();
               //TODO: Implement Intervals correctly!
-              /* var interval2 = dayjs(e.split(/[/]+/)[1].toString()).valueOf();
+              /* let interval2 = dayjs(e.split(/[/]+/)[1].toString()).valueOf();
             returnvalues.push({interval, interval2}); */
               returnvalues.push(interval);
             }
