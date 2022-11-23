@@ -27,7 +27,7 @@
   "dependencies": {
     "@material-table/core": "^5.1.7",
     "@material-ui/core": "^4.12.4",
-    "dayjs": "^1.11.4",
+    "dayjs": "^1.11.6",
     "jsonata": "^1.8.6",
     "jsonpath-plus": "^7.0.0",
     "memory-cache": "^0.2.0",
