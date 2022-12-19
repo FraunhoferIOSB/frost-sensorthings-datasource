@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.0.4
+* Simplified configuration while selecting Datastream
+* Updated dependencies
+
 ## Version 0.0.3
 * Updated dependencies
 * Added Signing Plugin for release
