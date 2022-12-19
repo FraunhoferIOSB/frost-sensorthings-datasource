@@ -54,40 +54,42 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
    * name it as you like.
    */
   async selectionRequest(query: JsonApiQuery, filters?: Array<Filter<any>>, skip?: number, top?: number) {
-    let urlWithFilters = query.urlPath;
-    let start = true;
+    let buildUrl = query.urlPath;
 
-    (filters ?? []).forEach((filter) => {
-      if (start) {
-        urlWithFilters = urlWithFilters 
+    (filters ?? []).forEach((filter, index) => {
+      if (index === 0) {
+        buildUrl = buildUrl 
           + '$filter=startswith(' 
           + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title): (filter.column.title)?.toString().replace('.', '/')) 
           + ',\'' + filter.value + '\')';
-        start = false;
+        
       } else {
-        urlWithFilters = urlWithFilters 
+        buildUrl = buildUrl 
           + ' and startswith(' 
           + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title): (filter.column.title)?.toString().replace('.', '/')) + ',\'' 
           + filter.value  + '\')';
       }
     })
 
-    if (urlWithFilters.endsWith('?')) {
-      urlWithFilters = urlWithFilters + '$count=true';
+    if (buildUrl.endsWith('?')) {
+      buildUrl = buildUrl + '$count=true';
     } else {
-      urlWithFilters = urlWithFilters + '&$count=true';
+      buildUrl = buildUrl + '&$count=true';
     }
 
     if (skip) {
-      urlWithFilters = urlWithFilters + '&$skip=' + skip;
+      buildUrl = buildUrl + '&$skip=' + skip;
     }
 
     if (top) {
-      urlWithFilters = urlWithFilters + '&$top=' + top;
+      buildUrl = buildUrl + '&$top=' + top;
     }
-    query.urlPath = urlWithFilters;
   
-    return this.requestJson(query,replace())
+    const result = await this.requestJson({...query, urlPath: buildUrl}, replace());
+    const value: any[] = result['value'];
+    const count = result['@iot.count'];
+
+    return { value, count };
   }
 
 
@@ -120,10 +122,7 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
       params: [],
       headers: [],
       body: '',
-      entrypointUrlPath: '',
       cacheDurationSeconds: 0,
-      selectedEntrypoint: '',
-      selectedDatastream: '',
     });
   }
   async query(request: DataQueryRequest<JsonApiQuery>): Promise<DataQueryResponse> {

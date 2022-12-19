@@ -1,4 +1,5 @@
 import { DataQuery, DataSourceJsonData, FieldType } from '@grafana/data';
+import { Filter } from '@material-table/core';
 
 export type QueryLanguage = 'jsonpath' | 'jsonata';
 
@@ -10,6 +11,27 @@ export interface JsonField {
 }
 
 export type Pair<T, K> = [T, K];
+
+export interface Table {
+  title: string;
+  data: any[];
+  columns: any[];
+  filters: Array<Filter<any>>;
+  pageSize: number;
+  count: number;
+  page: number;
+  clickedRow?: any;
+}
+
+export const defaultTable: Table = {
+  title: "",
+  data: [],
+  columns: [],
+  filters: [],
+  pageSize: 5,
+  count: 0,
+  page: 0,
+};
 
 export interface JsonApiQuery extends DataQuery {
   fields: JsonField[];
@@ -30,10 +52,6 @@ export interface JsonApiQuery extends DataQuery {
   experimentalVariableTextField?: string;
   experimentalVariableValueField?: string;
 
-  //for Basic Tab
-  entrypointUrlPath: string;
-  selectedEntrypoint: any;
-  selectedDatastream: any;
 }
 
 export const defaultQuery: Partial<JsonApiQuery> = {
@@ -41,9 +59,6 @@ export const defaultQuery: Partial<JsonApiQuery> = {
   method: 'GET',
   queryParams: '',
   urlPath: '',
-  entrypointUrlPath: '',
-  selectedEntrypoint: '',
-  selectedDatastream: '',
   fields: [
     /*{ name: 'Time', jsonPath: '$.value[*].phenomenonTime.start', language: 'jsonpath'}, 
     { name: 'Result', jsonPath: '$.value[*].result', language: 'jsonpath' }*/

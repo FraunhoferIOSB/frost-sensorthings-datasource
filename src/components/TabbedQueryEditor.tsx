@@ -10,15 +10,16 @@ import {
   CodeEditor,
   Container,
 } from '@grafana/ui';
-import MaterialTable, { Filter } from '@material-table/core';
 import { createTheme, CssBaseline, Grid, ThemeProvider } from '@material-ui/core';
 import { JsonDataSource } from 'datasource';
 import defaults from 'lodash/defaults';
 import React, { useState } from 'react';
-import { defaultQuery, JsonApiQuery } from '../types';
+import { defaultQuery, defaultTable, JsonApiQuery, Table } from '../types';
 import { getTableHeaders } from '../createHeader';
 
 import { PathEditor } from './PathEditor';
+import EntrypointTable from './EntrypointTable';
+import DatastreamTable from './DatastreamTable';
 
 interface Props {
   onChange: (query: JsonApiQuery) => void;
@@ -32,24 +33,6 @@ interface Props {
   fieldsTab: React.ReactNode;
 }
 
-interface Table {
-  data: any[];
-  columns: any[];
-  filters: Array<Filter<any>>;
-  pageSize: number;
-  count: number;
-  page: number;
-}
-
-const defaultTable: Table = {
-  data: [],
-  columns: [],
-  filters: [],
-  pageSize: 5,
-  count: 0,
-  page: 0,
-};
-
 const darkTheme = createTheme({
   palette: {
     type: 'dark',
@@ -61,46 +44,26 @@ export const TabbedQueryEditor = ({ query, onChange, onRunQuery, fieldsTab, data
   const [orderbyWarning, setOrderByWarning] = useState(false);
   const [filterWarning, setFilterWarning] = useState(false);
 
-  const [entrypoint, setEntrypoint] = useState<Table>(defaultTable);
-
-  const [datastream, setDatastream] = useState<Table>(defaultTable);
+  const [entrypoint, setEntrypoint] = useState<string | undefined>(undefined);
+  const [entrypointTable, setEntrypointTable] = useState<Table>(defaultTable);
+  const [datastreamTable, setDatastreamTable] = useState<Table>(defaultTable);
 
   const q = defaults(query, defaultQuery);
 
   //const onTypeahead = (value: string) =>
   //  onSuggest({ value } as TypeaheadInput, () => datasource.metadataRequest(query, range));
 
-  const getSelection = async (
-    urlPath: string,
-    filters?: Array<Filter<any>>,
-    skip?: number,
-    top?: number
-  ): Promise<{ value: any[]; count: number }> => {
-    if (urlPath === '') {
-      return { value: [], count: 0 };
-    }
-    q.urlPath = urlPath;
-    let result = await datasource.selectionRequest(q, filters ?? [], skip, top);
-    //let result = await datasource.metadataRequest(q)
-    let value: any[] = result['value'];
-    let count = result['@iot.count'];
-
-    return { value, count };
-  };
-
   const onEntrypointChange = async ({ value }: SelectableValue<string>) => {
-    let newQuery: JsonApiQuery = {
-      ...query,
-      entrypointUrlPath: value!,
-      //selectedDatastream: '',
-      //selectedEntrypoint: '',
-    };
+    setEntrypoint(value);
+    let result = await datasource.selectionRequest(
+      { ...query, urlPath: `/${value!}?` },
+      [],
+      0,
+      entrypointTable.pageSize
+    );
 
-    onChange(newQuery);
-    let result = await getSelection('/' + value! + '?', [], 0, entrypoint.pageSize);
-
-    setEntrypoint({
-      ...entrypoint,
+    setEntrypointTable({
+      ...entrypointTable,
       data: result.value,
       count: result.count,
       columns: filterColumns(getTableHeaders(result.value)).map((col) => ({ title: col, field: col })),
@@ -115,7 +78,6 @@ export const TabbedQueryEditor = ({ query, onChange, onRunQuery, fieldsTab, data
         value.startsWith('properties') ||
         value.startsWith('@iot.selfLink')
       ) {
-        //problem with ui, if attribute 'properties' is added - TODO: Fix
         return false;
       }
       return true;
@@ -123,137 +85,27 @@ export const TabbedQueryEditor = ({ query, onChange, onRunQuery, fieldsTab, data
   };
 
   const onRowClick = async (evt: any, row: any) => {
+    setEntrypointTable({ ...entrypointTable, clickedRow: row });
     let id = row['@iot.id'];
 
     if (id === undefined) {
       return;
     }
-    let newQuery: JsonApiQuery = {
-      ...query,
-      selectedEntrypoint: row,
-    };
-    onChange(newQuery);
-    let result = await getSelection(
-      '/' + query.entrypointUrlPath + '(' + id + ')' + '/Datastreams?',
+
+    let result = await datasource.selectionRequest(
+      { ...q, urlPath: `/${entrypoint}(${id})/Datastreams?` },
       [],
       0,
-      datastream.pageSize
+      datastreamTable.pageSize
     );
 
-    setDatastream({
-      ...datastream,
+    setDatastreamTable({
+      ...datastreamTable,
       data: result.value,
       count: result.count,
       columns: filterColumns(getTableHeaders(result.value)).map((col) => ({ title: col, field: col })),
       page: 0,
-    });
-  };
-
-  const onRowClickDatastream = (evt: any, row: any) => {
-    let id = row['@iot.id'];
-
-    if (id === undefined) {
-      return;
-    }
-
-    onChange({
-      ...query,
-      urlPath: '/Datastreams(' + id + ')' + '/Observations?$orderby=phenomenonTime asc',
-      selectedDatastream: row,
-      fields: [
-        { name: 'Time', jsonPath: '$.value[*].phenomenonTime', language: 'jsonpath' },
-        {
-          name: row['unitOfMeasurement']['symbol'] ? row['unitOfMeasurement']['symbol'] : 'Result',
-          jsonPath: '$.value[*].result',
-          language: 'jsonpath',
-        },
-      ],
-    });
-    onRunQuery();
-  };
-
-  const onFilterChangeEntry = async (filters: Array<Filter<any>>) => {
-    let result = await getSelection('/' + query.entrypointUrlPath + '?', filters, 0, entrypoint.pageSize);
-
-    if (result === undefined) {
-      return;
-    }
-
-    setEntrypoint({ ...entrypoint, data: result.value, count: result.count, page: 0, filters: filters });
-
-    /*let headers = getTableHeaders(result);
-    headers = filterColumns(headers);
-    let newColumns = entrypointColumns.concat(headers);
-    setEntrypointColumns([...new Set(newColumns)]); - When new headers are added - old inputs are deleted?
-    
-
-    setDatastreams([]);
-    setDatastreamColumns([]);*/
-
-    onChange({ ...query });
-  };
-
-  const onFilterChangeDatastream = async (filters: Array<Filter<any>>) => {
-    let id = query.selectedEntrypoint['@iot.id'];
-
-    if (id === undefined) {
-      return;
-    }
-
-    let result = await getSelection(
-      '/' + query.entrypointUrlPath + '(' + id + ')/Datastreams' + '?',
-      filters,
-      0,
-      datastream.pageSize
-    );
-
-    if (result === undefined) {
-      return;
-    }
-
-    setDatastream({ ...datastream, data: result.value, count: result.count, page: 0, filters: filters });
-  };
-
-  const onPageChangeEntrypoint = async (page: number, pageSize: number) => {
-    let result = await getSelection('/' + query.entrypointUrlPath + '?', entrypoint.filters, page * pageSize, pageSize);
-
-    if (result === undefined) {
-      return;
-    }
-
-    setEntrypoint({
-      ...entrypoint,
-      data: result.value,
-      count: result.count,
-      //columns: filterColumns(getTableHeaders(result.value)),
-      page: page,
-    });
-  };
-
-  const onPageChangeDatastream = async (page: number, pageSize: number) => {
-    let id = query.selectedEntrypoint['@iot.id'];
-
-    if (id === undefined) {
-      return;
-    }
-
-    let result = await getSelection(
-      '/' + query.entrypointUrlPath + '(' + id + ')/Datastreams' + '?',
-      datastream.filters,
-      page * pageSize,
-      pageSize
-    );
-
-    if (result === undefined) {
-      return;
-    }
-
-    setDatastream({
-      ...datastream,
-      data: result.value,
-      count: result.count,
-      //columns: filterColumns(getTableHeaders(result.value)),
-      page: page,
+      clickedRow: undefined,
     });
   };
 
@@ -306,7 +158,7 @@ export const TabbedQueryEditor = ({ query, onChange, onRunQuery, fieldsTab, data
           <Label> Select Entrypoint</Label>
           <InlineField label={'Entrypoint'} tooltip={''}>
             <Segment
-              value={{ label: query.entrypointUrlPath, value: query.entrypointUrlPath }}
+              value={{ label: entrypoint, value: entrypoint }}
               options={['Things', 'ObservedProperties', 'Sensors'].map((value) => ({
                 label: value,
                 value: value,
@@ -321,60 +173,28 @@ export const TabbedQueryEditor = ({ query, onChange, onRunQuery, fieldsTab, data
             <Container>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  {query.entrypointUrlPath !== '' ? (
-                    <MaterialTable
-                      title={query.entrypointUrlPath}
-                      columns={entrypoint.columns}
-                      data={entrypoint.data}
-                      totalCount={entrypoint.count}
-                      page={entrypoint.page}
+                  {entrypoint !== undefined ? (
+                    <EntrypointTable
+                      table={entrypointTable}
+                      entrypoint={entrypoint}
+                      datasource={datasource}
+                      onEntrypointChange={setEntrypointTable}
+                      query={query}
                       onRowClick={onRowClick}
-                      onPageChange={onPageChangeEntrypoint}
-                      onFilterChange={onFilterChangeEntry}
-                      onRowsPerPageChange={(pageSize: number) => {
-                        setEntrypoint({ ...entrypoint, pageSize: pageSize });
-                      }}
-                      options={{
-                        filtering: true,
-                        pageSize: 5,
-                        pageSizeOptions: [5, 10, 20],
-                        search: false,
-                        showEmptyDataSourceMessage: true,
-                        headerStyle: {
-                          position: 'sticky',
-                          top: 0,
-                        },
-                        maxBodyHeight: '500px',
-                      }}
                     />
                   ) : null}
                 </Grid>
                 <Grid item xs={6}>
-                  {query.selectedEntrypoint !== '' ? (
-                    <MaterialTable
-                      title="Datastreams"
-                      columns={datastream.columns}
-                      data={datastream.data}
-                      totalCount={datastream.count}
-                      page={datastream.page}
-                      onPageChange={onPageChangeDatastream}
-                      onRowClick={onRowClickDatastream}
-                      onFilterChange={onFilterChangeDatastream}
-                      onRowsPerPageChange={(pageSize: number) => {
-                        setDatastream({ ...datastream, pageSize: pageSize });
-                      }}
-                      options={{
-                        filtering: true,
-                        pageSize: 5,
-                        pageSizeOptions: [5, 10, 20],
-                        search: false,
-                        showEmptyDataSourceMessage: true,
-                        headerStyle: {
-                          position: 'sticky',
-                          top: 0,
-                        },
-                        maxBodyHeight: '500px',
-                      }}
+                  {entrypoint !== undefined && entrypointTable.clickedRow !== undefined ? (
+                    <DatastreamTable
+                      table={datastreamTable}
+                      query={query}
+                      selectedEntrypoint={entrypointTable.clickedRow}
+                      entrypoint={entrypoint}
+                      datasource={datasource}
+                      onChange={onChange}
+                      onTableChange={setDatastreamTable}
+                      onRunQuery={onRunQuery}
                     />
                   ) : null}
                 </Grid>
