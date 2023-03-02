@@ -38,7 +38,7 @@
     "@grafana/data": "^9.0.6",
     "@grafana/runtime": "^9.0.6",
     "@grafana/toolkit": "9.3.6",
-    "@grafana/ui": "^9.3.1",
+    "@grafana/ui": "^9.4.2",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/lodash": "^4.14.191",
