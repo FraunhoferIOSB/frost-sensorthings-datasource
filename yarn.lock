@@ -8194,10 +8194,10 @@ json5@2.x, json5@^2.1.2, json5@^2.2.1:
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.2.tgz#64471c5bdcc564c18f7c1d4df2e2297f2457c5ab"
   integrity sha512-46Tk9JiOL2z7ytNQWFLpj99RZkVgeHf87yGQKsIkaPz1qSH9UczKH1rO7K3wgRselo0tYMUNfecYpm/p1vC7tQ==
 
-jsonata@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/jsonata/-/jsonata-2.0.2.tgz#e41eb01e2aa05ac3cca3d25c04dd1ad3c4e0f723"
-  integrity sha512-CpwbpFNjuuukU+tIR6Qw+fhwQQ5iZGbB/Md8CVaU7/b/SI1RlQQVgf4rIEjoiG9/jDB7C45nKKwHXWKHQxvb7w==
+jsonata@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/jsonata/-/jsonata-2.0.3.tgz#f8971c2891cb1d6ebfeecbfe657ecc38c1b843a5"
+  integrity sha512-Up2H81MUtjqI/dWwWX7p4+bUMfMrQJVMN/jW6clFMTiYP528fBOBNtRu944QhKTs3+IsVWbgMeUTny5fw2VMUA==
 
 jsonfile@^6.0.1:
   version "6.1.0"
