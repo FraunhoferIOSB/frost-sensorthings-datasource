@@ -10588,10 +10588,10 @@ react-use@17.4.0:
     ts-easing "^0.2.0"
     tslib "^2.1.0"
 
-react-virtualized-auto-sizer@^1.0.15:
-  version "1.0.15"
-  resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.15.tgz#84558bcab61a625d13ec37876639bb09c5a3ec0b"
-  integrity sha512-01yhkssgHShMiu5W8k+86kgl8lutpl+Uef9KP4wrozXnzZjxWIgj+cH8Qi064oQpKD8myn/JNMzp4tcZNQ3Avg==
+react-virtualized-auto-sizer@^1.0.18:
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.18.tgz#ccb15d2ad0fdd23444b3d706ea671e415532d2bf"
+  integrity sha512-GQ+F6z6+upBGmoed5SyiAT3ZBLOeOJr4xH76dsARfRf4vmjspexsnSrMayDg7+xXmnW+BrKppqGh64s79w2xuA==
 
 react-window@1.8.7:
   version "1.8.7"
