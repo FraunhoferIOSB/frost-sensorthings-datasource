@@ -31,7 +31,7 @@
     "jsonata": "^2.0.3",
     "jsonpath-plus": "^7.0.0",
     "memory-cache": "^0.2.0",
-    "tslib": "^2.5.0"
+    "tslib": "^2.5.2"
   },
   "devDependencies": {
     "@emotion/core": "11.0.0",
