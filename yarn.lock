@@ -1903,13 +1903,41 @@
     uplot "1.6.22"
     xss "1.0.11"
 
-"@grafana/data@9.5.2", "@grafana/data@^9.0.6":
+"@grafana/data@9.5.2":
   version "9.5.2"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.5.2.tgz#983042208a61c3a321499da7837fdd2ecbe7a04c"
   integrity sha512-L5lXzwPfG1Zu04slMLVqwETykYoWfJFqB7HqeqHWRtUD4YW7NlsyNXnSI7/d0GnbPGNWjejWFxjss3jq4Beq5Q==
   dependencies:
     "@braintree/sanitize-url" "6.0.2"
     "@grafana/schema" "9.5.2"
+    "@types/d3-interpolate" "^3.0.0"
+    d3-interpolate "3.0.1"
+    date-fns "2.29.3"
+    dompurify "^2.4.3"
+    eventemitter3 "5.0.0"
+    fast_array_intersect "1.1.0"
+    history "4.10.1"
+    lodash "4.17.21"
+    marked "4.2.12"
+    moment "2.29.4"
+    moment-timezone "0.5.41"
+    ol "7.2.2"
+    papaparse "5.3.2"
+    react-use "17.4.0"
+    regenerator-runtime "0.13.11"
+    rxjs "7.8.0"
+    tinycolor2 "1.6.0"
+    tslib "2.5.0"
+    uplot "1.6.24"
+    xss "^1.0.14"
+
+"@grafana/data@^9.5.3":
+  version "9.5.3"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.5.3.tgz#2a6930cce1aa1a1f469c510c745cf4cb59158a2d"
+  integrity sha512-JO441E1puweeXO6bSu3QE6a2v5x3ZOyYlcHd66TBo4OOEvaqJOMz8P+uD2B9MKpnN+1VkSo83/MUNuQaQ2yJtA==
+  dependencies:
+    "@braintree/sanitize-url" "6.0.2"
+    "@grafana/schema" "9.5.3"
     "@types/d3-interpolate" "^3.0.0"
     d3-interpolate "3.0.1"
     date-fns "2.29.3"
@@ -2009,6 +2037,13 @@
   version "9.5.2"
   resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.5.2.tgz#336587ceb9cb1391b3d07d9e0372a7812cb7b215"
   integrity sha512-EbJLpdS4Zt7e8p40DVWOdGrTz0M8LRrCHGuHZnpz7xcFmwWTwu5bh/i1n4i98QYmF5cD+oAcRaHqRqT15HYORw==
+  dependencies:
+    tslib "2.5.0"
+
+"@grafana/schema@9.5.3":
+  version "9.5.3"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.5.3.tgz#dc873536000adf80287006fd2b35c1c8968e0d15"
+  integrity sha512-Ol0bRg/uI8jGyWfqxFcOJVcJoscpkIIGFt2IXzBgoeXLQLKc23HoUXFq2UEvWAu8heJUQC8Fk7L6i3MUGINq3g==
   dependencies:
     tslib "2.5.0"
 
@@ -11344,14 +11379,14 @@ rw@1, rw@^1.3.3:
   resolved "https://registry.yarnpkg.com/rw/-/rw-1.3.3.tgz#3f862dfa91ab766b14885ef4d01124bfda074fb4"
   integrity sha1-P4Yt+pGrdmsUiF700BEkv9oHT7Q=
 
-rxjs@7.5.5, rxjs@^7.2.0, rxjs@^7.5.5:
+rxjs@7.5.5:
   version "7.5.5"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.5.tgz#2ebad89af0f560f460ad5cc4213219e1f7dd4e9f"
   integrity sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==
   dependencies:
     tslib "^2.1.0"
 
-rxjs@7.8.0:
+rxjs@7.8.0, rxjs@^7.2.0, rxjs@^7.5.5:
   version "7.8.0"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.8.0.tgz#90a938862a82888ff4c7359811a595e14e1e09a4"
   integrity sha512-F2+gxDshqmIub1KdvZkaEfGDwLNpPvk9Fs6LD/MyQxNgMds/WH9OdDDXOmxUZpME+iSK3rQCctkL0DYyytUqMg==
