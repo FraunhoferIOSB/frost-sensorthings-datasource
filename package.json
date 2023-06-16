@@ -42,7 +42,7 @@
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/lodash": "^4.14.195",
-    "@types/memory-cache": "^0.2.2",
+    "@types/memory-cache": "^0.2.3",
     "@types/react-virtualized-auto-sizer": "^1.0.0",
     "emotion": "10.0.27",
     "react-virtualized-auto-sizer": "^1.0.20"
