@@ -39,7 +39,7 @@
     "@grafana/runtime": "^9.0.6",
     "@grafana/toolkit": "9.5.2",
     "@grafana/ui": "^9.3.1",
-    "@testing-library/jest-dom": "5.16.5",
+    "@testing-library/jest-dom": "5.17.0",
     "@testing-library/react": "^14.0.0",
     "@types/lodash": "^4.14.195",
     "@types/memory-cache": "^0.2.3",
