@@ -18,7 +18,7 @@ A data source plugin for loading OGC SensorThings API data into [Grafana](https:
 6. Add a panel (bar icon with plus on the top right)
 7. Make sure the correct datasource is chosen.
 8. Choose Advanced mode and select the desired cache time. Add your path to the Observations you want to visualize (without the baseURL, but keeping the leading _/_) e.g. `/Datastreams(1)/Observations`. It is recommended to order the Observations by phenomenonTime (`?$orderby=phenomenonTime`).
-9. The fields must be mapped manually to the axes. Select _Manually assign fields_. For the time axis select `Type:time` and assign it to `$.value[*].phenomenonTime`. For the value select `Type:number` and assign it to `$.value[*].result`.
+
 
 ## Further Documentation
 Full documentation for the plugin is available on [website](https://github.com/FraunhoferIOSB/frost-sensorthings-datasource). The developer documentation can be found on [GitHub](https://github.com/FraunhoferIOSB/frost-sensorthings-datasource/tree/master/docs/DevelopmentSetup.md).

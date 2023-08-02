@@ -2,14 +2,9 @@
 
 1. Make sure you have a working Docker setup.
 2. (Optional) Start a local FROST Server, e.g. using Docker
-3. start Grafana with Docker (on Windows you may need to replace `$pwd` with the actual path using the right syntax, like `'c:\Grafana\plugings'` or `c:\\Grafana\\plugings`):
-```bash
-docker run -d --rm \
-    -v $(pwd):/var/lib/grafana/plugins \
-    -e GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=iosb-sensorthings-datasource \
-    -p 3000:3000 \
-    --name grafana-sensorthings \
-    grafana/grafana:latest
+3. Start Grafana with docker-comopse (make sure you are in the project folder):
+```bash 
+docker-compose up
 ```
 Grafana is now reachable on [`http://localhost:3000`](http://localhost:3000).
 4. If not available, install yarn. Either installing using `npm`
@@ -22,13 +17,12 @@ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt update && sudo apt install yarn
 ```
-5. Build the plugin and restart the docker container:
+5. Build the plugin and start livereload: (connect over livereload with grafana)
 ```bash
-  yarn install
-  yarn dev && docker restart grafana-sensorthings
+yarn install
+yarn dev 
 ```
-6. You can use
-```bash
-  yarn watch
-```
-during development (build has lesser strict requirements), some changes need to rerun `yarn dev` like in step 5.
+
+Now if you do a code change, yarn automatically build a new version, and sync it with Grafana.
+
+Hint: If you use yarn in wsl and but your project is on windows, livereload doesn't work.
