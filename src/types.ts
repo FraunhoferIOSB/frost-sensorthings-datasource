@@ -60,7 +60,7 @@ export const defaultQuery: Partial<JsonApiQuery> = {
   queryParams: '',
   urlPath: '',
   fields: [
-    { name: 'Time', jsonPath: '$.value[*].phenomenonTime.start', type:FieldType.time, language: 'jsonpath'}, 
+    { name: 'Time', jsonPath: '$.value[*].phenomenonTime', type:FieldType.time, language: 'jsonpath'},
     { name: 'Result', jsonPath: '$.value[*].result', type:FieldType.number, language: 'jsonpath' }
   ],
 };
