@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.0.5
+* Fixed bug when `Manually Assign Fields` is empty
+* Added default mapping for fields
+* Updated dependencies
+
 ## Version 0.0.4
 * Simplified configuration while selecting Datastream
 * Updated dependencies
