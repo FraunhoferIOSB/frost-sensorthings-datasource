@@ -1,5 +1,7 @@
 # Changelog
 
+## Version 0.0.6
+
 ## Version 0.0.5
 * Fixed bug when `Manually Assign Fields` is empty
 * Added default mapping for fields
