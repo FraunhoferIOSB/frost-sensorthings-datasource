@@ -1330,7 +1330,7 @@
   dependencies:
     tslib "^2.4.0"
 
-"@grafana/data@10.0.3", "@grafana/data@^10.0.3":
+"@grafana/data@10.0.3":
   version "10.0.3"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-10.0.3.tgz#648f4560daf102fe44afad35ac2b95aab29c441e"
   integrity sha512-JW2A5DK+D6cmijDP1S/+/yYXz+NN0nElzvYiv1nesrNdd/4tNKPVtokX/bg0jdWgGc6Kpt3wJNv6gkxDQg8+PQ==
@@ -1357,6 +1357,37 @@
     string-hash "^1.1.3"
     tinycolor2 "1.6.0"
     tslib "2.5.0"
+    uplot "1.6.24"
+    xss "^1.0.14"
+
+"@grafana/data@^10.1.2":
+  version "10.1.2"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-10.1.2.tgz#f0f4122d054934bc7d972bafa9a7bc2a53f767e1"
+  integrity sha512-ue/OEciIlWxE9wJnyBlNRwt78VgnH8SIubs+Q8W2W5pMerPXMHXRctTFbh/qY93xLNkePy273Chd5TEQZPpYLg==
+  dependencies:
+    "@braintree/sanitize-url" "6.0.2"
+    "@grafana/schema" "10.1.2"
+    "@types/d3-interpolate" "^3.0.0"
+    "@types/string-hash" "1.1.1"
+    d3-interpolate "3.0.1"
+    date-fns "2.30.0"
+    dompurify "^2.4.3"
+    eventemitter3 "5.0.0"
+    fast_array_intersect "1.1.0"
+    history "4.10.1"
+    lodash "4.17.21"
+    marked "5.1.1"
+    marked-mangle "1.1.0"
+    moment "2.29.4"
+    moment-timezone "0.5.41"
+    ol "7.4.0"
+    papaparse "5.4.1"
+    react-use "17.4.0"
+    regenerator-runtime "0.13.11"
+    rxjs "7.8.0"
+    string-hash "^1.1.3"
+    tinycolor2 "1.6.0"
+    tslib "2.6.0"
     uplot "1.6.24"
     xss "^1.0.14"
 
@@ -1463,6 +1494,13 @@
   integrity sha512-0CBAB3HamQBuNaQXpN1B27Pq7yfFs5VBf7Y1vbuUcNnYEnZg4YtbBR8IiVeCLl3v4NjauskbRIu7iTafZOcBpQ==
   dependencies:
     tslib "2.5.0"
+
+"@grafana/schema@10.1.2":
+  version "10.1.2"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-10.1.2.tgz#1dbf97ac9577f38db3564cd228791c02f81ae176"
+  integrity sha512-k1fZ6ot4LWYNFGOlXJy/W6xEl9FJ3wo0tsCUmJhjq2/+MCLDHerQV5vVJ7m7jyLrb6n+eQZft/P5WcnXI4uwxA==
+  dependencies:
+    tslib "2.6.0"
 
 "@grafana/tsconfig@^1.2.0-rc1":
   version "1.2.0-rc1"
@@ -4681,7 +4719,7 @@ date-fns@2.29.3:
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.3.tgz#27402d2fc67eb442b511b70bbdf98e6411cd68a8"
   integrity sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==
 
-date-fns@^2.16.1:
+date-fns@2.30.0, date-fns@^2.16.1:
   version "2.30.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.30.0.tgz#f367e644839ff57894ec6ac480de40cae4b0f4d0"
   integrity sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==
@@ -7433,10 +7471,20 @@ mapbox-to-css-font@^2.4.1:
   resolved "https://registry.yarnpkg.com/mapbox-to-css-font/-/mapbox-to-css-font-2.4.2.tgz#a9e31b363ad8ca881cd339ca99f2d2a6b02ea5dd"
   integrity sha512-f+NBjJJY4T3dHtlEz1wCG7YFlkODEjFIYlxDdLIDMNpkSksqTt+l/d4rjuwItxuzkuMFvPyrjzV2lxRM4ePcIA==
 
+marked-mangle@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/marked-mangle/-/marked-mangle-1.1.0.tgz#f9f0adfbb841079d7342368bc5c7592ba93e3527"
+  integrity sha512-ed2W2gMB2HIBaYasBZveMFJfDRTL2OFycr0GgUSPcBSNl5dX+1r6lHG6u1eFXw7kej2hBTWa1m6YZqcfn4Coxw==
+
 marked@4.2.12:
   version "4.2.12"
   resolved "https://registry.yarnpkg.com/marked/-/marked-4.2.12.tgz#d69a64e21d71b06250da995dcd065c11083bebb5"
   integrity sha512-yr8hSKa3Fv4D3jdZmtMMPghgVt6TWbk86WQaWhDloQjRSQhMMYCAro7jP7VDJrjjdV8pxVxMssXS8B8Y5DZ5aw==
+
+marked@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-5.1.1.tgz#40b3963bb9da225314f746d5012ba7e34942f636"
+  integrity sha512-bTmmGdEINWmOMDjnPWDxGPQ4qkDLeYorpYbEtFOXzOruTwUE671q4Guiuchn4N8h/v6NGd7916kXsm3Iz4iUSg==
 
 mdn-data@2.0.14:
   version "2.0.14"
@@ -7784,6 +7832,15 @@ object.values@^1.1.6:
     define-properties "^1.1.4"
     es-abstract "^1.20.4"
 
+ol-mapbox-style@^10.1.0:
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/ol-mapbox-style/-/ol-mapbox-style-10.7.0.tgz#8837912da2a16fbd22992d76cbc4f491c838b973"
+  integrity sha512-S/UdYBuOjrotcR95Iq9AejGYbifKeZE85D9VtH11ryJLQPTZXZSW1J5bIXcr4AlAH6tyjPPHTK34AdkwB32Myw==
+  dependencies:
+    "@mapbox/mapbox-gl-style-spec" "^13.23.1"
+    mapbox-to-css-font "^2.4.1"
+    ol "^7.3.0"
+
 ol-mapbox-style@^9.2.0:
   version "9.7.0"
   resolved "https://registry.yarnpkg.com/ol-mapbox-style/-/ol-mapbox-style-9.7.0.tgz#38a4f7abc8f0a94f378dcdb7cefdcc69ca3f6287"
@@ -7800,6 +7857,28 @@ ol@7.2.2:
     earcut "^2.2.3"
     geotiff "^2.0.7"
     ol-mapbox-style "^9.2.0"
+    pbf "3.2.1"
+    rbush "^3.0.1"
+
+ol@7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/ol/-/ol-7.4.0.tgz#935436c0843d1f939972e076d4fcb130530ce9d7"
+  integrity sha512-bgBbiah694HhC0jt8ptEFNRXwgO8d6xWH3G97PCg4bmn9Li5nLLbi59oSrvqUI6VPVwonPQF1YcqJymxxyMC6A==
+  dependencies:
+    earcut "^2.2.3"
+    geotiff "^2.0.7"
+    ol-mapbox-style "^10.1.0"
+    pbf "3.2.1"
+    rbush "^3.0.1"
+
+ol@^7.3.0:
+  version "7.5.2"
+  resolved "https://registry.yarnpkg.com/ol/-/ol-7.5.2.tgz#2e40a16b45331dbee86ca86876fcc7846be0dbb7"
+  integrity sha512-HJbb3CxXrksM6ct367LsP3N+uh+iBBMdP3DeGGipdV9YAYTP0vTJzqGnoqQ6C2IW4qf8krw9yuyQbc9fjOIaOQ==
+  dependencies:
+    earcut "^2.2.3"
+    geotiff "^2.0.7"
+    ol-mapbox-style "^10.1.0"
     pbf "3.2.1"
     rbush "^3.0.1"
 
@@ -7888,6 +7967,11 @@ papaparse@5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-5.3.2.tgz#d1abed498a0ee299f103130a6109720404fbd467"
   integrity sha512-6dNZu0Ki+gyV0eBsFKJhYr+MdQYAzFUGlBMNj3GNrmHxmz1lfRa24CjFObPXtjcetlOv5Ad299MhIK0znp3afw==
+
+papaparse@5.4.1:
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-5.4.1.tgz#f45c0f871853578bd3a30f92d96fdcfb6ebea127"
+  integrity sha512-HipMsgJkZu8br23pW15uvo6sib6wne/4woLZPlFf3rpDyMe9ywEXUsuD7+6K9PRkJlVT51j/sCOYDKGGS3ZJrw==
 
 parent-module@^1.0.0:
   version "1.0.1"
