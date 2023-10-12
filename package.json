@@ -46,7 +46,7 @@
     "tslib": "2.6.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.10",
+    "@babel/core": "^7.23.2",
     "@emotion/core": "11.0.0",
     "@grafana/e2e": "10.0.3",
     "@grafana/e2e-selectors": "10.1.0",
