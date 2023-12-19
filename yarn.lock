@@ -1399,14 +1399,14 @@
     tslib "2.5.0"
     typescript "4.8.4"
 
-"@grafana/e2e-selectors@10.1.0":
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-10.1.0.tgz#421881e385abae6e355ea38e9e6e4d3451ddb0da"
-  integrity sha512-6c7FSVTw0V3A34GIXvbQz2/TL9r3io7rkYMPd0IodEYCJ5nfQCi/qdyuOtt3KA10HjDIl+0ctNXSaMg3pw6CXg==
+"@grafana/e2e-selectors@10.2.3":
+  version "10.2.3"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-10.2.3.tgz#de89ee7b9262a600539a5a72440d962e0c60e92e"
+  integrity sha512-As8ZAEi0hqxbCKEnetVVSQlUBWBQPdm1995zraPqHbrekfV862T+HUemuOveTnA6NwNl+ocs8thKNgxQAcExtg==
   dependencies:
     "@grafana/tsconfig" "^1.2.0-rc1"
     tslib "2.6.0"
-    typescript "4.8.4"
+    typescript "5.2.2"
 
 "@grafana/e2e@10.0.3":
   version "10.0.3"
