@@ -12,7 +12,7 @@
 4. Start Grafana with docker-compose (make sure you are in the project folder):
 
    ```bash
-   docker-compose up
+   docker compose up -d
    ```
 
 Grafana is now reachable on [`http://localhost:3000`](http://localhost:3000).
