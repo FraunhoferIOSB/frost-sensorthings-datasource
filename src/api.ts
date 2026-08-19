@@ -1,10 +1,10 @@
 import { BackendSrvRequest, getBackendSrv } from '@grafana/runtime';
-import cache from 'memory-cache';
 import { Observable } from 'rxjs';
+import { Cache } from './cache';
 import { Pair } from 'types';
 
 export default class Api {
-  cache: any;
+  cache: Cache;
   baseUrl: string;
   params: URLSearchParams;
   lastCacheDuration: number | undefined;
@@ -12,7 +12,7 @@ export default class Api {
   constructor(baseUrl: string, params: string) {
     this.baseUrl = baseUrl;
     this.params = new URLSearchParams('?' + params);
-    this.cache = new cache.Cache();
+    this.cache = new Cache();
   }
 
   /**
@@ -108,12 +108,12 @@ export default class Api {
 
   /**
    * Simplefied Fetch request to test.
-   * @param method 
-   * @param path 
-   * @param params 
-   * @param headers 
-   * @param data 
-   * @returns 
+   * @param method
+   * @param path
+   * @param params
+   * @param headers
+   * @param data
+   * @returns
    */
   simpleRequest(
     method: string,
@@ -130,16 +130,16 @@ export default class Api {
         recordHeaders[key] = value;
       });
 
-      const req: BackendSrvRequest = {
-        url: this.baseUrl + path,
-        method,
-        headers: recordHeaders,
-      };
-  
-      if (req.method !== 'GET' && data) {
-        req.data = data;
-      }
-      return getBackendSrv().fetch(req);
+    const req: BackendSrvRequest = {
+      url: this.baseUrl + path,
+      method,
+      headers: recordHeaders,
+    };
+
+    if (req.method !== 'GET' && data) {
+      req.data = data;
+    }
+    return getBackendSrv().fetch(req);
   }
 
   /**

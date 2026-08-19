@@ -13,14 +13,19 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: "20.x"
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Cache yarn cache
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v4
         id: cache-yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -30,7 +35,7 @@ jobs:
 
       - name: Cache node_modules
         id: cache-node-modules
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
@@ -40,5 +45,19 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build and test frontend
-        run: yarn build
+      - name: Check formatting
+        run: |
+          cd pkg && gofmt -l .
+          test -z "$(gofmt -l .)"
+
+      - name: Run backend tests
+        run: make test
+
+      - name: Build frontend and backend
+        run: make build
+
+      - name: Run frontend tests
+        run: yarn test:ci
+
+      - name: Typecheck
+        run: yarn typecheck

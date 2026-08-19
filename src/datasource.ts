@@ -1,5 +1,4 @@
 import {
-  ArrayVector,
   DataFrame,
   DataQueryRequest,
   DataQueryResponse,
@@ -58,16 +57,16 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
 
     (filters ?? []).forEach((filter, index) => {
       if (index === 0) {
-        buildUrl = buildUrl 
-          + '$filter=startswith(' 
-          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title): (filter.column.title)?.toString().replace('.', '/')) 
+        buildUrl = buildUrl
+          + '$filter=startswith('
+          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title) : (filter.column.title)?.toString().replace('.', '/'))
           + ',\'' + filter.value + '\')';
-        
+
       } else {
-        buildUrl = buildUrl 
-          + ' and startswith(' 
-          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title): (filter.column.title)?.toString().replace('.', '/')) + ',\'' 
-          + filter.value  + '\')';
+        buildUrl = buildUrl
+          + ' and startswith('
+          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title) : (filter.column.title)?.toString().replace('.', '/')) + ',\''
+          + filter.value + '\')';
       }
     })
 
@@ -84,8 +83,8 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
     if (top) {
       buildUrl = buildUrl + '&$top=' + top;
     }
-  
-    const result = await this.requestJson({...query, urlPath: buildUrl}, replace());
+
+    const result = await this.requestJson({ ...query, urlPath: buildUrl }, replace());
     const value: any[] = result['value'];
     const count = result['@iot.count'];
 
@@ -134,6 +133,32 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
 
     // Wait for all queries to finish before returning the result.
     return { data: res.flatMap((frames) => frames) };
+  }
+
+  /**
+   * Interpolates template variables in the query before it is executed by
+   * the plugin backend. Since the backend cannot resolve Grafana template
+   * variables, they have to be replaced on the frontend first.
+   */
+  applyTemplateVariables(query: JsonApiQuery, scopedVars: ScopedVars): JsonApiQuery {
+    const interpolate = replace(scopedVars);
+    const interpolateKeyValue = ([key, value]: Pair<string, string>): Pair<string, string> => [
+      interpolate(key),
+      interpolate(value),
+    ];
+
+    return {
+      ...query,
+      urlPath: interpolate(query.urlPath),
+      params: (query.params ?? []).map(interpolateKeyValue),
+      headers: (query.headers ?? []).map(interpolateKeyValue),
+      body: interpolate(query.body),
+      fields: (query.fields ?? []).map((field) => ({
+        ...field,
+        name: interpolate(field.name ?? ''),
+        jsonPath: interpolate(field.jsonPath),
+      })),
+    };
   }
 
   /**
@@ -287,7 +312,7 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
             return {
               name: replaceWithVars(field.name ?? '') || (query.fields.length > 1 ? `result${index}` : 'result'),
               type: field.type ? field.type : detectFieldType(arrayResult),
-              values: new ArrayVector(arrayResult),
+              values: arrayResult as any[],
               config: {},
             };
           //We always use JSONPATH
@@ -305,7 +330,7 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
             return {
               name: replaceWithVars(field.name ?? '') || paths[paths.length - 1],
               type: propertyType,
-              values: new ArrayVector(typedValues),
+              values: typedValues,
               config: {},
             };
         }
@@ -321,20 +346,20 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
 
     const frames = query.experimentalGroupByField
       ? groupBy(
-          toDataFrame({
-            name: query.refId,
-            refId: query.refId,
-            fields: fields,
-          }),
-          query.experimentalGroupByField
-        )
+        toDataFrame({
+          name: query.refId,
+          refId: query.refId,
+          fields: fields,
+        }),
+        query.experimentalGroupByField
+      )
       : [
-          toDataFrame({
-            name: query.refId,
-            refId: query.refId,
-            fields: fields,
-          }),
-        ];
+        toDataFrame({
+          name: query.refId,
+          refId: query.refId,
+          fields: fields,
+        }),
+      ];
 
     const res = frames.map((frame) => ({
       ...frame,
@@ -365,18 +390,18 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
 
 const replace =
   (scopedVars?: any, range?: TimeRange) =>
-  (str: string): string => {
-    return replaceMacros(getTemplateSrv().replace(str, scopedVars), range);
-  };
+    (str: string): string => {
+      return replaceMacros(getTemplateSrv().replace(str, scopedVars), range);
+    };
 
 // replaceMacros substitutes all available macros with their current value.
 export const replaceMacros = (str: string, range?: TimeRange) => {
   return range
     ? str
-        .replace(/\$__unixEpochFrom\(\)/g, range.from.unix().toString())
-        .replace(/\$__unixEpochTo\(\)/g, range.to.unix().toString())
-        .replace(/\$__isoFrom\(\)/g, range.from.toISOString())
-        .replace(/\$__isoTo\(\)/g, range.to.toISOString())
+      .replace(/\$__unixEpochFrom\(\)/g, range.from.unix().toString())
+      .replace(/\$__unixEpochTo\(\)/g, range.to.unix().toString())
+      .replace(/\$__isoFrom\(\)/g, range.from.toISOString())
+      .replace(/\$__isoTo\(\)/g, range.to.toISOString())
     : str;
 };
 
@@ -385,7 +410,7 @@ export const groupBy = (frame: DataFrame, fieldName: string): DataFrame[] => {
   if (!groupByField) {
     return [frame];
   }
-  const uniqueValues = new Set<string>(groupByField.values.toArray().map((value) => value.toString()));
+  const uniqueValues = new Set<string>(groupByField.values.map((value) => value.toString()));
 
   const frames = [...uniqueValues].map((groupByValue) => {
     const fields: Field[] = frame.fields
@@ -393,11 +418,9 @@ export const groupBy = (frame: DataFrame, fieldName: string): DataFrame[] => {
       .filter((field) => field.name.toString() !== groupByField.name)
       .map((field) => ({
         ...field,
-        values: new ArrayVector(
-          field.values.toArray().filter((_, idx) => {
-            return groupByField.values.get(idx) === groupByValue;
-          })
-        ),
+        values: field.values.filter((_, idx) => {
+          return groupByField.values[idx] === groupByValue;
+        }),
       }));
 
     return toDataFrame({

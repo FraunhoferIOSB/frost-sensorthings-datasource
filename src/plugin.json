@@ -6,6 +6,9 @@
   "metrics": true,
   "logs": true,
   "annotations": true,
+  "alerting": true,
+  "backend": true,
+  "executable": "gpx_iosb-sensorthings-datasource",
   "info": {
     "description": "A data source plugin for loading data from OGC SensorThings APIs into Grafana.",
     "keywords": [
@@ -34,14 +37,17 @@
       }
     ],
     "screenshots": [
-      { "name": "Displaying NO2 values in Karlsruhe.", "path": "img/screenshot-no2-karlsruhe.png" }
+      {
+        "name": "Displaying NO2 values in Karlsruhe.",
+        "path": "img/screenshot-no2-karlsruhe.png"
+      }
     ],
-    "version": "0.0.6",
+    "version": "0.1.0",
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=7.3.0",
-    "grafanaVersion": "7.3.0",
+    "grafanaDependency": ">=11.0.0",
+    "grafanaVersion": "11.0.0",
     "plugins": []
   }
 }

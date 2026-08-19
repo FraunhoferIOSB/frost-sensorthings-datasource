@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*' # Run workflow on version tags, e.g. v1.0.0.
+      - "v*.*.*" # Run workflow on version tags, e.g. v1.0.0.
 
 jobs:
   release:
@@ -15,19 +15,19 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: "20.x"
 
       - name: Setup Go environment
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.20'
+          go-version: "1.26.x"
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Cache yarn cache
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v4
         id: cache-yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -37,7 +37,7 @@ jobs:
 
       - name: Cache node_modules
         id: cache-node-modules
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
@@ -45,13 +45,18 @@ jobs:
             ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile;
+        run: yarn install --frozen-lockfile
         if: |
           steps.cache-yarn-cache.outputs.cache-hit != 'true' ||
           steps.cache-node-modules.outputs.cache-hit != 'true'
 
-      - name: Build and test frontend
+      - name: Build frontend
         run: yarn build
+
+      - name: Build and test backend
+        run: |
+          make test
+          make backend-all
 
       - name: Sign plugin
         run: yarn sign
@@ -76,7 +81,6 @@ jobs:
           echo "archive-checksum=${GRAFANA_PLUGIN_ARTIFACT_CHECKSUM}" >> $GITHUB_OUTPUT
 
           echo "github-tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-
 
       - name: Read changelog
         id: changelog

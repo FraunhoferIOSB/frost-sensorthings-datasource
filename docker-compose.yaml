@@ -1,13 +1,13 @@
-version: '3.0'
+version: "3.0"
 
 services:
   grafana:
-    container_name: 'iosb-sensorthings-datasource'
+    container_name: "iosb-sensorthings-datasource"
     build:
       context: ./.config
       args:
         grafana_image: ${GRAFANA_IMAGE:-grafana-enterprise}
-        grafana_version: ${GRAFANA_VERSION:-9.5.3}
+        grafana_version: ${GRAFANA_VERSION:-11.6.16}
     ports:
       - 3000:3000/tcp
     volumes:
