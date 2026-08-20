@@ -168,6 +168,80 @@ func TestDataSource_ExecuteQuery_timeFilterApplied(t *testing.T) {
 	}
 }
 
+func TestDataSource_ExecuteQuery_customTimeProperty(t *testing.T) {
+	var gotFilter string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		gotFilter = r.URL.Query().Get("$filter")
+		_, _ = w.Write(mustJSON(t, sampleObservations()))
+	}))
+	defer server.Close()
+
+	ds, err := NewDataSource(context.Background(), backend.DataSourceInstanceSettings{
+		URL:      server.URL,
+		JSONData: json.RawMessage(`{"timeProperty": "resultTime"}`),
+	})
+	if err != nil {
+		t.Fatalf("could not create data source: %v", err)
+	}
+
+	_, err = ds.(*DataSource).executeQuery(context.Background(), JsonApiQuery{
+		RefID:   "A",
+		URLPath: "/Datastreams(1)/Observations",
+		Fields: []JsonField{
+			{Name: "Result", JSONPath: "$.value[*].result", Type: "number"},
+		},
+	}, backend.TimeRange{
+		From: time.Date(2021, 5, 17, 20, 47, 0, 0, time.UTC),
+		To:   time.Date(2021, 5, 17, 20, 51, 0, 0, time.UTC),
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	expectedFilter := "resultTime ge 2021-05-17T20:47:00.000Z and resultTime le 2021-05-17T20:51:00.000Z"
+	if gotFilter != expectedFilter {
+		t.Errorf("expected filter %q, got %q", expectedFilter, gotFilter)
+	}
+}
+
+func TestDataSource_ExecuteQuery_explicitFilterSkipsAutoFilter(t *testing.T) {
+	var gotFilter string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		gotFilter = r.URL.Query().Get("$filter")
+		_, _ = w.Write(mustJSON(t, sampleObservations()))
+	}))
+	defer server.Close()
+
+	ds, err := NewDataSource(context.Background(), backend.DataSourceInstanceSettings{
+		URL:      server.URL,
+		JSONData: json.RawMessage(`{"timeProperty": "resultTime"}`),
+	})
+	if err != nil {
+		t.Fatalf("could not create data source: %v", err)
+	}
+
+	_, err = ds.(*DataSource).executeQuery(context.Background(), JsonApiQuery{
+		RefID:   "A",
+		URLPath: "/Datastreams(1)/Observations?$filter=resultTime ge 2021-05-17T20:47:00.000Z and resultTime le 2021-05-17T20:51:00.000Z",
+		Fields: []JsonField{
+			{Name: "Result", JSONPath: "$.value[*].result", Type: "number"},
+		},
+	}, backend.TimeRange{
+		From: time.Date(2021, 5, 17, 20, 47, 0, 0, time.UTC),
+		To:   time.Date(2021, 5, 17, 20, 51, 0, 0, time.UTC),
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// An explicit filter in the URL path suppresses the automatic filter.
+	if gotFilter != "resultTime ge 2021-05-17T20:47:00.000Z and resultTime le 2021-05-17T20:51:00.000Z" {
+		t.Errorf("unexpected filter: %q", gotFilter)
+	}
+}
+
 func TestDataSource_ExecuteQuery_paging(t *testing.T) {
 	type observation struct {
 		ID     int    `json:"@iot.id"`

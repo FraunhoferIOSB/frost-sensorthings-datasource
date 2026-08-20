@@ -42,6 +42,15 @@ Notes:
 7. Make sure the correct datasource is chosen.
 8. Choose Advanced mode and select the desired cache time. Add your path to the Observations you want to visualize (without the baseURL, but keeping the leading _/_) e.g. `/Datastreams(1)/Observations`. It is recommended to order the Observations by phenomenonTime (`?$orderby=phenomenonTime`).
 
+If no `$filter` is part of the query path, the plugin automatically restricts the
+query to the dashboard time range using
+`$filter=phenomenonTime ge ... and phenomenonTime le ...`. Data sources whose
+observations use a different time property (e.g. only `resultTime`) can change
+the property used here in the data source configuration under
+_Misc_ → _Time property_ (default: `phenomenonTime`). Alternatively, add an
+explicit `$filter` to the query path, e.g.
+`/Datastreams(1)/Observations?$filter=resultTime ge $__isoFrom() and resultTime le $__isoTo()`.
+
 ## Further Documentation
 
 Full documentation for the plugin is available on the plugin [website](https://github.com/FraunhoferIOSB/frost-sensorthings-datasource). The developer documentation can be found on [GitHub](https://github.com/FraunhoferIOSB/frost-sensorthings-datasource/tree/master/docs/DevelopmentSetup.md).

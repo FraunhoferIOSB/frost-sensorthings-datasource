@@ -1,5 +1,5 @@
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { DataSourceHttpSettings, InlineField, InlineFieldRow, Input } from '@grafana/ui';
+import { DataSourceHttpSettings, InlineField, InlineFieldRow, Input, Select } from '@grafana/ui';
 import React, { ChangeEvent } from 'react';
 import { JsonApiDataSourceOptions } from '../types';
 
@@ -16,6 +16,16 @@ export const ConfigEditor: React.FC<Props> = ({ options, onOptionsChange }) => {
       jsonData: {
         ...options.jsonData,
         queryParams: e.currentTarget.value,
+      },
+    });
+  };
+
+  const onTimePropertyChange = (value?: string) => {
+    onOptionsChange({
+      ...options,
+      jsonData: {
+        ...options.jsonData,
+        timeProperty: value,
       },
     });
   };
@@ -42,6 +52,23 @@ export const ConfigEditor: React.FC<Props> = ({ options, onOptionsChange }) => {
             onChange={onParamsChange}
             spellCheck={false}
             placeholder="page=1&limit=100"
+          />
+        </InlineField>
+      </InlineFieldRow>
+      <InlineFieldRow>
+        <InlineField
+          label="Time property"
+          tooltip="SensorThings property used for the automatically added time filter. Defaults to phenomenonTime."
+        >
+          <Select
+            width={50}
+            value={options.jsonData.timeProperty ?? 'phenomenonTime'}
+            onChange={(option) => onTimePropertyChange(option.value)}
+            options={[
+              { label: 'phenomenonTime', value: 'phenomenonTime' },
+              { label: 'resultTime', value: 'resultTime' },
+            ]}
+            allowCustomValue
           />
         </InlineField>
       </InlineFieldRow>

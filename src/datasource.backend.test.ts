@@ -47,6 +47,19 @@ describe('JsonDataSource (DataSourceWithBackend refactor)', () => {
     expect(ds).toBeInstanceOf(DataSourceWithBackend);
   });
 
+  it('defaults the automatic time-filter property to phenomenonTime', () => {
+    const ds = new JsonDataSource(settings);
+    expect(ds.timeProperty).toBe('phenomenonTime');
+  });
+
+  it('reads a custom time property from the data source settings', () => {
+    const ds = new JsonDataSource({
+      ...settings,
+      jsonData: { timeProperty: 'resultTime' },
+    } as unknown as DataSourceInstanceSettings<JsonApiDataSourceOptions>);
+    expect(ds.timeProperty).toBe('resultTime');
+  });
+
   it('delegates to the backend and filters hidden queries', () => {
     const ds = new JsonDataSource(settings);
     const baseQuery = jest

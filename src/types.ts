@@ -60,12 +60,18 @@ export const defaultQuery: Partial<JsonApiQuery> = {
   queryParams: '',
   urlPath: '',
   fields: [
-    { name: 'Time', jsonPath: '$.value[*].phenomenonTime', type:FieldType.time, language: 'jsonpath'},
-    { name: 'Result', jsonPath: '$.value[*].result', type:FieldType.number, language: 'jsonpath' }
+    { name: 'Time', jsonPath: '$.value[*].phenomenonTime', type: FieldType.time, language: 'jsonpath' },
+    { name: 'Result', jsonPath: '$.value[*].result', type: FieldType.number, language: 'jsonpath' }
   ],
 };
 
 
 export interface JsonApiDataSourceOptions extends DataSourceJsonData {
   queryParams?: string;
+
+  /**
+   * SensorThings property used for the automatically added time filter.
+   * Defaults to "phenomenonTime".
+   */
+  timeProperty?: string;
 }

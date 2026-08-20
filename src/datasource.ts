@@ -27,11 +27,13 @@ export interface SensorThingsDataFormat {
 
 export class JsonDataSource extends DataSourceWithBackend<JsonApiQuery, JsonApiDataSourceOptions> {
   api: API;
+  timeProperty: string;
 
   constructor(instanceSettings: DataSourceInstanceSettings<JsonApiDataSourceOptions>) {
     super(instanceSettings);
 
     this.api = new API(instanceSettings.url!, instanceSettings.jsonData.queryParams || '');
+    this.timeProperty = instanceSettings.jsonData.timeProperty || 'phenomenonTime';
   }
 
   /**
@@ -255,11 +257,16 @@ export class JsonDataSource extends DataSourceWithBackend<JsonApiQuery, JsonApiD
         query.urlPath.includes('Filter')
       )
     ) {
+      const timeProperty = this.timeProperty;
       query.urlPath =
         query.urlPath.trim() +
-        '&$filter=phenomenonTime ge ' +
+        '&$filter=' +
+        timeProperty +
+        ' ge ' +
         range?.from.toISOString() +
-        ' and phenomenonTime le ' +
+        ' and ' +
+        timeProperty +
+        ' le ' +
         range?.to.toISOString();
     }
 

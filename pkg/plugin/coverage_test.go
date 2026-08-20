@@ -479,6 +479,52 @@ func TestParseTimeValues_millisecondsPassthrough(t *testing.T) {
 	}
 }
 
+func TestParseTimeValues_empty(t *testing.T) {
+	// A query that returns no observations must not fail: the frontend passes
+	// an empty array through, so the backend has to do the same (otherwise
+	// alert rules evaluated over a range without data error out).
+	values, err := parseTimeValues([]interface{}{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(values) != 0 {
+		t.Errorf("expected empty values, got %v", values)
+	}
+}
+
+func TestParseTimeValues_allNull(t *testing.T) {
+	// All-null values are preserved, mirroring the frontend.
+	values, err := parseTimeValues([]interface{}{nil, nil})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if fmt.Sprintf("%v", values) != "[<nil> <nil>]" {
+		t.Errorf("expected two nulls, got %v", values)
+	}
+}
+
+func TestParseTimeValues_extractFieldsEmptyResult(t *testing.T) {
+	// Regression test: extractFields on a response without observations used
+	// to fail with `field "Time": unsupported time property`, breaking alert
+	// rule evaluation whenever the evaluated time range had no data.
+	q := JsonApiQuery{
+		Fields: []JsonField{
+			{Name: "Time", JSONPath: "$.value[*].phenomenonTime", Type: "time", Language: "jsonpath"},
+			{Name: "Result", JSONPath: "$.value[*].result", Type: "number", Language: "jsonpath"},
+		},
+	}
+	fields, err := extractFields(q, map[string]interface{}{"@iot.count": 0, "value": []interface{}{}})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(fields) != 2 {
+		t.Fatalf("expected 2 fields, got %d", len(fields))
+	}
+	if len(fields[0].values) != 0 || len(fields[1].values) != 0 {
+		t.Errorf("expected empty field values, got %v / %v", fields[0].values, fields[1].values)
+	}
+}
+
 // ---------------------------------------------------------------------------
 // helpers used by parse* / groupBy
 // ---------------------------------------------------------------------------

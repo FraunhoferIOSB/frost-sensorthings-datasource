@@ -417,6 +417,15 @@ func parseValues(values []interface{}, ftype data.FieldType) ([]interface{}, err
 func parseTimeValues(values []interface{}) ([]interface{}, error) {
 	nonNull := nonNullValues(values)
 
+	// If there are no non-null values, return them as-is. Otherwise a query
+	// that returns no observations (e.g. an alert rule evaluated over a time
+	// range without data) would fail with "unsupported time property". This
+	// mirrors the frontend, where an empty array passes the "all strings"
+	// check vacuously and produces an empty field.
+	if nonNull == nil {
+		return values, nil
+	}
+
 	// All (non-null) values are strings.
 	if nonNull != nil && allStrings(nonNull) {
 		hasInterval := false

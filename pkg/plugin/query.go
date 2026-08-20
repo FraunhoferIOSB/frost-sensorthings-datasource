@@ -46,10 +46,18 @@ func (d *DataSource) executeQuery(ctx context.Context, q JsonApiQuery, tr backen
 		urlPath = toPattern.ReplaceAllString(urlPath, tr.To.UTC().Format(isoFormat))
 	}
 
+	// The property used for the automatically added time filter. If the data
+	// source configures a custom property (e.g. "resultTime"), it is used
+	// instead of the default "phenomenonTime".
+	timeProperty := d.timeProperty
+	if timeProperty == "" {
+		timeProperty = defaultTimeProperty
+	}
+
 	if !(containsIgnoreCase(urlPath, "expand") || containsIgnoreCase(urlPath, "filter")) {
 		urlPath = strings.TrimSpace(urlPath) +
-			"&$filter=phenomenonTime ge " + tr.From.UTC().Format(isoFormat) +
-			" and phenomenonTime le " + tr.To.UTC().Format(isoFormat)
+			"&$filter=" + timeProperty + " ge " + tr.From.UTC().Format(isoFormat) +
+			" and " + timeProperty + " le " + tr.To.UTC().Format(isoFormat)
 	}
 
 	// Default page size.

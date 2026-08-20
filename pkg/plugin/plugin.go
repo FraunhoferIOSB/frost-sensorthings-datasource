@@ -84,11 +84,16 @@ func (q JsonApiQuery) isMetricField() string {
 // It is created once per data source id and reused for all queries, so it has
 // to be safe for concurrent use.
 type DataSource struct {
-	settings   backend.DataSourceInstanceSettings
-	httpClient *http.Client
+	settings     backend.DataSourceInstanceSettings
+	httpClient   *http.Client
+	timeProperty string
 
 	cache *TTLCache
 }
+
+// defaultTimeProperty is the SensorThings property used for the automatic
+// time filter if the data source does not configure a custom one.
+const defaultTimeProperty = "phenomenonTime"
 
 // NewDataSource creates a new data source instance.
 func NewDataSource(ctx context.Context, settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
@@ -102,10 +107,22 @@ func NewDataSource(ctx context.Context, settings backend.DataSourceInstanceSetti
 		return nil, fmt.Errorf("could not create http client: %w", err)
 	}
 
+	timeProperty := defaultTimeProperty
+	var jsonData map[string]json.RawMessage
+	if err := json.Unmarshal(settings.JSONData, &jsonData); err == nil {
+		if raw, ok := jsonData["timeProperty"]; ok {
+			var tp string
+			if err := json.Unmarshal(raw, &tp); err == nil && tp != "" {
+				timeProperty = tp
+			}
+		}
+	}
+
 	return &DataSource{
-		settings:   settings,
-		httpClient: client,
-		cache:      NewTTLCache(),
+		settings:     settings,
+		httpClient:   client,
+		timeProperty: timeProperty,
+		cache:        NewTTLCache(),
 	}, nil
 }
 
