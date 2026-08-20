@@ -145,6 +145,84 @@ from the pinned commit is running.
   frontend-only plugin. It can still be used as a data source, but public
   dashboards and the backend health check require the fork's backend.
 
+## Use the plugin with your own docker-compose Grafana
+
+If you run a Grafana image (OSS or Enterprise) through your own
+docker-compose script, you don't need the custom image build from the
+previous section — just mount the **built** plugin into the Grafana container
+and allow the unsigned plugin to load.
+
+Prerequisites:
+
+- Grafana 11 or newer (the plugin requires `grafanaDependency: >=11.0.0`).
+- The plugin must be built first, i.e. you need a `dist/` directory (see
+  [Makefile](#makefile)). A fresh clone does not contain `dist/`; the
+  release/GitHub flows from the previous section exist because of that.
+
+### 1. Build the plugin
+
+```bash
+git clone https://github.com/FObersteiner/frost-sensorthings-datasource.git
+cd frost-sensorthings-datasource
+yarn install
+make build
+```
+
+The Grafana container runs Linux, so `dist/` must contain the Linux backend
+binary. `make build` produces it on a Linux host; on macOS/Windows run
+`make backend-all` instead (or build the Linux binary explicitly) so that
+`dist/` includes `gpx_iosb-sensorthings-datasource_linux_amd64` (and
+`_linux_arm64` for ARM hosts).
+
+### 2. Wire the plugin into your compose script
+
+```yaml
+services:
+  grafana:
+    image: grafana/grafana:11.6.16
+    ports:
+      - '3000:3000'
+    environment:
+      # The plugin is unsigned, allow Grafana to load it.
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=iosb-sensorthings-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      # Mount the built plugin into Grafana's plugin directory. The folder
+      # name must match the plugin id.
+      - ./dist:/var/lib/grafana/plugins/iosb-sensorthings-datasource:ro
+
+volumes:
+  grafana-data:
+```
+
+### 3. Start and verify
+
+```bash
+docker compose up -d
+```
+
+Check that Grafana picked up the plugin:
+
+```bash
+docker compose logs grafana | grep -i sensorthings
+# logger=plugins.registration ... msg="Plugin registered" pluginId=iosb-sensorthings-datasource
+```
+
+### 4. Add the data source
+
+1. In the Grafana UI go to **Connections → Data sources → Add data source**
+   and pick _FROST SensorThings API Plugin_.
+2. Enter the base URL of your SensorThings server, e.g.
+   `https://airquality-frost.k8s.ilt-dmz.iosb.fraunhofer.de/v1.1/`, plus any
+   authentication settings.
+3. Optionally set a **Query string** (Misc section) that is appended to every
+   query.
+4. Click **Save & Test** — a successful health check confirms that the
+   backend compiled from your build is running.
+
+From there, panels can use the data source exactly as described in the
+[README](https://github.com/FraunhoferIOSB/frost-sensorthings-datasource#using-the-plugin).
+
 ## Makefile
 
 The `Makefile` centralizes the plugin's build and tooling commands. Run
