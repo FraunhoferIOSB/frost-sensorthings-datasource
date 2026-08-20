@@ -2,7 +2,6 @@ import {
   DataFrame,
   DataQueryRequest,
   DataQueryResponse,
-  DataSourceApi,
   DataSourceInstanceSettings,
   Field,
   MetricFindValue,
@@ -10,7 +9,8 @@ import {
   TimeRange,
   toDataFrame,
 } from '@grafana/data';
-import { getTemplateSrv } from '@grafana/runtime';
+import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
+import { Observable } from 'rxjs';
 import { Filter } from '@material-table/core';
 import jsonata from 'jsonata';
 import { JSONPath } from 'jsonpath-plus';
@@ -25,7 +25,7 @@ export interface SensorThingsDataFormat {
   url: string;
 }
 
-export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourceOptions> {
+export class JsonDataSource extends DataSourceWithBackend<JsonApiQuery, JsonApiDataSourceOptions> {
   api: API;
 
   constructor(instanceSettings: DataSourceInstanceSettings<JsonApiDataSourceOptions>) {
@@ -124,15 +124,17 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
       cacheDurationSeconds: 0,
     });
   }
-  async query(request: DataQueryRequest<JsonApiQuery>): Promise<DataQueryResponse> {
-    const promises = await request.targets
-      .filter((query) => !query.hide)
-      .flatMap((query) => this.doRequest(query, request.range, request.scopedVars));
-
-    const res: DataFrame[][] = await Promise.all(promises);
-
-    // Wait for all queries to finish before returning the result.
-    return { data: res.flatMap((frames) => frames) };
+  /**
+   * Runs the queries for a panel. The base DataSourceWithBackend implementation
+   * sends the queries to the plugin backend via `/api/ds/query` and maps the
+   * response frames, so that panel queries are executed server-side by the Go
+   * backend (this is required for externally shared dashboards, where the
+   * frontend cannot fetch the data).
+   *
+   * Hidden queries are filtered here to preserve the previous behavior.
+   */
+  query(request: DataQueryRequest<JsonApiQuery>): Observable<DataQueryResponse> {
+    return super.query({ ...request, targets: request.targets.filter((query) => !query.hide) });
   }
 
   /**
