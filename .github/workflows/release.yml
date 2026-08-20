@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.26.x"
+          cache: true
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -40,9 +41,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
+            ${{ runner.os }}-nodemodules-
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -108,32 +109,15 @@ jobs:
           plugincheck2 ${{ steps.metadata.outputs.archive }}
 
       - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          name: Release ${{ github.ref }}
           body_path: ${{ steps.changelog.outputs.path }}
           draft: true
-
-      - name: Add plugin to release
-        id: upload-plugin-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
           files: |
             ./${{ steps.metadata.outputs.archive }}
-
-      - name: Add checksum to release
-        id: upload-checksum-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: |
             ./${{ steps.metadata.outputs.archive-checksum }}
 
       - name: Publish to Grafana.com
