@@ -56,7 +56,7 @@
     "@testing-library/dom": "^10.4.1",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.25",
-    "@types/node": "^20.19.43",
+    "@types/node": "^24.13.3",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "copy-webpack-plugin": "^13.0.0",
@@ -78,6 +78,6 @@
     "webpack-livereload-plugin": "^3.0.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }
