@@ -30,6 +30,7 @@ e2e-results/
 
 # Editor
 .idea
+.ropeproject
 
 # Lint
 .eslintcache
