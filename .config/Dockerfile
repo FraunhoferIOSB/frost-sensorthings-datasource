@@ -1,15 +1,14 @@
-ARG grafana_version=13.2.0
-ARG grafana_image=grafana-enterprise
+ARG grafana_version=13.0.2
+ARG grafana_image=grafana-oss
 
 FROM grafana/${grafana_image}:${grafana_version}
 
-# Make it as simple as possible to access the grafana instance for development purposes
+# Make simple to access the grafana instance for development purposes
 # Do NOT enable these settings in a public facing / production grafana instance
-ENV GF_AUTH_ANONYMOUS_ORG_ROLE "Admin"
-ENV GF_AUTH_ANONYMOUS_ENABLED "true"
-ENV GF_AUTH_BASIC_ENABLED "false"
+ENV GF_AUTH_BASIC_ENABLED="true"
+
 # Set development mode so plugins can be loaded without the need to sign
-ENV GF_DEFAULT_APP_MODE "development"
+ENV GF_DEFAULT_APP_MODE="development"
 
 # Inject livereload script into grafana index.html
 # Grafana renders the tags on separate lines ("</body>", "</html>"), so the
