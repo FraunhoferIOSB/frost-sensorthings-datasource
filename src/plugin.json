@@ -42,7 +42,7 @@
         "path": "img/screenshot-no2-karlsruhe.png"
       }
     ],
-    "version": "0.1.0",
+    "version": "%VERSION%",
     "updated": "%TODAY%"
   },
   "dependencies": {
