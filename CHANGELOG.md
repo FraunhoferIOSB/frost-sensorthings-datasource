@@ -7,6 +7,9 @@
   <https://github.com/FraunhoferIOSB/frost-sensorthings-datasource/issues/450>
 - Added `alerting` support (the queries supported by the plugin can now be
   used in Grafana alert rules).
+- Added a configurable _Time property_ (data source configuration under
+  _Misc_) used for the automatically added time filter, for data sources whose
+  observations use a property other than `phenomenonTime` (e.g. `resultTime`).
 - Updated the Grafana frontend packages to 11.x and React to 18.
 - Replaced the unmaintained `memory-cache` package with a small in-repo
   implementation.
