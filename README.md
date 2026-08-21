@@ -10,12 +10,13 @@ A data source plugin for loading OGC SensorThings API data into [Grafana](https:
 
 ![NO2 Values in Karlsruhe](https://raw.githubusercontent.com/FraunhoferIOSB/frost-sensorthings-datasource/master/src/img/sensorthings-demo.gif)
 
-## Externally shared dashboards (public dashboards)
+## Externally shared dashboards (public dashboards) and alerting
 
 Since version 0.1.0 the plugin ships a Go backend component. Panel queries are
 executed server-side by the Grafana instance, which means dashboards using this
 data source can also be shared externally
-([public dashboards](https://grafana.com/docs/grafana/latest/visualizations/dashboards/share-dashboards-panels/shared-dashboards/)).
+([public dashboards](https://grafana.com/docs/grafana/latest/visualizations/dashboards/share-dashboards-panels/shared-dashboards/))
+and the queries can be used in [Grafana alert rules](https://grafana.com/docs/grafana/latest/alerting/).
 
 Notes:
 
@@ -29,7 +30,8 @@ Notes:
   dashboards (a limitation of Grafana itself).
 - JSONata expressions that reference Grafana dashboard variables cannot be
   evaluated by the backend and are therefore not supported for panel queries.
-  The default JSONPath-based fields work as before.
+  The default JSONPath-based fields work as before. The same limitation applies
+  to alert rules, since those are also evaluated server-side.
 
 ## Using the Plugin
 
@@ -40,7 +42,9 @@ Notes:
 5. Create a new dashboard, under _Dashboards_, _Browse_, _New Dashboard_.
 6. Add a panel (bar icon with plus on the top right)
 7. Make sure the correct datasource is chosen.
-8. Choose Advanced mode and select the desired cache time. Add your path to the Observations you want to visualize (without the baseURL, but keeping the leading _/_) e.g. `/Datastreams(1)/Observations`. It is recommended to order the Observations by phenomenonTime (`?$orderby=phenomenonTime`).
+8. Choose Advanced mode and select the desired cache time (cached query results
+   are stored in both the browser and the plugin backend). Add your path to the
+   Observations you want to visualize (without the baseURL, but keeping the leading _/_) e.g. `/Datastreams(1)/Observations`. It is recommended to order the Observations by phenomenonTime (`?$orderby=phenomenonTime asc`).
 
 If no `$filter` is part of the query path, the plugin automatically restricts the
 query to the dashboard time range using
@@ -53,7 +57,7 @@ explicit `$filter` to the query path, e.g.
 
 ## Further Documentation
 
-Full documentation for the plugin is available on the plugin [website](https://github.com/FraunhoferIOSB/frost-sensorthings-datasource). The developer documentation can be found on [GitHub](https://github.com/FraunhoferIOSB/frost-sensorthings-datasource/tree/master/docs/DevelopmentSetup.md).
+Full documentation for the plugin is available on the plugin [website](https://github.com/FraunhoferIOSB/frost-sensorthings-datasource). The developer documentation can be found on [GitHub](docs/DevelopmentSetup.md).
 
 ## Contributions
 

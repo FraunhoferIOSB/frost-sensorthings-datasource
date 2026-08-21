@@ -59,7 +59,9 @@ Save the following file, e.g. as `Grafana.Dockerfile`:
 # Builds a Grafana image containing the plugin, built directly from GitHub at
 # a pinned commit.
 ARG GRAFANA_IMAGE=grafana-enterprise
-ARG GRAFANA_VERSION=11.6.16
+# The project's docker-compose.yaml defaults to 13.0.2; any version >=11.0.0
+# satisfies the plugin's grafanaDependency.
+ARG GRAFANA_VERSION=13.0.2
 
 # Build stage: fetch the plugin source from GitHub at the pinned commit and
 # compile the frontend bundle and the Go backend.
@@ -179,7 +181,7 @@ binary. `make build` produces it on a Linux host; on macOS/Windows run
 ```yaml
 services:
   grafana:
-    image: grafana/grafana:11.6.16
+    image: grafana/grafana:13.0.2
     ports:
       - '3000:3000'
     environment:
