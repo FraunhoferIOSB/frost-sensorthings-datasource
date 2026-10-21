@@ -10,29 +10,6 @@ A data source plugin for loading OGC SensorThings API data into [Grafana](https:
 
 ![NO2 Values in Karlsruhe](https://raw.githubusercontent.com/FraunhoferIOSB/frost-sensorthings-datasource/master/src/img/sensorthings-demo.gif)
 
-## Externally shared dashboards (public dashboards) and alerting
-
-Since version 0.1.0 the plugin ships a Go backend component. Panel queries are
-executed server-side by the Grafana instance, which means dashboards using this
-data source can also be shared externally
-([public dashboards](https://grafana.com/docs/grafana/latest/visualizations/dashboards/share-dashboards-panels/shared-dashboards/))
-and the queries can be used in [Grafana alert rules](https://grafana.com/docs/grafana/latest/alerting/).
-
-Notes:
-
-- The Grafana server executing the plugin needs to be able to reach the
-  SensorThings API endpoint (in previous versions the requests were performed
-  by the browser).
-- TLS-aware data source configurations (e.g. custom CA certificates or client
-  certificates) are honored by the backend.
-- Template variables in queries are interpolated before the query is sent to
-  the backend. Grafana variables are not supported on externally shared
-  dashboards (a limitation of Grafana itself).
-- JSONata expressions that reference Grafana dashboard variables cannot be
-  evaluated by the backend and are therefore not supported for panel queries.
-  The default JSONPath-based fields work as before. The same limitation applies
-  to alert rules, since those are also evaluated server-side.
-
 ## Using the Plugin
 
 1. Click the _Gear_ icon in Grafana to enter the configuration menu, select Plugins, and add _FROST SensorThings Plugin_
