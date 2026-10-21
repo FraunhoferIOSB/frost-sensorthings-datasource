@@ -81,7 +81,7 @@ const config = async (env): Promise<Configuration> => ({
           loader: 'swc-loader',
           options: {
             jsc: {
-              baseUrl: './src',
+              baseUrl: path.resolve(__dirname, '../../src'),
               target: 'es2015',
               loose: false,
               parser: {
@@ -93,14 +93,6 @@ const config = async (env): Promise<Configuration> => ({
             },
           },
         },
-      },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"]
-      },
-      {
-        test: /\.s[ac]ss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/,

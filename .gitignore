@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 
 node_modules/
+.tmp-install/
+*.zip
 
 # Runtime data
 pids
@@ -28,4 +30,7 @@ e2e-results/
 
 # Editor
 .idea
+.ropeproject
 
+# Lint
+.eslintcache

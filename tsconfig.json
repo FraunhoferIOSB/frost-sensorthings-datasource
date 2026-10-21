@@ -1,3 +1,19 @@
 {
-  "extends": "./.config/tsconfig.json"
+  "extends": "./.config/tsconfig.json",
+  "compilerOptions": {
+    // @grafana/tsconfig 2.x sets "moduleResolution": "bundler". ts-node needs
+    // to compile the webpack config to CommonJS, which is incompatible with
+    // "bundler", so a matching module setting is used here.
+    "module": "esnext",
+    "moduleResolution": "bundler"
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "target": "es2020",
+      "esModuleInterop": true
+    },
+    "transpileOnly": true
+  }
 }

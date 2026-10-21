@@ -1,9 +1,7 @@
 import {
-  ArrayVector,
   DataFrame,
   DataQueryRequest,
   DataQueryResponse,
-  DataSourceApi,
   DataSourceInstanceSettings,
   Field,
   MetricFindValue,
@@ -11,7 +9,8 @@ import {
   TimeRange,
   toDataFrame,
 } from '@grafana/data';
-import { getTemplateSrv } from '@grafana/runtime';
+import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
+import { Observable } from 'rxjs';
 import { Filter } from '@material-table/core';
 import jsonata from 'jsonata';
 import { JSONPath } from 'jsonpath-plus';
@@ -26,13 +25,15 @@ export interface SensorThingsDataFormat {
   url: string;
 }
 
-export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourceOptions> {
+export class JsonDataSource extends DataSourceWithBackend<JsonApiQuery, JsonApiDataSourceOptions> {
   api: API;
+  timeProperty: string;
 
   constructor(instanceSettings: DataSourceInstanceSettings<JsonApiDataSourceOptions>) {
     super(instanceSettings);
 
     this.api = new API(instanceSettings.url!, instanceSettings.jsonData.queryParams || '');
+    this.timeProperty = instanceSettings.jsonData.timeProperty || 'phenomenonTime';
   }
 
   /**
@@ -58,16 +59,16 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
 
     (filters ?? []).forEach((filter, index) => {
       if (index === 0) {
-        buildUrl = buildUrl 
-          + '$filter=startswith(' 
-          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title): (filter.column.title)?.toString().replace('.', '/')) 
+        buildUrl = buildUrl
+          + '$filter=startswith('
+          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title) : (filter.column.title)?.toString().replace('.', '/'))
           + ',\'' + filter.value + '\')';
-        
+
       } else {
-        buildUrl = buildUrl 
-          + ' and startswith(' 
-          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title): (filter.column.title)?.toString().replace('.', '/')) + ',\'' 
-          + filter.value  + '\')';
+        buildUrl = buildUrl
+          + ' and startswith('
+          + ((filter.column.title)?.toString().startsWith('@') ? (filter.column.title) : (filter.column.title)?.toString().replace('.', '/')) + ',\''
+          + filter.value + '\')';
       }
     })
 
@@ -84,8 +85,8 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
     if (top) {
       buildUrl = buildUrl + '&$top=' + top;
     }
-  
-    const result = await this.requestJson({...query, urlPath: buildUrl}, replace());
+
+    const result = await this.requestJson({ ...query, urlPath: buildUrl }, replace());
     const value: any[] = result['value'];
     const count = result['@iot.count'];
 
@@ -125,15 +126,43 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
       cacheDurationSeconds: 0,
     });
   }
-  async query(request: DataQueryRequest<JsonApiQuery>): Promise<DataQueryResponse> {
-    const promises = await request.targets
-      .filter((query) => !query.hide)
-      .flatMap((query) => this.doRequest(query, request.range, request.scopedVars));
+  /**
+   * Runs the queries for a panel. The base DataSourceWithBackend implementation
+   * sends the queries to the plugin backend via `/api/ds/query` and maps the
+   * response frames, so that panel queries are executed server-side by the Go
+   * backend (this is required for externally shared dashboards, where the
+   * frontend cannot fetch the data).
+   *
+   * Hidden queries are filtered here to preserve the previous behavior.
+   */
+  query(request: DataQueryRequest<JsonApiQuery>): Observable<DataQueryResponse> {
+    return super.query({ ...request, targets: request.targets.filter((query) => !query.hide) });
+  }
 
-    const res: DataFrame[][] = await Promise.all(promises);
+  /**
+   * Interpolates template variables in the query before it is executed by
+   * the plugin backend. Since the backend cannot resolve Grafana template
+   * variables, they have to be replaced on the frontend first.
+   */
+  applyTemplateVariables(query: JsonApiQuery, scopedVars: ScopedVars): JsonApiQuery {
+    const interpolate = replace(scopedVars);
+    const interpolateKeyValue = ([key, value]: Pair<string, string>): Pair<string, string> => [
+      interpolate(key),
+      interpolate(value),
+    ];
 
-    // Wait for all queries to finish before returning the result.
-    return { data: res.flatMap((frames) => frames) };
+    return {
+      ...query,
+      urlPath: interpolate(query.urlPath),
+      params: (query.params ?? []).map(interpolateKeyValue),
+      headers: (query.headers ?? []).map(interpolateKeyValue),
+      body: interpolate(query.body),
+      fields: (query.fields ?? []).map((field) => ({
+        ...field,
+        name: interpolate(field.name ?? ''),
+        jsonPath: interpolate(field.jsonPath),
+      })),
+    };
   }
 
   /**
@@ -228,11 +257,16 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
         query.urlPath.includes('Filter')
       )
     ) {
+      const timeProperty = this.timeProperty;
       query.urlPath =
         query.urlPath.trim() +
-        '&$filter=phenomenonTime ge ' +
+        '&$filter=' +
+        timeProperty +
+        ' ge ' +
         range?.from.toISOString() +
-        ' and phenomenonTime le ' +
+        ' and ' +
+        timeProperty +
+        ' le ' +
         range?.to.toISOString();
     }
 
@@ -287,7 +321,7 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
             return {
               name: replaceWithVars(field.name ?? '') || (query.fields.length > 1 ? `result${index}` : 'result'),
               type: field.type ? field.type : detectFieldType(arrayResult),
-              values: new ArrayVector(arrayResult),
+              values: arrayResult as any[],
               config: {},
             };
           //We always use JSONPATH
@@ -305,7 +339,7 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
             return {
               name: replaceWithVars(field.name ?? '') || paths[paths.length - 1],
               type: propertyType,
-              values: new ArrayVector(typedValues),
+              values: typedValues,
               config: {},
             };
         }
@@ -321,20 +355,20 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
 
     const frames = query.experimentalGroupByField
       ? groupBy(
-          toDataFrame({
-            name: query.refId,
-            refId: query.refId,
-            fields: fields,
-          }),
-          query.experimentalGroupByField
-        )
+        toDataFrame({
+          name: query.refId,
+          refId: query.refId,
+          fields: fields,
+        }),
+        query.experimentalGroupByField
+      )
       : [
-          toDataFrame({
-            name: query.refId,
-            refId: query.refId,
-            fields: fields,
-          }),
-        ];
+        toDataFrame({
+          name: query.refId,
+          refId: query.refId,
+          fields: fields,
+        }),
+      ];
 
     const res = frames.map((frame) => ({
       ...frame,
@@ -365,18 +399,18 @@ export class JsonDataSource extends DataSourceApi<JsonApiQuery, JsonApiDataSourc
 
 const replace =
   (scopedVars?: any, range?: TimeRange) =>
-  (str: string): string => {
-    return replaceMacros(getTemplateSrv().replace(str, scopedVars), range);
-  };
+    (str: string): string => {
+      return replaceMacros(getTemplateSrv().replace(str, scopedVars), range);
+    };
 
 // replaceMacros substitutes all available macros with their current value.
 export const replaceMacros = (str: string, range?: TimeRange) => {
   return range
     ? str
-        .replace(/\$__unixEpochFrom\(\)/g, range.from.unix().toString())
-        .replace(/\$__unixEpochTo\(\)/g, range.to.unix().toString())
-        .replace(/\$__isoFrom\(\)/g, range.from.toISOString())
-        .replace(/\$__isoTo\(\)/g, range.to.toISOString())
+      .replace(/\$__unixEpochFrom\(\)/g, range.from.unix().toString())
+      .replace(/\$__unixEpochTo\(\)/g, range.to.unix().toString())
+      .replace(/\$__isoFrom\(\)/g, range.from.toISOString())
+      .replace(/\$__isoTo\(\)/g, range.to.toISOString())
     : str;
 };
 
@@ -385,7 +419,7 @@ export const groupBy = (frame: DataFrame, fieldName: string): DataFrame[] => {
   if (!groupByField) {
     return [frame];
   }
-  const uniqueValues = new Set<string>(groupByField.values.toArray().map((value) => value.toString()));
+  const uniqueValues = new Set<string>(groupByField.values.map((value) => value.toString()));
 
   const frames = [...uniqueValues].map((groupByValue) => {
     const fields: Field[] = frame.fields
@@ -393,11 +427,9 @@ export const groupBy = (frame: DataFrame, fieldName: string): DataFrame[] => {
       .filter((field) => field.name.toString() !== groupByField.name)
       .map((field) => ({
         ...field,
-        values: new ArrayVector(
-          field.values.toArray().filter((_, idx) => {
-            return groupByField.values.get(idx) === groupByValue;
-          })
-        ),
+        values: field.values.filter((_, idx) => {
+          return groupByField.values[idx] === groupByValue;
+        }),
       }));
 
     return toDataFrame({

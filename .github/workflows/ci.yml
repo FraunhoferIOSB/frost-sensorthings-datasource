@@ -8,19 +8,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '16.x'
+          node-version: "24.x"
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v7
+        with:
+          go-version: "1.26.x"
+          cache: true
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Cache yarn cache
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v6
         id: cache-yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -30,15 +36,32 @@ jobs:
 
       - name: Cache node_modules
         id: cache-node-modules
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v6
         with:
           path: node_modules
-          key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
+            ${{ runner.os }}-nodemodules-
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build and test frontend
-        run: yarn build
+      - name: Check formatting
+        run: |
+          cd pkg && gofmt -l .
+          test -z "$(gofmt -l .)"
+
+      - name: Run go vet
+        run: cd pkg && go vet ./...
+
+      - name: Run backend tests
+        run: make test
+
+      - name: Build frontend and backend
+        run: make build
+
+      - name: Run frontend tests
+        run: yarn test:ci
+
+      - name: Typecheck
+        run: yarn typecheck

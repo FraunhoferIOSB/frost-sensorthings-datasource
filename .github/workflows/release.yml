@@ -3,31 +3,32 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*' # Run workflow on version tags, e.g. v1.0.0.
+      - "v*.*.*" # Run workflow on version tags, e.g. v1.0.0.
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '18.x'
+          node-version: "24.x"
 
       - name: Setup Go environment
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v7
         with:
-          go-version: '1.20'
+          go-version: "1.26.x"
+          cache: true
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Cache yarn cache
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v6
         id: cache-yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -37,21 +38,26 @@ jobs:
 
       - name: Cache node_modules
         id: cache-node-modules
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v6
         with:
           path: node_modules
-          key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
+            ${{ runner.os }}-nodemodules-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile;
+        run: yarn install --frozen-lockfile
         if: |
           steps.cache-yarn-cache.outputs.cache-hit != 'true' ||
           steps.cache-node-modules.outputs.cache-hit != 'true'
 
-      - name: Build and test frontend
+      - name: Build frontend
         run: yarn build
+
+      - name: Build and test backend
+        run: |
+          make test
+          make backend-all
 
       - name: Sign plugin
         run: yarn sign
@@ -76,7 +82,6 @@ jobs:
           echo "archive-checksum=${GRAFANA_PLUGIN_ARTIFACT_CHECKSUM}" >> $GITHUB_OUTPUT
 
           echo "github-tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-
 
       - name: Read changelog
         id: changelog
@@ -104,32 +109,15 @@ jobs:
           plugincheck2 ${{ steps.metadata.outputs.archive }}
 
       - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          name: Release ${{ github.ref }}
           body_path: ${{ steps.changelog.outputs.path }}
           draft: true
-
-      - name: Add plugin to release
-        id: upload-plugin-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
           files: |
             ./${{ steps.metadata.outputs.archive }}
-
-      - name: Add checksum to release
-        id: upload-checksum-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: |
             ./${{ steps.metadata.outputs.archive-checksum }}
 
       - name: Publish to Grafana.com
